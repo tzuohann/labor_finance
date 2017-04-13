@@ -28,7 +28,7 @@
 %that all firms are constrained, but not forced to exit
 %Also some values of Z
 
-clear all
+clear 
 close all
 
 global gamma_matching
@@ -76,6 +76,7 @@ nG = 500;
 nV = 500;
 
 gamma_vect = linspace(0,1.5,nG);   % Lagrange multiplier grid
+gamma_vect_ws0 = (gamma_vect/(1-tau)).^(1/rra);
 
 % inner loop
 Niter   = 300;
@@ -107,6 +108,16 @@ for iD = 1:nD
     ke = max(K-D,0);   %%%%% entry cost depends on D
     
     
+    %Endogenous separation policy
+    sep_pol = 1*(K*r +(Phi_grid - D*r)*(1-tau) < 0);
+    
+    w_star0 = gamma_vect_ws0; 
+                        
+    % accounting for distress case, and making sure w is positive
+    bla1       = (r*K + (bsxfun(@minus,Phi_grid , w_star0) - D*r)*(1-tau) >= 0);
+    
+    w_star_pre = max(bsxfun(@times,w_star0,bla1) + bsxfun(@times,(r/(1-tau)*K +(Phi_grid - D*r)),(1-bla1)),0);
+    w_star_pre_cons = utilFunc(w_star_pre,rra);
     
     U_min   = ((b^(1-rra))/(1-rra))/(1-BETA); % lowest possible value
     U_max   = ((max(K*r +(Phi_grid - D*r)*(1-tau))^(1-rra))/(1-rra))/(1-BETA);%6*U_min; %4
@@ -126,7 +137,6 @@ for iD = 1:nD
     tol_U = 1;
     iter_U = 0;
     
-    
     while(tol_U>CV_tol_U &&  iter_U < maxIter_U  )
         
         U       = U0;
@@ -138,7 +148,6 @@ for iD = 1:nD
         tol  = 1;
         Iter = 0;
         
-        
         while (tol > CV_tol && iter_U < Niter )
             
             Iter = Iter +1;
@@ -149,9 +158,6 @@ for iD = 1:nD
             for ig = 1:nG
                 
                 P_sl    = P(:,ig);
-                
-                %Endogenous separation policy
-                sep_pol = 1*(K*r +(Phi_grid - D*r)*(1-tau) <0);
                 
                 P2      = (1-max(sep_pol,sigma)).*P_sl;%  + max(sep_pol,sigma)*(K-D); %% testing with K-D
                 EP0     = pi_Phi*P2(:);   % this one includes separation
@@ -176,32 +182,18 @@ for iD = 1:nD
                 Phi = Phi_grid(iphi);
                 EP_Phi0 = squeeze(EP(iphi,:));
                 EsigU0 = squeeze(EsigU(iphi));
+                max_EP_Phi0 = max(EP_Phi0,0);
                 
-                if  (r *K + (Phi-D*r)*(1-tau)) > 0   % as long as there is no separation
+                if sep_pol(iphi) < 1   % as long as there is no separation
                     
-                    
+                    Obj = zeros(1,nG);
                     for ig = 1:nG
                         
-                        % unconstrained optimal wage - comes from FOC
-                        w_star0 = (gamma_vect(ig)/(1-tau)).^(1/rra);
+                        w_star     = w_star_pre(iphi,ig);
                         
-                        % accounting for distress case, and making sure w is positive
-                        w_star = max(w_star0*(r*K + (Phi- w_star0 - D*r)*(1-tau) >= 0) + (r/(1-tau)*K +(Phi-D*r))*(r*K + (Phi- w_star0 - D*r)*(1-tau) < 0),0);
+                        Obj(ig:nG) = r*K + (Phi - D*r)*(1-tau) + gamma_vect(ig)*(w_star_pre_cons(iphi,ig) +  BETA*EsigU0)  + BETA*max_EP_Phi0(ig:nG) - w_star*(1-tau);                             
                         
-                        
-                        for igp = ig:nG
-                            
-                            Obj(igp) = r*K + (Phi - w_star- D*r)*(1-tau) + gamma_vect(ig)*(w_star^(1-rra)/(1-rra)+  BETA*EsigU0)  + BETA*max(EP_Phi0(igp),0);
-                            
-                            %Obj(igp) = (R*K + ((z - w_star(igp)- D*r))*(1-tau)) + gamma_vect(igp)*(w_star(igp).^(1-rra)/(1-rra)+BETA*EsigU(iz)) + BETA*(gamma_vect(ig) - gamma_vect(igp))*(1-sigma)*U0(iz) + BETA*(1-sigma)*EP_z0(igp);
-                            %Obj(igp) = max((R*K + ((Phi - w_star- D*r))*(1-tau)),0) + gamma_vect(ig)*(w_star^(1-rra)/(1-rra)+BETA*EsigU(iz)) + BETA*(gamma_vect(ig) - gamma_vect(igp))*EsigU3(iz) + BETA*EP_Phi0(igp);
-                            %+ BETA*(gamma_vect(ig) - gamma_vect(igp))*EsigU3(iz)
-                            %delta = (D>RK+z)
-                            
-                        end
-                        
-                        ZZ                = Obj(ig:nG);
-                        [A B0]            = min(ZZ);
+                        [A B0]            = min(Obj(ig:nG));
                         B                 = B0+ig-1;
                         igp_star(iphi,ig) = B;
                         gp_star(iphi,ig)  = gamma_vect(B);
@@ -463,3 +455,4 @@ set(legend4,'location','northeast','box','off');
 
 close all
 EnteringW0_D
+disp([5.3299, 6.0199 ,7.5283])
