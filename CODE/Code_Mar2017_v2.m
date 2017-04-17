@@ -45,23 +45,22 @@ dynamicT            = 20;
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nG                  = 1000;
-nV                  = 500;
-
-gamma_vect          = linspace(0,3,nG);   % Lagrange multiplier grid
+nG                  = 10000;
+gamMax              = .5;
+gamma_vect          = linspace(0,gamMax,nG);   % Lagrange multiplier grid
 gamma_vect_ws0      = (gamma_vect/(1-tau)).^(1/rra);
 
 % inner loop
 Niter               = 300;
-CV_tol              = 0.00000001;
+CV_tol              = 0.000000001;
 
 % outer loop
 maxIter_U           = 600;
-CV_tol_U            = 0.00000001;
+CV_tol_U            = 0.000000001;
 
 %%% Optimizing grid over Debt D
-nD                  = 3;
-D_grid              = linspace(0,K-0.1,nD);
+nD                  = 20;
+D_grid              = linspace(0,K-0.01,nD);
 
 %%% Bringing the unemployment value limits in the outer loop closer
 uSqueezeFactor      = 6;
@@ -70,7 +69,7 @@ uSqueezeFactor      = 6;
 % Core code
 %%%%%%%%%%%%%%%%%%%%%%
 
-for iD = 1:nD
+for iD = 14:16
   D = D_grid(iD);
   disp(['Calculating for iD = ',num2str(iD)])
   ke = K-D;   %%%%% entry cost depends on D
@@ -80,7 +79,7 @@ for iD = 1:nD
     
   %Endogenous separation policy
   sep_pol = (K*r +(Phi_grid - D*r)*(1-tau) < 0);
-
+  
   %Variables that only depend on D
   w_star0         = gamma_vect_ws0;
   bla1            = (r*K + (bsxfun(@minus,Phi_grid , w_star0) - D*r)*(1-tau) >= 0);
@@ -175,10 +174,10 @@ for iD = 1:nD
               B                 = igp_star(iphi,ig);
               A                 = BETA*max_EP_Phi0(B);
             end
-            igp_star(iphi,ig) = B;
-            gp_star(iphi,ig)  = gamma_vect(B);
-            w_star_v(iphi,ig) = w_star_pre(iphi,ig);                 % independent of ig
-            TP(iphi,ig)       = A + Obj_Pre(iphi,ig);
+            igp_star(iphi,ig)   = B;
+            gp_star(iphi,ig)    = gamma_vect(B);
+            w_star_v(iphi,ig)   = w_star_pre(iphi,ig);                 % independent of ig
+            TP(iphi,ig)         = A + Obj_Pre(iphi,ig);
             
           end
           
@@ -227,41 +226,15 @@ for iD = 1:nD
     
     
     
-    V_grid0 = squeeze(V(:,1:end));
-    min_V = min(V_grid0 (:));
-    max_V = max(V_grid0 (:));
-    V_grid = linspace(min_V, max_V,nV);
-    
-    J0=  squeeze(F(:,1:end));
-    JV = zeros(nPhi,nG-2);
-    
-    
-    for iphi=1:nPhi
-      
-      %Solution to the pareto problem yields a positive result
-      if max(TP(iphi,:)) > 0
-        
-        V1 = squeeze(V_grid0(iphi,:));
-%         [A1, B1] = unique(V1);
-%         J1 = squeeze(J0(iphi,B1));
-%         JV(iphi,:) = interp1(A1,J1,V_grid);
-        JV(iphi,:) = F(iphi,1:end);
-      else
-        
-        JV(iphi,:) = 0;
-        
-      end
-      
-    end
-    
-    
-    
     for iz=1:nZ
+
+      %Assume for now entrants get max Phi
+      Phi0                = nPhi;
       
       %These are the possible values that firms can promise workers.
-      Rmin      = min(U0(iz));
-      Rmax      = max(max_V,U_max) ;
-      R_grid    = linspace(Rmin,Rmax,nV);
+      R_grid              = V(Phi0,:);
+      R_grid              = R_grid(V(Phi0,:) > U0);
+      JV0                 = F(Phi0,V(Phi0,:) > U0);
       
       %Maximizing the worker's search problem
       rho(iz)   = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
@@ -269,18 +242,14 @@ for iD = 1:nD
       
       %Matching probability
       A0        = min(max(A0,0),1);
-      theta     = 1./(qinv(A0));
+      theta     = 1./qinv(A0);
       
-      %Assume for now entrants get max Phi
-      Phi0                = nG; 
+      FirmFun             = q(theta).*JV0;
       
-      
-      JV00                = squeeze(JV(Phi0,:))';
-      JV0                 = interp1(V_grid,JV00,R_grid);
-      
-      FirmFun             =  q(theta).*(JV0);
-      
-      [AR BR]             = max(FirmFun);
+      [AR , BR]             = max(FirmFun);
+      if BR == 1 || BR == numel(FirmFun)
+        error('Corner solution to search problem')
+      end
       EnteringP0(iz)      = A0(BR)*(AR>0);
       EnteringAR(iz)      = AR;
       X                   = R_grid(BR)*(AR>0);
@@ -288,12 +257,10 @@ for iD = 1:nD
       EnteringW0(iz)      = X;
       
       
-      [X0 Y0]             = min(abs((X) - (squeeze(V(Phi0,:)))));
+      [X0 , Y0]             = min(abs((X) - (squeeze(V(Phi0,:)))));
       EnteringLam_Idx(iz) = max(Y0,1);
       EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
       OptimalWage(iz)     = w_star_v(iphi,EnteringLam_Idx(iz) )*(AR>0);
-      
-      
       
       if FirmObj(iz)>=ke
         U_l(iz)=(U_u(iz)+(uSqueezeFactor - 1)*U_l(iz))/uSqueezeFactor;
@@ -310,13 +277,19 @@ for iD = 1:nD
     
     
   end
-  FirmObj_D(iD)       = FirmObj
-  EnteringP0_D(iD)    = EnteringP0
-  EnteringW0_D(iD)    = EnteringW0
-  OptimalWage_D(iD)   = OptimalWage
-  U0_D(iD)            = U0
-  sep_pol'
   
+  %What the firm compares to ke
+  FirmObj_D(iD)       = FirmObj;
+  %Matching probability p 
+  EnteringP0_D(iD)    = EnteringP0;
+  %Promised worker value conditional on matching.
+  EnteringW0_D(iD)    = EnteringW0;
+  %Lagrange multiplier at entry
+  OptimalWage_D(iD)   = OptimalWage;
+  %Value of unemployment
+  U0_D(iD)            = U0;
+  %Separation policy
+  sepPol_D(:,iD)      = sep_pol;
 end;
 
 
@@ -386,24 +359,3 @@ for t=2:dynamicT
     
   end
 end
-
-
-%%%%% plot dynamics
-figure(5);
-plot(Gammap_TS)
-
-figure(6);
-plot1= plot(Phi_grid(phi_vect),'--k')
-hold on
-plot2 = plot(wage_TS,'--b')
-hold on
-plot3 = plot(div_TS,'-r')
-set(plot1,'DisplayName','\phi shock');
-set(plot2,'DisplayName','wage');
-set(plot3,'DisplayName','dividend');
-legend4 = legend('show');
-set(legend4,'location','northeast','box','off');
-
-close all
-EnteringW0_D
-disp([5.3299, 6.0199 ,7.5283])
