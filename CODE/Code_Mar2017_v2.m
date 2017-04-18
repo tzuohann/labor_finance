@@ -69,7 +69,7 @@ uSqueezeFactor      = 6;
 % Core code
 %%%%%%%%%%%%%%%%%%%%%%
 
-for iD = 1:nD
+for iD = 20
   D = D_grid(iD);
   disp(['Calculating for iD = ',num2str(iD)])
   ke = K-D;   %%%%% entry cost depends on D
@@ -230,7 +230,7 @@ for iD = 1:nD
 
       %Assume for now entrants get max Phi
       Phi0                    = nPhi;
-      
+     
       %These are the possible values that firms can promise workers.
       R_grid                  = V(Phi0,:);
       JV0                     = F(Phi0,:);
@@ -240,14 +240,14 @@ for iD = 1:nD
       %Maximizing the worker's search problem
       rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
       A0              = rho(iz)./(BETA*(R_grid - EU_vect(iz)));   
-      %A0              = rho(iz)./((R_grid - BETA*EU_vect(iz))); 
+
       %If A0 > 1, this means that the firm is offering so little that the
       %workers needs to get the job more than for sure. Hence, it is not
       %possible to offer that quantity
       feasSet(A0 > 1) = false;
-       
+      
       %Matching probability
-      if any(A0(feasSet) > 1) || any(A0(feasSet) < 0) 
+      if any(A0(feasSet) > 1) || any(A0(feasSet) < 0)
         error('Matching probability error')
       end
       theta     = 1./qinv(A0);
@@ -255,37 +255,38 @@ for iD = 1:nD
       FirmFun                   = q(theta).*JV0;
       FirmFun(feasSet == false) = nan;
       
-      [AR , BR]             = max(FirmFun);
-      if BR == 1 || BR == numel(FirmFun)
-        error('Corner solution to search problem')
-      end
-      EnteringP0(iz)      = A0(BR)*(AR>0);
-      EnteringAR(iz)      = AR;
-      X                   = R_grid(BR)*(AR>0);
-      FirmObj(iz)         = max(AR,0);
-      EnteringW0(iz)      = X;
-      
-      [X0 , Y0]             = min(abs((X) - (squeeze(V(Phi0,:)))));
-      EnteringLam_Idx(iz) = max(Y0,1);
-      EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
-      OptimalWage(iz)     = w_star_v(nPhi,EnteringLam_Idx(iz) )*(AR>0);
-      
-      if FirmObj(iz)>=ke
-        U_l(iz)=(U_u(iz)+(uSqueezeFactor - 1)*U_l(iz))/uSqueezeFactor;
-      else
+      if all(isnan(FirmFun))
         U_u(iz)=((uSqueezeFactor - 1)*U_u(iz)+U_l(iz))/uSqueezeFactor;
+      else
+        
+        [AR , BR]             = max(FirmFun);
+        if BR == 1 || BR == numel(FirmFun)
+          error('Corner solution to search problem')
+        end
+        EnteringP0(iz)      = A0(BR)*(AR>0);
+        EnteringAR(iz)      = AR;
+        X                   = R_grid(BR)*(AR>0);
+        FirmObj(iz)         = max(AR,0);
+        EnteringW0(iz)      = X;
+        
+        [X0 , Y0]             = min(abs((X) - (squeeze(V(Phi0,:)))));
+        EnteringLam_Idx(iz) = max(Y0,1);
+        EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
+        OptimalWage(iz)     = w_star_v(nPhi,EnteringLam_Idx(iz) )*(AR>0);
+        
+        if FirmObj(iz)>=ke
+          U_l(iz)=(U_u(iz)+(uSqueezeFactor - 1)*U_l(iz))/uSqueezeFactor;
+        else
+          U_u(iz)=((uSqueezeFactor - 1)*U_u(iz)+U_l(iz))/uSqueezeFactor;
+        end
       end
-      
       U0(iz)=(U_u(iz) + U_l(iz))/2;
     end
     
-    
-    
-    tol_U = sum((FirmObj(:) -ke).^2);
-    
+    tol_U = sum((U_u - U_l).^2);
     
   end
-  
+  asdasd
   %What the firm compares to ke
   FirmObj_D(iD)       = FirmObj;
   %Matching probability p 
