@@ -45,8 +45,8 @@ dynamicT            = 20;
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nG                  = 5000;
-gamMax              = 1.5;
+nG                  = 2000;
+gamMax              = 1;
 gamma_vect          = linspace(0,gamMax,nG);   % Lagrange multiplier grid
 gamma_vect_ws0      = (gamma_vect/(1-tau)).^(1/rra);
 
@@ -60,7 +60,7 @@ CV_tol_U            = 0.0000000001;
 
 %%% Optimizing grid over Debt D
 nD                  = 20;
-D_grid              = linspace(0,K-0.01,nD);
+D_grid              = linspace(0,K-0.1,nD);
 
 %%% Bringing the unemployment value limits in the outer loop closer
 uSqueezeFactor      = 6;
@@ -69,7 +69,7 @@ uSqueezeFactor      = 6;
 % Core code
 %%%%%%%%%%%%%%%%%%%%%%
 
-for iD = 20
+for iD = 1:nD
   D = D_grid(iD);
   disp(['Calculating for iD = ',num2str(iD)])
   ke = K-D;   %%%%% entry cost depends on D
@@ -228,6 +228,8 @@ for iD = 20
     
     for iz=1:nZ
 
+      
+      
       %Assume for now entrants get max Phi
       Phi0                    = nPhi;
      
@@ -286,7 +288,7 @@ for iD = 20
     tol_U = sum((U_u - U_l).^2);
     
   end
-  asdasd
+  
   %What the firm compares to ke
   FirmObj_D(iD)       = FirmObj;
   %Matching probability p 
