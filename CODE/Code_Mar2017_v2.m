@@ -37,6 +37,9 @@ Phi_grid            = linspace(-mPhi*sigma_Phi,mPhi*sigma_Phi,nPhi)';
 pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,sigma_Phi);
 Phi_grid            = mean_Phi + (Phi_grid);
 
+%Initial productivity distrib
+init_Prod           = ones(size(Phi_grid))./nPhi;
+
 %%%%%%%%%%%%%%%%%%%%%%
 % Plot parameters
 %%%%%%%%%%%%%%%%%%%%%%
@@ -228,16 +231,14 @@ for iD = 1:nD
     
     for iz=1:nZ
 
-      
-      
-      %Assume for now entrants get max Phi
-      Phi0                    = nPhi;
-     
+      %Firm offers a choice of V which is realized via init_Prod
+
       %These are the possible values that firms can promise workers.
-      R_grid                  = V(Phi0,:);
-      JV0                     = F(Phi0,:);
+      R_grid                  = init_Prod'*V;
+      JV0                     = init_Prod'*F;
       feasSet                 = true(size(R_grid));
-      feasSet(V(Phi0,:) < U0) = false;
+      %Off the bat, anything less than U0 is a no-go
+      feasSet(R_grid < U0)    = false;
       
       %Maximizing the worker's search problem
       rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
