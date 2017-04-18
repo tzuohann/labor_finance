@@ -45,18 +45,18 @@ dynamicT            = 20;
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nG                  = 10000;
-gamMax              = .5;
+nG                  = 5000;
+gamMax              = 1.5;
 gamma_vect          = linspace(0,gamMax,nG);   % Lagrange multiplier grid
 gamma_vect_ws0      = (gamma_vect/(1-tau)).^(1/rra);
 
 % inner loop
 Niter               = 300;
-CV_tol              = 0.000000001;
+CV_tol              = 0.0000000001;
 
 % outer loop
 maxIter_U           = 600;
-CV_tol_U            = 0.000000001;
+CV_tol_U            = 0.0000000001;
 
 %%% Optimizing grid over Debt D
 nD                  = 20;
@@ -69,7 +69,7 @@ uSqueezeFactor      = 6;
 % Core code
 %%%%%%%%%%%%%%%%%%%%%%
 
-for iD = 14:16
+for iD = 1:nD
   D = D_grid(iD);
   disp(['Calculating for iD = ',num2str(iD)])
   ke = K-D;   %%%%% entry cost depends on D
@@ -185,7 +185,7 @@ for iD = 14:16
         
       end
       
-      tol = sum((TP(:) - P(:)).^2);
+      tol = max((TP(:) - P(:)).^2);
       
     end
     
@@ -229,22 +229,31 @@ for iD = 14:16
     for iz=1:nZ
 
       %Assume for now entrants get max Phi
-      Phi0                = nPhi;
+      Phi0                    = nPhi;
       
       %These are the possible values that firms can promise workers.
-      R_grid              = V(Phi0,:);
-      R_grid              = R_grid(V(Phi0,:) > U0);
-      JV0                 = F(Phi0,V(Phi0,:) > U0);
+      R_grid                  = V(Phi0,:);
+      JV0                     = F(Phi0,:);
+      feasSet                 = true(size(R_grid));
+      feasSet(V(Phi0,:) < U0) = false;
       
       %Maximizing the worker's search problem
-      rho(iz)   = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
-      A0        = rho(iz)./(R_grid - BETA*EU_vect(iz));   
-      
+      rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
+      A0              = rho(iz)./(BETA*(R_grid - EU_vect(iz)));   
+      %A0              = rho(iz)./((R_grid - BETA*EU_vect(iz))); 
+      %If A0 > 1, this means that the firm is offering so little that the
+      %workers needs to get the job more than for sure. Hence, it is not
+      %possible to offer that quantity
+      feasSet(A0 > 1) = false;
+       
       %Matching probability
-      A0        = min(max(A0,0),1);
+      if any(A0(feasSet) > 1) || any(A0(feasSet) < 0) 
+        error('Matching probability error')
+      end
       theta     = 1./qinv(A0);
       
-      FirmFun             = q(theta).*JV0;
+      FirmFun                   = q(theta).*JV0;
+      FirmFun(feasSet == false) = nan;
       
       [AR , BR]             = max(FirmFun);
       if BR == 1 || BR == numel(FirmFun)
@@ -256,11 +265,10 @@ for iD = 14:16
       FirmObj(iz)         = max(AR,0);
       EnteringW0(iz)      = X;
       
-      
       [X0 , Y0]             = min(abs((X) - (squeeze(V(Phi0,:)))));
       EnteringLam_Idx(iz) = max(Y0,1);
       EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
-      OptimalWage(iz)     = w_star_v(iphi,EnteringLam_Idx(iz) )*(AR>0);
+      OptimalWage(iz)     = w_star_v(nPhi,EnteringLam_Idx(iz) )*(AR>0);
       
       if FirmObj(iz)>=ke
         U_l(iz)=(U_u(iz)+(uSqueezeFactor - 1)*U_l(iz))/uSqueezeFactor;
