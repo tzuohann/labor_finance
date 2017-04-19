@@ -231,9 +231,11 @@ for iD = 1:nD
     
     for iz=1:nZ
 
-      %Firm offers a choice of V which is realized via init_Prod
-
-      %These are the possible values that firms can promise workers.
+      %Firm offers contracts which workers are indifferent towards.
+      %Contracts state value given to worker in each state of the world
+      %This translates to specifying some V in each phi state
+      %Therefore for each V offered, the firm gives some combination of V
+      %in each phi so that his expected marginal F is equal in all phi.
       R_grid                  = init_Prod'*V;
       JV0                     = init_Prod'*F;
       feasSet                 = true(size(R_grid));
@@ -266,13 +268,16 @@ for iD = 1:nD
         if BR == 1 || BR == numel(FirmFun)
           error('Corner solution to search problem')
         end
-        EnteringP0(iz)      = A0(BR)*(AR>0);
-        EnteringAR(iz)      = AR;
-        X                   = R_grid(BR)*(AR>0);
-        FirmObj(iz)         = max(AR,0);
-        EnteringW0(iz)      = X;
+        if AR <= 0
+          error('Firm value at entry at negative')
+        end
+        EnteringP0(iz)      = A0(BR);
+        FirmObj(iz)         = AR;
+        EnteringW0(iz)      = R_grid(BR);
         
-        [X0 , Y0]             = min(abs((X) - (squeeze(V(Phi0,:)))));
+        
+        %Not sure what happens here with the initial probability
+        %distribution
         EnteringLam_Idx(iz) = max(Y0,1);
         EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
         OptimalWage(iz)     = w_star_v(nPhi,EnteringLam_Idx(iz) )*(AR>0);
