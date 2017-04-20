@@ -10,13 +10,13 @@ global gamma_matching
 % Model parameters
 %%%%%%%%%%%%%%%%%%%%%%
 K                   = 1;            %Fixed required capital normalized to 1.
-tau                 = 0.1;          %Taxes
+tau                 = 0.1;            %Taxes
 r                   = 0.1;          %Return on capital.
 R                   = r/(1-tau);    %Gross return on capital
-rra                 = 0.5;          %Relative risk aversion.
+rra                 = 0.6;          %Relative risk aversion.
 BETA                = 1/(1+r);      %Discount factor
 sigma               = 0.025;        %Exogenous separatoin probability. We call this delta in the paper.
-gamma_matching      = .5;         %Matching elasticity parameter
+gamma_matching      = .5;           %Matching elasticity parameter
 b                   = 0.02;         %Value of home production
 psi                 = 0;            %fraction of recovered firm value if failed search
 
@@ -76,13 +76,13 @@ firstRun = true;
 for iD = 1:nD
   D = D_grid(iD);
   disp(['Calculating for iD = ',num2str(iD)])
-  ke = K-D;   %%%%% entry cost depends on D
+  ke = 0.2%K-0.7*D;   %%%%% entry cost depends on D
   if ke <= 0
     error('Cost of entry must be weakly positive')
   end
   
   %Endogenous separation policy
-  sep_pol = (K*r +(Phi_grid - D*r)*(1-tau) < 0);
+  sep_pol         = (K*r +(Phi_grid - D*r)*(1-tau) < 0);
   
   %Variables that only depend on D
   w_star0         = gamma_vect_ws0;
@@ -311,9 +311,11 @@ for iD = 1:nD
   sepPol_D(:,iD)      = sep_pol;
   %Wages, this works because Entering_Lam is identical in all states
   wages_D(:,iD)       = w_star_v(:,EnteringLam_Idx(iz));
-  %   %Period unemployment
-  %   unemployment_D(:,iD)=
+  %Saddle point problem solution
   TP_D(:,iD)          = TP(:,EnteringLam_Idx(iz));
+  %Calculate SS distrib of E, U etc
+  [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,sigma,EnteringP0,init_Prod);
+  massEnt(iD)         = theta(BR).*massU;
 end
 
 figure(1)
@@ -341,6 +343,17 @@ imagesc(D_grid,Phi_grid,sepPol_D)
 xlabel('Debt')
 ylabel('Phi')
 title('Separations (Yellow)')
+subplot(2,2,2)
+imagesc(D_grid,Phi_grid,massE_D)
+colorbar
+xlabel('Debt')
+ylabel('Phi')
+title('Mass')
+subplot(2,2,3)
+plotyy(D_grid,massU,D_grid,massEnt)
+colorbar
+xlabel('Debt')
+title('Unemployment (Left), Entrants (Right)')
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

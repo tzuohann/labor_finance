@@ -1,3 +1,4 @@
 *.asv
 *.m~
 CODE/matlab.mat
+*.fig
