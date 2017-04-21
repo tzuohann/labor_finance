@@ -1,4 +1,4 @@
-function [TP,igp_star,gp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
+function [TP,igp_star,gp_star,w_star_v,EU_vect,U] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
     Phi_grid,BETA,igp_star,gp_star,gamma_vect,w_star_v,w_star_pre,U0,pi_z,r,K,D,tau,w_star_pre_cons)
   
   U       = U0;
@@ -46,7 +46,7 @@ function [TP,igp_star,gp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nG,sep_p
         for ig = 1:nG
           
           %Maximize more frequently as we get closer to the solution
-          if rand() < max(CV_tol/tol,0.5)
+          if rand() < 2%max(CV_tol/tol,0.5)
             [A,B0]            = min(BETA*max_EP_Phi0(ig:nG));
             B                 = B0+ig-1;
           else

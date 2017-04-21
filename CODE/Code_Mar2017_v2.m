@@ -74,7 +74,7 @@ function Code_Mar2017_v2()
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
   firstRun = true;
-  for iD = 1:nD
+  for iD = 2%1:nD
     D = D_grid(iD);
     disp(['Calculating for iD = ',num2str(iD)])
     ke = K-D;   %%%%% entry cost depends on D
@@ -111,122 +111,27 @@ function Code_Mar2017_v2()
     U   = U0;
     
     %Start from zero, but otherwise, just start from previous value
-    P = zeros(nPhi, nG);
-    TP = P;
+    TP = zeros(nPhi, nG);
     
     tol_U = 1;
     iter_U = 0;
     firstRun = false;
-    while(tol_U>CV_tol_U &&  iter_U < maxIter_U  )
+    while(tol_U > CV_tol_U &&  iter_U < maxIter_U  )
       iter_U =  iter_U +1;
       if iter_U == maxIter_U
         error('Maximum Iteration U reached')
       end
       
-      [TP,igp_star,gp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
-    Phi_grid,BETA,igp_star,gp_star,gamma_vect,w_star_v,w_star_pre,U0,pi_z,r,K,D,tau,w_star_pre_cons);
+      [TP,igp_star,gp_star,w_star_v,EU_vect,U] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
+        Phi_grid,BETA,igp_star,gp_star,gamma_vect,w_star_v,w_star_pre,U0,pi_z,r,K,D,tau,w_star_pre_cons);
       
       % Converting the solution from Lagrange multiplier space to promised value space
+      [V,F] = calcVF(TP,nPhi,nG,gamma_vect,U0,gp_star,sep_pol,psi,K,D);
       
-      V = zeros(nPhi,nG-2);   %% Promised Value
-      F = zeros(nPhi,nG-2);   %% Firm value
+      %Solve the search problem
+      [FirmObj,U_u,U_l,EnteringP0,EnteringW0,U0,EnteringLam_Idx,BR,theta] = solveSearch(nZ,init_Prod,sigma,V,F,U0,BETA,EU_vect,U_u,U_l,ke,U,b,rra,gamma_vect,uSqueezeFactor);
       
-      for iphi=1:nPhi
-        
-        if sep_pol(iphi) == 0
-          
-          for irho=2:nG-1
-            
-            V(iphi,irho-1) = (TP(iphi,irho+1) - TP(iphi,irho-1))/(2*(gamma_vect(2) - gamma_vect(1)));
-            
-          end
-        else
-          V(iphi,1:nG-2) = U0;
-        end
-        
-      end
-      
-      
-      for iphi=1:nPhi
-        
-        if sep_pol(iphi) ==0
-          
-          F(iphi,:) = TP(iphi,2:end-1) - gp_star(iphi,2:end-1).*V(iphi,:);
-          
-        else
-          
-          F(iphi,1:nG-2) = psi.*(K-D);  %% testing with K-D instead of 0
-        end
-        
-      end
-      
-      FirmObj = -10;
-      for iz=1:nZ
-        
-        %Firm offers contracts which workers are indifferent towards.
-        %Contracts state value given to worker in each state of the world
-        %This translates to specifying some V in each phi state
-        %Therefore for each V offered, the firm gives some combination of V
-        %in each phi so that his expected marginal F is equal in all phi.
-        %TP = F + LAMBDA*W so the marginal loss to F is LAMBDA
-        %So the firm offers W from the same lambda across all different
-        %states. Assume this is correct for now, come back to this later.
-        R_grid                  = (1-sigma).*init_Prod'*V;
-        JV0                     = (1-sigma).*init_Prod'*F;
-        feasSet                 = true(size(R_grid));
-        %Off the bat, anything less than U0 is a no-go
-        feasSet(R_grid < U0)    = false;
-        
-        %Maximizing the worker's search problem
-        rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
-        A0              = rho(iz)./(BETA*(R_grid - EU_vect(iz)));
-        
-        %If A0 > 1, this means that the firm is offering so little that the
-        %workers needs to get the job more than for sure. Hence, it is not
-        %possible to offer that quantity
-        feasSet(A0 > 1) = false;
-        
-        %Matching probability
-        if any(A0(feasSet) > 1) || any(A0(feasSet) < 0)
-          error('Matching probability error')
-        end
-        theta     = 1./qinv(A0);
-        
-        FirmFun                   = q(theta).*JV0;
-        FirmFun(feasSet == false) = nan;
-        
-        if all(isnan(FirmFun))
-          U_u(iz)=((uSqueezeFactor - 1)*U_u(iz)+U_l(iz))/uSqueezeFactor;
-        else
-          
-          [AR , BR]             = max(FirmFun);
-          if BR == 1 || BR == numel(FirmFun)
-            error('Corner solution to search problem')
-          end
-          if AR <= 0
-            error('Firm value at entry at negative')
-          end
-          EnteringP0(iz)      = A0(BR);
-          FirmObj(iz)         = AR;
-          EnteringW0(iz)      = R_grid(BR);
-          
-          
-          %Not sure what happens here with the initial probability
-          %distribution
-          EnteringLam_Idx(iz) = BR + 1;
-          EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
-          
-          if FirmObj(iz)>=ke
-            U_l(iz)=(U_u(iz)+(uSqueezeFactor - 1)*U_l(iz))/uSqueezeFactor;
-          else
-            U_u(iz)=((uSqueezeFactor - 1)*U_u(iz)+U_l(iz))/uSqueezeFactor;
-          end
-        end
-        U0(iz)=(U_u(iz) + U_l(iz))/2;
-      end
-
       tol_U = (FirmObj - ke)^2;
-      
     end
     
     %What the firm compares to ke
@@ -249,6 +154,11 @@ function Code_Mar2017_v2()
     %Calculate SS distrib of E, U etc
     [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,sigma,EnteringP0,init_Prod);
     massEnt(iD)         = theta(BR).*massU(iD);
+    
+    display('match this 3.840744724881307e+04')
+    format long
+    nansum(TP(:))
+    asd
   end
   
   figure(1)
