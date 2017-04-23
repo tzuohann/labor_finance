@@ -1,11 +1,11 @@
-function [TP,gp_star,w_star_v,EU_vect,U] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
-        Phi_grid,BETA,gamma_vect,w_star_pre,U0,pi_z,r,K,D,tau,w_star_pre_cons);
-      
-  igp_star          = nG*ones(nPhi,nG);
-  gp_star           = gamma_vect(nG)*ones(nPhi,nG);
-  w_star_v          = gamma_vect(nG)*ones(nPhi,nG);
+function [TP,gp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,pi_Phi,...
+    Phi_grid,BETA,gamma_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons)
   
-  U       = U0;
+  igp_star          = nan*ones(nPhi,nG);
+  gp_star           = nan*ones(nPhi,nG);
+  w_star_v          = nan*ones(nPhi,nG);
+  TP                = zeros(nPhi, nG);
+  
   EU0     = pi_z*(U(:));
   EU_vect = EU0;
   
