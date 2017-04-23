@@ -1,4 +1,4 @@
-function [FirmObj,U_u,U_l,EnteringP0,EnteringW0,U0,EnteringLam_Idx,BR,theta] = solveSearch(nZ,init_Prod,sigma,V,F,U0,BETA,EU_vect,U_u,U_l,ke,U,b,rra,gamma_vect,uSqueezeFactor)
+function [FirmObj,U_u,U_l,EnteringP0,EnteringW0,EnteringLam_Idx,BR,theta] = solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,U_u,U_l,ke,b,rra,gamma_vect,uSqueezeFactor)
 %   nZ
 %   init_Prod
 %   sigma
@@ -32,7 +32,7 @@ function [FirmObj,U_u,U_l,EnteringP0,EnteringW0,U0,EnteringLam_Idx,BR,theta] = s
     JV0                     = (1-sigma).*init_Prod'*F;
     feasSet                 = true(size(R_grid));
     %Off the bat, anything less than U0 is a no-go
-    feasSet(R_grid < U0)    = false;
+    feasSet(R_grid < U)    = false;
     
     %Maximizing the worker's search problem
     rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));

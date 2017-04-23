@@ -73,7 +73,6 @@ function Code_Mar2017_v2()
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
-  firstRun = true;
   for iD = 2%1:nD
     D = D_grid(iD);
     disp(['Calculating for iD = ',num2str(iD)])
@@ -101,35 +100,28 @@ function Code_Mar2017_v2()
     U_l     = U_min*ones(nZ,1);
     U_u     = U_max*ones(nZ,1);
     
-    
-    igp_star          = nG*ones(nPhi,nG);
-    gp_star           = gamma_vect(nG)*ones(nPhi,nG);
-    w_star_v          = gamma_vect(nG)*ones(nPhi,nG);
-    
-    % initial values
-    U0  = (U_l + U_u)/2;
-    U   = U0;
-    
     %Start from zero, but otherwise, just start from previous value
     TP = zeros(nPhi, nG);
     
     tol_U = 1;
     iter_U = 0;
-    firstRun = false;
     while(tol_U > CV_tol_U &&  iter_U < maxIter_U  )
+      %Update U
+      U   = (U_l + U_u)/2;
       iter_U =  iter_U +1;
+      
       if iter_U == maxIter_U
         error('Maximum Iteration U reached')
       end
       
-      [TP,igp_star,gp_star,w_star_v,EU_vect,U] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
-        Phi_grid,BETA,igp_star,gp_star,gamma_vect,w_star_v,w_star_pre,U0,pi_z,r,K,D,tau,w_star_pre_cons);
+      [TP,gp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nG,sep_pol,sigma,TP,pi_Phi,...
+        Phi_grid,BETA,gamma_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons);
       
       % Converting the solution from Lagrange multiplier space to promised value space
-      [V,F] = calcVF(TP,nPhi,nG,gamma_vect,U0,gp_star,sep_pol,psi,K,D);
+      [V,F] = calcVF(TP,nPhi,nG,gamma_vect,U,gp_star,sep_pol,psi,K,D);
       
       %Solve the search problem
-      [FirmObj,U_u,U_l,EnteringP0,EnteringW0,U0,EnteringLam_Idx,BR,theta] = solveSearch(nZ,init_Prod,sigma,V,F,U0,BETA,EU_vect,U_u,U_l,ke,U,b,rra,gamma_vect,uSqueezeFactor);
+      [FirmObj,U_u,U_l,EnteringP0,EnteringW0,EnteringLam_Idx,BR,theta] = solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,U_u,U_l,ke,b,rra,gamma_vect,uSqueezeFactor);
       
       tol_U = (FirmObj - ke)^2;
     end
@@ -142,7 +134,7 @@ function Code_Mar2017_v2()
     %This is what's offered in the search market.
     EnteringW0_D(iD)    = EnteringW0;
     %Value of unemployment
-    U0_D(iD)            = U0;
+    U0_D(iD)            = U;
     %Separation policy
     sepPol_D(:,iD)      = sep_pol;
     %Wages, this works because Entering_Lam is identical in all states
@@ -151,6 +143,10 @@ function Code_Mar2017_v2()
     dividends_D(:,iD)   = w_star_v(:,EnteringLam_Idx(iz));
     %Saddle point problem solution
     TP_D(:,iD)          = TP(:,EnteringLam_Idx(iz));
+    %Value of worker in each state of the world
+    Vstar_D(:,iD)       = V(:,EnteringLam_Idx);
+    %Value of firm in each state of the world
+    Fstar_D(:,iD)       = F(:,EnteringLam_Idx);
     %Calculate SS distrib of E, U etc
     [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,sigma,EnteringP0,init_Prod);
     massEnt(iD)         = theta(BR).*massU(iD);
