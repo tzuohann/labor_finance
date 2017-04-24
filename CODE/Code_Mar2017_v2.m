@@ -122,7 +122,7 @@ function Code_Mar2017_v2()
       
       %Solve the entire problem given U
       [TP,gp_star,w_star_v,EU_vect,...
-        V,F,FirmObj,EnteringP0,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
+        V,F,FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
         CV_tol,Niter,nPhi,nG,sep_pol,sigma,pi_Phi,...
         Phi_grid,BETA,gamma_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
       
@@ -138,14 +138,16 @@ function Code_Mar2017_v2()
     end
     
     %What the firm compares to ke
-    FirmObj_D(iD)       = FirmObj;
+    EnteringF_D(iD)     = FirmObj./q(theta_star);
     %Matching probability p
-    EnteringP0_D(iD)    = EnteringP0;
+    Q_D(iD)             = q(theta_star);
+    %Matching probability p
+    P_D(iD)             = theta_star*q(theta_star);
     %Promised worker value conditional on matching.
     %This is what's offered in the search market.
-    EnteringW0_D(iD)    = EnteringW0;
+    EnteringW_D(iD)             = EnteringW0;
     %Value of unemployment
-    U0_D(iD)            = U;
+    U_D(iD)             = U;
     %Separation policy
     sepPol_D(:,iD)      = sep_pol;
     %Wages, this works because Entering_Lam is identical in all states
@@ -159,24 +161,24 @@ function Code_Mar2017_v2()
     %Value of firm in each state of the world
     Fstar_D(:,iD)       = F(:,EnteringLam_Idx);
     %Calculate SS distrib of E, U etc
-    [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,sigma,EnteringP0,init_Prod);
+    [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,sigma,P_D(iD),init_Prod);
     massEnt(iD)         = theta_star.*massU(iD);
     
   end
   
   figure(1)
   subplot(2,2,1)
-  plot(D_grid, EnteringP0_D,'-*','LineWidth',3);
+  plot(D_grid, P_D,'-*','LineWidth',3);
   title('Matching probability over debt choice')
   subplot(2,2,2)
   hold on
-  plot(D_grid, EnteringW0_D,'-*','LineWidth',3);
-  plot(D_grid, U0_D,'-*','LineWidth',3);
+  plot(D_grid, EnteringW_D,'-*','LineWidth',3);
+  plot(D_grid, U_D,'-*','LineWidth',3);
   hold off
   legend({'W','U'})
   title('W and U')
   subplot(2,2,3)
-  plot(D_grid, FirmObj_D,'-*','LineWidth',3);
+  plot(D_grid, EnteringF_D,'-*','LineWidth',3);
   title('Cost of entry = expected value from search')
   xlabel('Debt')
   subplot(2,2,4)
@@ -199,6 +201,9 @@ function Code_Mar2017_v2()
   plotyy(D_grid,massU,D_grid,massEnt)
   xlabel('Debt')
   title('Unemployment (Left), Entrants (Right)')
+  
+  figure(3)
+  subplot(2,2,1)
   
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
