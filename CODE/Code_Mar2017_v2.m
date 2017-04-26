@@ -11,14 +11,14 @@ function Code_Mar2017_v2()
   % Model parameters
   %%%%%%%%%%%%%%%%%%%%%%
   K                   = 1;            %Fixed required capital normalized to 1.
-  tau                 = 0.1;          %Taxes
-  r                   = 0.1;          %Return on capital.
+  tau                 = 0.5;          %Taxes
+  r                   = 0.5;          %Return on capital.
   R                   = r/(1-tau);    %Gross return on capital
-  rra                 = 0.6;          %Relative risk aversion.
+  rra                 = 0.5;          %Relative risk aversion.
   BETA                = 1/(1+r);      %Discount factor
-  sigma               = 0.025;        %Exogenous separatoin probability. We call this delta in the paper.
-  gamma_matching      = 0.5;          %Matching elasticity parameter
-  b                   = 0.02;         %Value of home production
+  delta               = 0.05;         %Exogenous separation probability.
+  gamma_matching      = 2;          %Matching elasticity parameter
+  b                   = 0;         %Value of home production
   psi                 = 0;            %fraction of recovered firm value if failed search
   
   %Aggregate productivity shock -- muted for now
@@ -28,15 +28,16 @@ function Code_Mar2017_v2()
   iz                  = 1;
   
   %Worker productivity shock
-  nPhi                = 20;
+  nPhi                = 30;
   rho_Phi             = 0.9;
-  sigma_Phi           = 0.15;
+  delta_Phi           = 0.15;
   mean_Phi            = 0.10;
   
   mPhi                = 1;
-  Phi_grid            = linspace(-mPhi*sigma_Phi,mPhi*sigma_Phi,nPhi)';
-  pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,sigma_Phi);
-  Phi_grid            = mean_Phi + (Phi_grid);
+  %   Phi_grid            = linspace(-mPhi*delta_Phi,mPhi*delta_Phi,nPhi)';
+  Phi_grid            = linspace(-r/(1-tau),0.5,nPhi)';
+  pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,delta_Phi);
+  %   Phi_grid            = mean_Phi + (Phi_grid);
   
   %Initial productivity distrib
   init_Prod           = zeros(size(Phi_grid));
@@ -46,21 +47,28 @@ function Code_Mar2017_v2()
   % Technical parameters
   %%%%%%%%%%%%%%%%%%%%%%
   nG                  = 500;
-  gamMax              = 2;
+  gamMax              = 1;
   gamma_vect          = linspace(0,gamMax,nG);   % Lagrange multiplier grid
   gamma_vect_ws0      = (gamma_vect/(1-tau)).^(1/rra);
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.0000000001;
+  CV_tol              = 0.0000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.0000000001;
+  CV_tol_U            = 0.0000001;
   
   %%% Optimizing grid over Debt D
-  nD                  = 6;
-  D_grid              = linspace(0.1,K-0.1,nD);
+  %Choose debt so that it is both inbetween 0 and 1 and increases
+  %separations as a function of D
+  nD                  = 10;
+  %   D_grid              = linspace(0.5,0.8,nD);
+  D_grid              = 1/(1-tau) + Phi_grid(1:nD)/r;
+  if any(K - D_grid) <= 0
+    error('Cost of entry must be weakly positive. Check K - D_grid')
+  end
+  
   
   %%% Bringing the unemployment value limits in the outer loop closer
   uSqueezeFactor      = 10;
@@ -75,16 +83,14 @@ function Code_Mar2017_v2()
   %%%%%%%%%%%%%%%%%%%%%%
   for iD = 1:nD
     D = D_grid(iD);
+    ke = 0.5;%K - D;
     disp(['Calculating for iD = ',num2str(iD)])
-    ke = K-D;   %%%%% entry cost depends on D
-    if ke <= 0
-      error('Cost of entry must be weakly positive')
-    end
+    
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%Variables that only depend on D %%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     preTaxOutput    = outputFunc(K,r,tau,Phi_grid,D);
-    sep_pol         = preTaxOutput*(1-tau) < 0;  %Endogenous separation policy
+    sep_pol         = preTaxOutput*(1-tau) <= 0;  %Endogenous separation policy
     %Wages and utility from consuming wages
     w_star0                     = gamma_vect_ws0;
     w_cons                      = (r/(1-tau)*K +(Phi_grid - D*r));
@@ -100,7 +106,7 @@ function Code_Mar2017_v2()
     
     %Check that there is entry at U_min
     [~,~,~,~,~,~,FirmObj] = solveGivenU(...
-      CV_tol,Niter,nPhi,nG,sep_pol,sigma,pi_Phi,...
+      CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
       Phi_grid,BETA,gamma_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
     if FirmObj > ke
     else
@@ -123,7 +129,7 @@ function Code_Mar2017_v2()
       %Solve the entire problem given U
       [TP,gp_star,w_star_v,EU_vect,...
         V,F,FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
-        CV_tol,Niter,nPhi,nG,sep_pol,sigma,pi_Phi,...
+        CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
         Phi_grid,BETA,gamma_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
       
       %Update U_u and U_l given solution to problem
@@ -145,7 +151,10 @@ function Code_Mar2017_v2()
     P_D(iD)             = theta_star*q(theta_star);
     %Promised worker value conditional on matching.
     %This is what's offered in the search market.
-    EnteringW_D(iD)             = EnteringW0;
+    EnteringW_D(iD)     = EnteringW0;
+    %Entering Lambda
+    %This tells us how much of lambda is actually used
+    EnteringLam_Idx_D(iD) = EnteringLam_Idx;
     %Value of unemployment
     U_D(iD)             = U;
     %Separation policy
@@ -161,7 +170,7 @@ function Code_Mar2017_v2()
     %Value of firm in each state of the world
     Fstar_D(:,iD)       = F(:,EnteringLam_Idx);
     %Calculate SS distrib of E, U etc
-    [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,sigma,P_D(iD),init_Prod);
+    [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,delta,P_D(iD),init_Prod);
     massEnt(iD)         = theta_star.*massU(iD);
     
   end
@@ -204,7 +213,7 @@ function Code_Mar2017_v2()
   
   figure(3)
   subplot(2,2,1)
-  
+  keyboard
   
   % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % % Dynamics - Just to look at wages as phi starts high, decreases and
