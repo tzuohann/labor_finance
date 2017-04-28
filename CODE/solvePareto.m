@@ -46,6 +46,7 @@ function [TP,gp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nG,sep_po
       
       if sep_pol(iphi) < 1   % as long as there is no separation
         
+        %This is the slow part. Make this faster.
         for ig = 1:nG
           
           %Maximize more frequently as we get closer to the solution
@@ -67,7 +68,7 @@ function [TP,gp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nG,sep_po
       
     end
     
-    tol = max((TP(:) - P(:)).^2);
+    tol = max(max((TP - P).*(TP - P)));
     
   end
 end

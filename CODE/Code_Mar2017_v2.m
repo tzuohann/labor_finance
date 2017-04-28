@@ -17,8 +17,8 @@ function Code_Mar2017_v2()
   rra                 = 0.5;          %Relative risk aversion.
   BETA                = 1/(1+r);      %Discount factor
   delta               = 0.05;         %Exogenous separation probability.
-  gamma_matching      = 2;          %Matching elasticity parameter
-  b                   = 0;         %Value of home production
+  gamma_matching      = 2;            %Matching elasticity parameter
+  b                   = 0;            %Value of home production
   psi                 = 0;            %fraction of recovered firm value if failed search
   
   %Aggregate productivity shock -- muted for now
@@ -39,7 +39,7 @@ function Code_Mar2017_v2()
   pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,delta_Phi);
   %   Phi_grid            = mean_Phi + (Phi_grid);
   
-  %Initial productivity distrib
+  % Initial productivity distrib
   init_Prod           = zeros(size(Phi_grid));
   init_Prod(end)      = 1;
   

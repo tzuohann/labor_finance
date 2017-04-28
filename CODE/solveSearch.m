@@ -58,7 +58,4 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
       theta_star          = theta(BR);
     end
   end
-  figure(1)
-  plot(FirmFun)
-  pause(0.1)
 end

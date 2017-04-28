@@ -1,0 +1,15 @@
+LIBRARY solvePareto_mex.mexw64
+EXPORTS
+mexFunction
+emlrtMexFcnProperties
+solvePareto
+b_error
+emxEnsureCapacity
+emxFree_int32_T
+emxFree_real_T
+emxInit_int32_T
+emxInit_real_T
+emxInit_real_T1
+solvePareto_initialize
+solvePareto_terminate
+solvePareto_atexit
