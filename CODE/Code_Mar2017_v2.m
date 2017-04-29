@@ -28,20 +28,19 @@ function Code_Mar2017_v2()
   iz                  = 1;
   
   %Worker productivity shock
-  nPhi                = 30;
+  nPhi                = 60;
   rho_Phi             = 0.9;
   delta_Phi           = 0.15;
   mean_Phi            = 0.10;
   
   mPhi                = 1;
-  %   Phi_grid            = linspace(-mPhi*delta_Phi,mPhi*delta_Phi,nPhi)';
-  Phi_grid            = linspace(-r/(1-tau),0.5,nPhi)';
+  Phi_grid            = linspace(-1,0.1,nPhi)';
   pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,delta_Phi);
-  %   Phi_grid            = mean_Phi + (Phi_grid);
   
   % Initial productivity distrib
-  init_Prod           = zeros(size(Phi_grid));
-  init_Prod(end)      = 1;
+  init_Prod           = zeros(size(Phi_grid))./nPhi;
+  init_Prod(end)      = 1;           
+  
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Technical parameters
@@ -53,11 +52,11 @@ function Code_Mar2017_v2()
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.0000001;
+  CV_tol              = 0.000000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.0000001;
+  CV_tol_U            = 0.000000001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
@@ -69,6 +68,11 @@ function Code_Mar2017_v2()
     error('Cost of entry must be weakly positive. Check K - D_grid')
   end
   
+  nD = 40;
+  D_grid = linspace(D_grid(1),D_grid(end),nD);
+  
+  nD = 2;
+  D_grid = D_grid(1:nD);
   
   %%% Bringing the unemployment value limits in the outer loop closer
   uSqueezeFactor      = 10;
@@ -77,13 +81,13 @@ function Code_Mar2017_v2()
   % Plot parameters
   %%%%%%%%%%%%%%%%%%%%%%
   dynamicT            = 10;
-  
+    
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
   for iD = 1:nD
     D = D_grid(iD);
-    ke = 0.5;%K - D;
+    ke = K - D;
     disp(['Calculating for iD = ',num2str(iD)])
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -172,13 +176,15 @@ function Code_Mar2017_v2()
     %Calculate SS distrib of E, U etc
     [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,delta,P_D(iD),init_Prod);
     massEnt(iD)         = theta_star.*massU(iD);
-    
+    %Output
   end
   
   figure(1)
   subplot(2,2,1)
-  plot(D_grid, P_D,'-*','LineWidth',3);
-  title('Matching probability over debt choice')
+  [a,h1,h2] = plotyy(D_grid, P_D,D_grid,Q_D);
+  set(h1,'LineWidth',3);
+  set(h2,'LineWidth',3);
+  title('Matching probability')
   subplot(2,2,2)
   hold on
   plot(D_grid, EnteringW_D,'-*','LineWidth',3);
@@ -188,11 +194,10 @@ function Code_Mar2017_v2()
   title('W and U')
   subplot(2,2,3)
   plot(D_grid, EnteringF_D,'-*','LineWidth',3);
-  title('Cost of entry = expected value from search')
-  xlabel('Debt')
+  title('F (value condition on matching)')
   subplot(2,2,4)
-  plot(D_grid,TP_D(5,:),'-*','LineWidth',3);
-  title('TP')
+  plot(D_grid,init_Prod'*TP_D,'-*','LineWidth',3);
+  title('Expected TP')
   
   figure(2)
   subplot(2,2,1)
@@ -202,68 +207,31 @@ function Code_Mar2017_v2()
   title('Separations (Yellow)')
   subplot(2,2,2)
   imagesc(D_grid,Phi_grid,massE_D)
-  colorbar
-  xlabel('Debt')
   ylabel('Phi')
   title('Mass')
   subplot(2,2,3)
   plotyy(D_grid,massU,D_grid,massEnt)
-  xlabel('Debt')
-  title('Unemployment (Left), Entrants (Right)')
+  title('mass U (L), mass entrants (R)')
+  subplot(2,2,4)
+  plot(Phi_grid,wages_D,'-*','LineWidth',3)
+  bla = {};
+  for i1 = 1:nD
+    bla{i1} = num2str(i1);
+  end
+  legend(bla)
+  title('Wages')
   
   figure(3)
   subplot(2,2,1)
-  keyboard
-  
-  % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % % Dynamics - Just to look at wages as phi starts high, decreases and
-  % % increases
-  % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % [phi_vect]  = [nPhi:-1:2,1:1:nPhi];
-  % igamma      = EnteringLam_Idx(iz);
-  % EnteringP   = EnteringP0(iz);
-  % iGammap_TS(1) = igamma;
-  % wage_TS(1)    = OptimalWage_D(1);
-  % Gammap_TS(1)  = gamma_vect(iGammap_TS(1));
-  % div_TS(1)     = r*K + (Phi_grid(phi_vect(1))- wage_TS(1) - D*r)*(1-tau);
-  % for t=2:dynamicT
-  %
-  %   iphi        = phi_vect(t);
-  %   sep_TS(t)   = sep_pol(iphi);
-  %
-  %   if done_idx == 0
-  %
-  %     if sep_TS(t) == 1;
-  %
-  %       done_idx        = 1;
-  %       wage_TS(t)      = 0;
-  %       iGammap_TS(t)   = 0;
-  %       Gammap_TS(t)    = 0;
-  %       div_TS(t)       = 0;
-  %
-  %     else
-  %
-  %       iGammap_TS(t)   = igp_star(iphi,igamma);
-  %       Gammap_TS(t)    = gamma_vect(iGammap_TS(t));
-  %       wage_TS(t)      = w_star_v(iphi,igamma);
-  %       div_TS(t)       = r*K + (Phi_grid(iphi)- wage_TS(t) - D*r)*(1-tau);
-  %       sep_TS(t)       = sep_pol(iphi);
-  %       igamma          = iGammap_TS(t);
-  %
-  %     end
-  %
-  %   else
-  %
-  %     done_idx        = 1;
-  %     wage_TS(t)      = 0;
-  %     iGammap_TS(t)   = 0;
-  %     Gammap_TS(t)    = 0;
-  %     div_TS(t)       = 0;
-  %     sep_TS(t)       = 1;
-  %
-  %   end
-  % end
-  
-  
-  
+  plot(D_grid, EnteringW_D - U_D,'-*','LineWidth',3);
+  title('W - U')
+  subplot(2,2,2)
+  plot(D_grid, P_D.*EnteringW_D,'-*','LineWidth',3);
+  title('p(theta)*W')  
+  subplot(2,2,3)
+  plot(D_grid, P_D.*(EnteringW_D - U_D),'-*','LineWidth',3);
+  title('p(theta)*(W - U)')  
+  subplot(2,2,4)
+  plot(D_grid, Q_D.*EnteringF_D,'-*','LineWidth',3);
+  title('q(theta)*F')  
 end
