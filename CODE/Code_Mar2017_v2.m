@@ -65,7 +65,7 @@ function Code_Mar2017_v2()
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
   %separations as a function of D - ok, it makes sense!
-  nD                  = 10;
+  nD                  = 10; %should be 10 <----
   %   D_grid              = linspace(0.5,0.8,nD);
   D_grid              = 1/(1-tau) + Phi_grid(1:nD)/r; %the grid can be enything between 0 and 1
   if any(K - D_grid) <= 0
@@ -86,14 +86,14 @@ function Code_Mar2017_v2()
   %%%%%%%%%%%%%%%%%%%%%%
   for iD = 1:nD
     D = D_grid(iD);
-    ke = 0.5;%K - D; %this is equity?
+    ke = K - D; %line 185 of the paper - still thinking about that
     disp(['Calculating for iD = ',num2str(iD)])
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%Variables that only depend on D %%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     preTaxOutput    = outputFunc(K,r,tau,Phi_grid,D); %ok, easy!
-    sep_pol         = preTaxOutput*(1-tau) <= 0;  %Endogenous separation policy - This is not clear to me!
+    sep_pol         = preTaxOutput*(1-tau) <= 0;  %bankruptcy threshold 
     %Wages and utility from consuming wages
     w_star0                     = gamma_vect_ws0; %this was the trange object. Utility function using constraint..
     w_cons                      = (r/(1-tau)*K +(Phi_grid - D*r)); %this is what is left to the worker
@@ -106,9 +106,10 @@ function Code_Mar2017_v2()
     %lowest possible utlity is consuming b forever
     U_min   = utilFunc(b,rra)/(1-BETA); %ok, clear
     %highest possible utlity is consuming all production
-    U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra)/(1-BETA); %why we do not have the max level of Phi?
+    U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra)/(1-BETA); %cool!
     
-    %Check that there is entry at U_min
+    %Check that there is entry at U_min - we need that at U min the value
+    %of the firm must be higher that K - D.
     [~,~,~,~,~,~,FirmObj] = solveGivenU(...
       CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
       Phi_grid,BETA,gamma_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
@@ -170,7 +171,7 @@ function Code_Mar2017_v2()
     %Saddle point problem solution
     TP_D(:,iD)          = TP(:,EnteringLam_Idx(iz));
     %Value of worker in each state of the world
-    Vstar_D(:,iD)       = V(:,EnteringLam_Idx);
+    Vstar_D(:,iD)       = V(:,EnteringLam_Idx); %This is E in the paper
     %Value of firm in each state of the world
     Fstar_D(:,iD)       = F(:,EnteringLam_Idx);
     %Calculate SS distrib of E, U etc
@@ -267,7 +268,8 @@ function Code_Mar2017_v2()
   %
   %   end
   % end
-  
-  
-  
+
 end
+
+
+
