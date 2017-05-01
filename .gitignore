@@ -2,3 +2,4 @@
 *.m~
 CODE/matlab.mat
 *.fig
+*.mat

@@ -1,4 +1,4 @@
-function [FirmObj,EnteringP0,EnteringW0,EnteringLam_Idx,theta_star] = ...
+function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,b,rra,gamma_vect)
 
   FirmObj = -10;
@@ -58,4 +58,7 @@ function [FirmObj,EnteringP0,EnteringW0,EnteringLam_Idx,theta_star] = ...
       theta_star          = theta(BR);
     end
   end
+  figure(1)
+  plot(FirmFun)
+  pause(0.1)
 end
