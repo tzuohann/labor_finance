@@ -169,7 +169,7 @@ function Code_Mar2017_v2()
     massEnt(iD)         = theta_star.*massU(iD);
     %Return on equity
     %Dividends plus wages across all firms in economy
-    ROE_D(:,iD)         = ( sum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD) )/(K - D);
+    ROE_D(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(K - D);
   end
 
   save

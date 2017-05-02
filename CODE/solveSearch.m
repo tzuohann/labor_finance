@@ -1,5 +1,5 @@
 function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,EU_vect,b,rra,gamma_vect,sep_pol)
+    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,EU_vect,b,rra,Lambda_vect,sep_pol)
 
   FirmObj = -10;
   for iz=1:nZ
@@ -9,15 +9,15 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     %This translates to specifying some V in each phi state
     %FOC shows that marginal E in each state is lambda
     separationProb          = max(delta,sep_pol);
-    R_grid                  = ((1-separationProb)'.*init_Prod')*E;
+    W0_grid                 = init_Prod'*(bsxfun(@plus,bsxfun(@times,(1-separationProb),E),bsxfun(@times,separationProb,U)));
     JV0                     = ((1-separationProb)'.*init_Prod')*V; %+ Value Vacancy = 0 becaus psi = 0
-    feasSet                 = true(size(R_grid));
+    feasSet                 = true(size(W0_grid));
     %Off the bat, anything less than U0 is a no-go
-    feasSet(R_grid < U)     = false;
+    feasSet(W0_grid < U)     = false;
     
     %Maximizing the worker's search problem
     rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
-    A0              = rho(iz)./(BETA*(R_grid - EU_vect(iz)));
+    A0              = rho(iz)./(BETA*(W0_grid - EU_vect(iz)));
     
     %If A0 > 1, this means that the firm is offering so little that the
     %workers needs to get the job more than for sure. Hence, it is not
@@ -42,7 +42,7 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
       theta_star      = nan;
     else
       
-      [AR , BR]             = max(FirmFun);
+      [AR , BR]       = max(FirmFun);
       if BR == 1 || BR == numel(FirmFun)
         error('Corner solution to search problem')
       end
@@ -51,11 +51,11 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
       end
       EnteringP0(iz)      = A0(BR);
       FirmObj(iz)         = AR;
-      EnteringW0(iz)      = R_grid(BR);
+      EnteringW0(iz)      = W0_grid(BR);
       
       %For the case with PC, the multipler is a constant from entry
       EnteringLam_Idx(iz) = BR;
-      EnteringLam(iz)     = gamma_vect(BR);
+      EnteringLam(iz)     = Lambda_vect(BR);
       theta_star          = theta(BR);
     end
   end

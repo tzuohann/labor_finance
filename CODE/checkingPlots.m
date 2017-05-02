@@ -53,3 +53,10 @@ title('p(theta)*(W - U)')
 subplot(2,2,4)
 plot(D_grid, Q_D.*EnteringF_D,'-*','LineWidth',3);
 title('q(theta)*F')
+
+figure(4)
+plot(D_grid,ROE_D)
+title('Return on equity')
+xlabel({'Why does ROE go up even tho taking on'; 
+        'more D generates marginally more ';
+        'endogenous exit?'});
