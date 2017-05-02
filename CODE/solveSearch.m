@@ -1,5 +1,5 @@
 function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,b,rra,gamma_vect)
+    solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,b,rra,gamma_vect,sep_pol)
 
   FirmObj = -10;
   for iz=1:nZ
@@ -8,8 +8,9 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     %Contracts state value given to worker in each state of the world
     %This translates to specifying some V in each phi state
     %FOC shows that marginal E in each state is lambda
-    R_grid                  = (1-sigma).*init_Prod'*V;
-    JV0                     = (1-sigma).*init_Prod'*F;
+    separationProb          = max(sigma,sep_pol);
+    R_grid                  = (1-separationProb)'.*init_Prod'*V;
+    JV0                     = (1-separationProb)'.*init_Prod'*F; %+ Value Vacancy = 0 becaus psi = 0
     feasSet                 = true(size(R_grid));
     %Off the bat, anything less than U0 is a no-go
     feasSet(R_grid < U)    = false;

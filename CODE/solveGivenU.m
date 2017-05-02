@@ -12,6 +12,6 @@ function [TP,gp_star,w_star_v,EU_vect,...
   
   %Solve the search problem
   [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,b,rra,gamma_vect);
+    solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,b,rra,gamma_vect,sep_pol);
 end
 

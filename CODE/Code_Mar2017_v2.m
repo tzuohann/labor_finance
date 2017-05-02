@@ -28,7 +28,7 @@ function Code_Mar2017_v2()
   iz                  = 1;
   
   %Worker productivity shock
-  nPhi                = 60;
+  nPhi                = 30;
   rho_Phi             = 0.9;
   delta_Phi           = 0.15;
   mean_Phi            = 0.10;
@@ -52,11 +52,11 @@ function Code_Mar2017_v2()
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.000000001;
+  CV_tol              = 0.0000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.000000001;
+  CV_tol_U            = 0.0000001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
@@ -67,13 +67,7 @@ function Code_Mar2017_v2()
   if any(K - D_grid) <= 0
     error('Cost of entry must be weakly positive. Check K - D_grid')
   end
-  
-  nD = 40;
-  D_grid = linspace(D_grid(1),D_grid(end),nD);
-  
-  nD = 2;
-  D_grid = D_grid(1:nD);
-  
+   
   %%% Bringing the unemployment value limits in the outer loop closer
   uSqueezeFactor      = 10;
   
