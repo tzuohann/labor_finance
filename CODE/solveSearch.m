@@ -1,5 +1,5 @@
 function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,sigma,V,F,U,BETA,EU_vect,b,rra,gamma_vect,sep_pol)
+    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,EU_vect,b,rra,gamma_vect,sep_pol)
 
   FirmObj = -10;
   for iz=1:nZ
@@ -8,12 +8,12 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     %Contracts state value given to worker in each state of the world
     %This translates to specifying some V in each phi state
     %FOC shows that marginal E in each state is lambda
-    separationProb          = max(sigma,sep_pol);
-    R_grid                  = (1-separationProb)'.*init_Prod'*V;
-    JV0                     = (1-separationProb)'.*init_Prod'*F; %+ Value Vacancy = 0 becaus psi = 0
+    separationProb          = max(delta,sep_pol);
+    R_grid                  = ((1-separationProb)'.*init_Prod')*E;
+    JV0                     = ((1-separationProb)'.*init_Prod')*V; %+ Value Vacancy = 0 becaus psi = 0
     feasSet                 = true(size(R_grid));
     %Off the bat, anything less than U0 is a no-go
-    feasSet(R_grid < U)    = false;
+    feasSet(R_grid < U)     = false;
     
     %Maximizing the worker's search problem
     rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
@@ -54,8 +54,8 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
       EnteringW0(iz)      = R_grid(BR);
       
       %For the case with PC, the multipler is a constant from entry
-      EnteringLam_Idx(iz) = BR + 1;
-      EnteringLam(iz)     = gamma_vect(EnteringLam_Idx(iz));
+      EnteringLam_Idx(iz) = BR;
+      EnteringLam(iz)     = gamma_vect(BR);
       theta_star          = theta(BR);
     end
   end

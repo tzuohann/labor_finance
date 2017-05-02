@@ -46,9 +46,9 @@ function Code_Mar2017_v2()
   % Technical parameters
   %%%%%%%%%%%%%%%%%%%%%%
   nG                  = 500;
-  gamMax              = 1;
-  gamma_vect          = linspace(0,gamMax,nG);   % Lagrange multiplier grid
-  gamma_vect_ws0      = (gamma_vect/(1-tau)).^(1/rra);
+  LambdaMax              = 1;
+  Lambda_vect          = linspace(0,LambdaMax,nG);   % Lagrange multiplier grid
+  Lambda_vect_ws0      = (Lambda_vect/(1-tau)).^(1/rra);
   
   % inner loop
   Niter               = 500;
@@ -72,11 +72,6 @@ function Code_Mar2017_v2()
   uSqueezeFactor      = 10;
   
   %%%%%%%%%%%%%%%%%%%%%%
-  % Plot parameters
-  %%%%%%%%%%%%%%%%%%%%%%
-  dynamicT            = 10;
-    
-  %%%%%%%%%%%%%%%%%%%%%%
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
   for iD = 1:nD
@@ -87,10 +82,10 @@ function Code_Mar2017_v2()
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%Variables that only depend on D %%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    preTaxOutput    = outputFunc(K,r,tau,Phi_grid,D);
-    sep_pol         = preTaxOutput*(1-tau) <= 0;  %Endogenous separation policy
+    preTaxOutput                = outputFunc(K,r,tau,Phi_grid,D);
+    sep_pol                     = preTaxOutput*(1-tau) <= 0;  %Endogenous separation policy
     %Wages and utility from consuming wages
-    w_star0                     = gamma_vect_ws0;
+    w_star0                     = Lambda_vect_ws0;
     w_cons                      = (r/(1-tau)*K +(Phi_grid - D*r));
     posDiv                      = (bsxfun(@minus,preTaxOutput,w_star0).*(1-tau) >= 0);
     w_star_pre                  = bsxfun(@times,w_star0,posDiv) + bsxfun(@times,w_cons,(1-posDiv));
@@ -105,7 +100,7 @@ function Code_Mar2017_v2()
     %Check that there is entry at U_min
     [~,~,~,~,~,~,FirmObj] = solveGivenU(...
       CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
-      Phi_grid,BETA,gamma_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
+      Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
     if FirmObj > ke
     else
       error('No entry at U_min')
@@ -125,10 +120,12 @@ function Code_Mar2017_v2()
       end
       
       %Solve the entire problem given U
-      [TP,gp_star,w_star_v,EU_vect,...
-        V,F,FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
+      %Lp_star is unused because in PC case, Lambda' - Lambda
+      %EU_vect is unused because there is only one aggregate state
+      [TP,Lp_star,w_star_v,EU_vect,...
+        E,V,FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
         CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
-        Phi_grid,BETA,gamma_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
+        Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
       
       %Update U_u and U_l given solution to problem
       for iz = 1:nZ
@@ -143,9 +140,9 @@ function Code_Mar2017_v2()
     
     %What the firm compares to ke
     EnteringF_D(iD)     = FirmObj./q(theta_star);
-    %Matching probability p
+    %Firm matching probability q
     Q_D(iD)             = q(theta_star);
-    %Matching probability p
+    %Worker matching probability p
     P_D(iD)             = theta_star*q(theta_star);
     %Promised worker value conditional on matching.
     %This is what's offered in the search market.
@@ -155,8 +152,8 @@ function Code_Mar2017_v2()
     EnteringLam_Idx_D(iD) = EnteringLam_Idx;
     %Value of unemployment
     U_D(iD)             = U;
-    %Separation policy
-    sepPol_D(:,iD)      = sep_pol;
+    %Separation policy including delta
+    sepPol_D(:,iD)      = max(delta,sep_pol);
     %Wages, this works because Entering_Lam is identical in all states
     wages_D(:,iD)       = w_star_v(:,EnteringLam_Idx(iz));
     %Dividends, this works because Entering_Lam is identical in all states
@@ -164,68 +161,18 @@ function Code_Mar2017_v2()
     %Saddle point problem solution
     TP_D(:,iD)          = TP(:,EnteringLam_Idx(iz));
     %Value of worker in each state of the world
-    Vstar_D(:,iD)       = V(:,EnteringLam_Idx);
+    Estar_D(:,iD)       = E(:,EnteringLam_Idx);
     %Value of firm in each state of the world
-    Fstar_D(:,iD)       = F(:,EnteringLam_Idx);
+    Vstar_D(:,iD)       = V(:,EnteringLam_Idx);
     %Calculate SS distrib of E, U etc
     [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,delta,P_D(iD),init_Prod);
     massEnt(iD)         = theta_star.*massU(iD);
-    %Output
+    %Return on equity
+    %Dividends plus wages across all firms in economy
+    ROE_D(:,iD)         = ( sum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD) )/(K - D);
   end
+
+  save
+  checkingPlots
   
-  figure(1)
-  subplot(2,2,1)
-  [a,h1,h2] = plotyy(D_grid, P_D,D_grid,Q_D);
-  set(h1,'LineWidth',3);
-  set(h2,'LineWidth',3);
-  title('Matching probability')
-  subplot(2,2,2)
-  hold on
-  plot(D_grid, EnteringW_D,'-*','LineWidth',3);
-  plot(D_grid, U_D,'-*','LineWidth',3);
-  hold off
-  legend({'W','U'})
-  title('W and U')
-  subplot(2,2,3)
-  plot(D_grid, EnteringF_D,'-*','LineWidth',3);
-  title('F (value condition on matching)')
-  subplot(2,2,4)
-  plot(D_grid,init_Prod'*TP_D,'-*','LineWidth',3);
-  title('Expected TP')
-  
-  figure(2)
-  subplot(2,2,1)
-  imagesc(D_grid,Phi_grid,sepPol_D)
-  xlabel('Debt')
-  ylabel('Phi')
-  title('Separations (Yellow)')
-  subplot(2,2,2)
-  imagesc(D_grid,Phi_grid,massE_D)
-  ylabel('Phi')
-  title('Mass')
-  subplot(2,2,3)
-  plotyy(D_grid,massU,D_grid,massEnt)
-  title('mass U (L), mass entrants (R)')
-  subplot(2,2,4)
-  plot(Phi_grid,wages_D,'-*','LineWidth',3)
-  bla = {};
-  for i1 = 1:nD
-    bla{i1} = num2str(i1);
-  end
-  legend(bla)
-  title('Wages')
-  
-  figure(3)
-  subplot(2,2,1)
-  plot(D_grid, EnteringW_D - U_D,'-*','LineWidth',3);
-  title('W - U')
-  subplot(2,2,2)
-  plot(D_grid, P_D.*EnteringW_D,'-*','LineWidth',3);
-  title('p(theta)*W')  
-  subplot(2,2,3)
-  plot(D_grid, P_D.*(EnteringW_D - U_D),'-*','LineWidth',3);
-  title('p(theta)*(W - U)')  
-  subplot(2,2,4)
-  plot(D_grid, Q_D.*EnteringF_D,'-*','LineWidth',3);
-  title('q(theta)*F')  
 end
