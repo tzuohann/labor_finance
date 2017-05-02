@@ -64,6 +64,9 @@ function Code_Mar2017_v2()
   nD                  = 14;
   D_grid              = 1/(1-tau) + Phi_grid(1:nD)/r;
   
+  nD                  = 4;
+  D_grid              = linspace(D_grid(1),D_grid(end),nD);
+  
   if any(K - D_grid) <= 0
     error('Cost of entry must be weakly positive. Check K - D_grid')
   end
@@ -137,6 +140,11 @@ function Code_Mar2017_v2()
       end
       tol_U = (FirmObj - ke)^2;
     end
+    
+    EnteringW_err(iD) = EnteringW_D_err(sep_pol,delta,init_Prod,E(:,EnteringLam_Idx),nPhi,U,EnteringW0);
+    U_err(iD)         = U_D_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U);
+    Estar_err(iD)     = Estar_D_err(sep_pol,delta,pi_Phi,w_star_v(:,EnteringLam_Idx(iz)),rra,BETA,E(:,EnteringLam_Idx),nPhi,U);
+    Vstar_err(iD)     = Vstar_D_err(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,V(:,EnteringLam_Idx(iz)));
     
     %What the firm compares to ke
     EnteringF_D(iD)     = FirmObj./q(theta_star);
