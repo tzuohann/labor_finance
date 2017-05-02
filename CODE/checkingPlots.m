@@ -55,8 +55,27 @@ plot(D_grid, Q_D.*EnteringF_D,'-*','LineWidth',3);
 title('q(theta)*F')
 
 figure(4)
-plot(D_grid,ROE_D)
-title('Return on equity')
-xlabel({'Why does ROE go up even tho taking on'; 
-        'more D generates marginally more ';
-        'endogenous exit?'});
+subplot(3,3,1)
+plot(D_grid,ROE_D1,'-*')
+subplot(3,3,2)
+plot(D_grid,ROE_D2,'-*')
+subplot(3,3,3)
+plot(D_grid,ROE_D3,'-*')
+subplot(3,3,4)
+plot(D_grid,ROE_D4,'-*')
+subplot(3,3,5)
+plot(D_grid,ROE_D5,'-*')
+subplot(3,3,6)
+plot(D_grid,ROE_D6,'-*')
+subplot(3,3,7)
+plot(D_grid,ROE_D7,'-*')
+subplot(3,3,8)
+plot(D_grid,ROE_D8,'-*')
+subplot(3,3,9)
+plot(D_grid,ROE_D9,'-*')
+
+
+
+
+
+

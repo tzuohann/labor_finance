@@ -52,18 +52,18 @@ function Code_Mar2017_v2()
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.0000001;
+  CV_tol              = 0.000000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.0000001;
+  CV_tol_U            = 0.000000001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
   %separations as a function of D
-  nD                  = 10;
-  %   D_grid              = linspace(0.5,0.8,nD);
+  nD                  = 14;
   D_grid              = 1/(1-tau) + Phi_grid(1:nD)/r;
+
   if any(K - D_grid) <= 0
     error('Cost of entry must be weakly positive. Check K - D_grid')
   end
@@ -150,6 +150,7 @@ function Code_Mar2017_v2()
     %Entering Lambda
     %This tells us how much of lambda is actually used
     EnteringLam_Idx_D(iD) = EnteringLam_Idx;
+    EnteringLam(iD)       = Lambda_vect(EnteringLam_Idx_D(iD));
     %Value of unemployment
     U_D(iD)             = U;
     %Separation policy including delta
@@ -159,7 +160,7 @@ function Code_Mar2017_v2()
     %Dividends, this works because Entering_Lam is identical in all states
     dividends_D(:,iD)   = (preTaxOutput - w_star_v(:,EnteringLam_Idx(iz)))*(1-tau);
     %Saddle point problem solution
-    TP_D(:,iD)          = TP(:,EnteringLam_Idx(iz));
+    TP_D(:,iD)          = TP(:,EnteringLam_Idx_D(iD));
     %Value of worker in each state of the world
     Estar_D(:,iD)       = E(:,EnteringLam_Idx);
     %Value of firm in each state of the world
@@ -167,9 +168,27 @@ function Code_Mar2017_v2()
     %Calculate SS distrib of E, U etc
     [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,delta,P_D(iD),init_Prod);
     massEnt(iD)         = theta_star.*massU(iD);
-    %Return on equity
-    %Dividends plus wages across all firms in economy
-    ROE_D(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(K - D);
+    
+    %Understanding where we can get a hump
+ 
+    %ROE period output of economy / capital injected in each period
+    ROE_D1(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(massEnt(iD).*(K - D));
+    %ROE period output of economy / capital injected and used in each period
+    ROE_D2(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(Q_D(iD).*massEnt(iD).*(K - D));
+    %ROE period output of economy / capital injected by all firms
+    ROE_D3(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(sum(massE_D(:,iD)).*(K - D));
+    %ROE period output of economy / K - D
+    ROE_D4(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(K - D);
+    %ROE period VALUE / K - D
+    ROE_D5(:,iD)         = (EnteringF_D(iD) + EnteringLam(iD)*EnteringW_D(iD))/(K - D);
+    %ROE period VALUE / K - D
+    ROE_D6(:,iD)         = Q_D(iD).*(EnteringF_D(iD) + EnteringLam(iD)*EnteringW_D(iD))/(K - D);
+    %ROE period VALUE / K - D
+    ROE_D7(:,iD)         = nansum(massE_D(:,iD).*TP_D(:,iD))/(K - D);
+    %ROE period VALUE / K - D
+    ROE_D8(:,iD)         = Q_D(iD)*(init_Prod'*(sepPol_D(:,iD).*TP(:,EnteringLam_Idx_D(iD))))/(K - D);
+    %ROE period VALUE / K - D
+    ROE_D9(:,iD)         = (init_Prod'*(sepPol_D(:,iD).*TP(:,EnteringLam_Idx_D(iD))))/(K - D);
   end
 
   save
