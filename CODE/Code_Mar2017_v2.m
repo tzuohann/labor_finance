@@ -39,7 +39,7 @@ function Code_Mar2017_v2()
   
   % Initial productivity distrib
   init_Prod           = zeros(size(Phi_grid))./nPhi;
-  init_Prod(end)      = 1;           
+  init_Prod(end)      = 1;
   
   
   %%%%%%%%%%%%%%%%%%%%%%
@@ -52,22 +52,22 @@ function Code_Mar2017_v2()
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.000000001;
+  CV_tol              = 0.0000000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.000000001;
+  CV_tol_U            = 0.0000000001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
   %separations as a function of D
   nD                  = 14;
   D_grid              = 1/(1-tau) + Phi_grid(1:nD)/r;
-
+  
   if any(K - D_grid) <= 0
     error('Cost of entry must be weakly positive. Check K - D_grid')
   end
-   
+  
   %%% Bringing the unemployment value limits in the outer loop closer
   uSqueezeFactor      = 10;
   
@@ -170,7 +170,7 @@ function Code_Mar2017_v2()
     massEnt(iD)         = theta_star.*massU(iD);
     
     %Understanding where we can get a hump
- 
+    
     %ROE period output of economy / capital injected in each period
     ROE_D1(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(massEnt(iD).*(K - D));
     %ROE period output of economy / capital injected and used in each period
@@ -190,7 +190,7 @@ function Code_Mar2017_v2()
     %ROE period VALUE / K - D
     ROE_D9(:,iD)         = (init_Prod'*(sepPol_D(:,iD).*TP(:,EnteringLam_Idx_D(iD))))/(K - D);
   end
-
+  
   save
   checkingPlots
   
