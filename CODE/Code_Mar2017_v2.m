@@ -11,13 +11,13 @@ function Code_Mar2017_v2()
   % Model parameters
   %%%%%%%%%%%%%%%%%%%%%%
   K                   = 1;            %Fixed required capital normalized to 1.
-  tau                 = 0.5;          %Taxes
+  tau                 = 0.2;          %Taxes
   r                   = 0.5;          %Return on capital.
   R                   = r/(1-tau);    %Gross return on capital
   rra                 = 0.5;          %Relative risk aversion.
   BETA                = 1/(1+r);      %Discount factor
   delta               = 0.05;         %Exogenous separation probability.
-  gamma_matching      = 2;            %Matching elasticity parameter
+  gamma_matching      = 0.5;          %Matching elasticity parameter
   b                   = 0;            %Value of home production
   psi                 = 0;            %fraction of recovered firm value if failed search
   
@@ -38,25 +38,24 @@ function Code_Mar2017_v2()
   pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,delta_Phi);
   
   % Initial productivity distrib
-  init_Prod           = zeros(size(Phi_grid))./nPhi;
-  init_Prod(end)      = 1;
-  
+  init_Prod           = pi_Phi^100;
+  init_Prod           = init_Prod(1,:)';
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Technical parameters
   %%%%%%%%%%%%%%%%%%%%%%
-  nG                  = 500;
-  LambdaMax              = 1;
-  Lambda_vect          = linspace(0,LambdaMax,nG);   % Lagrange multiplier grid
-  Lambda_vect_ws0      = (Lambda_vect/(1-tau)).^(1/rra);
+  nL                  = 2000;
+  LambdaMax           = 0.75;
+  Lambda_vect         = linspace(0,LambdaMax,nL);   % Lagrange multiplier grid
+  Lambda_vect_ws0     = (Lambda_vect/(1-tau)).^(1/rra);
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.00000001;
+  CV_tol              = 0.0000000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.00000001;
+  CV_tol_U            = 0.0000000001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
@@ -90,7 +89,7 @@ function Code_Mar2017_v2()
     %Wages and utility from consuming wages
     w_star0                     = Lambda_vect_ws0;
     w_cons                      = (r/(1-tau)*K +(Phi_grid - D*r));
-    posDiv                      = (bsxfun(@minus,preTaxOutput,w_star0).*(1-tau) >= 0);
+    posDiv                      = bsxfun(@minus,preTaxOutput,w_star0) >= 0;
     w_star_pre                  = bsxfun(@times,w_star0,posDiv) + bsxfun(@times,w_cons,(1-posDiv));
     w_star_pre(w_star_pre <= 0) = nan;
     w_star_pre_cons             = utilFunc(w_star_pre,rra);
@@ -102,7 +101,7 @@ function Code_Mar2017_v2()
     
     %Check that there is entry at U_min
     [~,~,~,~,~,~,FirmObj] = solveGivenU(...
-      CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
+      CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
       Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
     if FirmObj > ke
     else
@@ -127,7 +126,7 @@ function Code_Mar2017_v2()
       %EU_vect is unused because there is only one aggregate state
       [TP,Lp_star,w_star_v,EU_vect,...
         E,V,FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
-        CV_tol,Niter,nPhi,nG,sep_pol,delta,pi_Phi,...
+        CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
         Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
       
       %Update U_u and U_l given solution to problem
@@ -194,12 +193,16 @@ function Code_Mar2017_v2()
     %ROE period VALUE / K - D
     ROE_D7(:,iD)         = nansum(massE_D(:,iD).*TP_D(:,iD))/(K - D);
     %ROE period VALUE / K - D
-    ROE_D8(:,iD)         = Q_D(iD)*(init_Prod'*(sepPol_D(:,iD).*TP(:,EnteringLam_Idx_D(iD))))/(K - D);
+    ROE_D8(:,iD)         = Q_D(iD)*(init_Prod'*(sepPol_D(:,iD).*TP_D(:,iD)))/(K - D);
     %ROE period VALUE / K - D
-    ROE_D9(:,iD)         = (init_Prod'*(sepPol_D(:,iD).*TP(:,EnteringLam_Idx_D(iD))))/(K - D);
+    ROE_D9(:,iD)         = (init_Prod'*(sepPol_D(:,iD).*TP_D(:,iD)))/(K - D);
   end
   
   save
   checkingPlots
+  EnteringW_err
+  U_err
+  Estar_err
+  Vstar_err
   
 end

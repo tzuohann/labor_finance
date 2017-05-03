@@ -1,7 +1,7 @@
 function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     solveSearch(nZ,init_Prod,delta,E,V,U,BETA,EU_vect,b,rra,Lambda_vect,sep_pol)
 
-  FirmObj = -10;
+  FirmObj = -666;
   for iz=1:nZ
     
     %Firm offers contracts which workers are indifferent towards.
@@ -13,7 +13,7 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     JV0                     = ((1-separationProb)'.*init_Prod')*V; %+ Value Vacancy = 0 becaus psi = 0
     feasSet                 = true(size(W0_grid));
     %Off the bat, anything less than U0 is a no-go
-    feasSet(W0_grid < U)     = false;
+    feasSet(W0_grid < U)    = false;
     
     %Maximizing the worker's search problem
     rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
@@ -51,7 +51,7 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
       end
       EnteringP0(iz)      = A0(BR);
       FirmObj(iz)         = AR;
-      EnteringW0(iz)      = W0_grid(BR);
+      EnteringW0(iz)      = W0_grid(BR); 
       
       %For the case with PC, the multipler is a constant from entry
       EnteringLam_Idx(iz) = BR;
