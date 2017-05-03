@@ -52,11 +52,11 @@ function Code_Mar2017_v2()
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.0000000001;
+  CV_tol              = 0.00000001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.0000000001;
+  CV_tol_U            = 0.00000001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases

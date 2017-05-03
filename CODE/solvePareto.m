@@ -25,22 +25,18 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nG,sep_po
     if Iter == Niter
       error('Maximum Iteration TP reached')
     end
+    
     P    = TP;
-    
-    % computing expectations
-    EP = zeros(nPhi,nG);
-    for ig = 1:nG
-      EP(:,ig)    = pi_Phi*(1-max(sep_pol,delta)).*P(:,ig);
-    end
-    
+    % Expectations over phi shock
+    EP   = bsxfun(@times,pi_Phi*(1-max(sep_pol,delta)),P);
+        
     for iphi = 1:nPhi
       
-      EP_Phi0 = squeeze(EP(iphi,:));
-      max_EP_Phi0 = max(EP_Phi0,0);
-      
-      if sep_pol(iphi) < 1   % as long as there is no separation
+      if sep_pol(iphi) < 1   
         
-        %This is the slow part. Make this faster.
+        EP_Phi0 = squeeze(EP(iphi,:));
+        max_EP_Phi0 = max(EP_Phi0,0);
+        
         for ig = 1:nG
           
           %Maximize more frequently as we get closer to the solution
