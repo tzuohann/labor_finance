@@ -7,7 +7,7 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_po
   iLp_star(sep_pol == 1,:)  = nan;
   Lp_star(sep_pol == 1,:)   = nan;
   w_star_v(sep_pol == 1,:)  = nan;
-  TP                        = zeros(nPhi, nL);
+  TP                        = repmat(Lambda_vect.*U,nPhi,1);
   
   EU_vect                   = pi_z*(U(:));
     
@@ -34,7 +34,7 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_po
       if sep_pol(iphi) < 1   
         
         EP_Phi0 = squeeze(EP(iphi,:));
-        max_EP_Phi0 = max(EP_Phi0,0);
+        max_EP_Phi0 = max(EP_Phi0,Lambda_vect.*U);
         
         for ig = 1:nL
           
@@ -49,7 +49,7 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_po
       
     end
     
-    tol = max(max((TP - P).*(TP - P)));
+    tol = max(max(abs(TP - P)));
     
   end
 end

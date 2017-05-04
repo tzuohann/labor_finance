@@ -1,7 +1,6 @@
-function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
+function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
     solveSearch(nZ,init_Prod,delta,E,V,U,BETA,EU_vect,b,rra,Lambda_vect,sep_pol)
-
-  FirmObj = -666;
+  
   for iz=1:nZ
     
     %Firm offers contracts which workers are indifferent towards.
@@ -34,7 +33,7 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     FirmFun(feasSet == false) = nan;
     
     if all(isnan(FirmFun))
-      FirmObj         = 0;
+      EnteringF0      = -666666666;
       EnteringP0      = nan;
       EnteringW0      = nan;
       EnteringLam_Idx = nan;
@@ -43,15 +42,12 @@ function [FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = ...
     else
       
       [AR , BR]       = max(FirmFun);
-      if BR == 1 || BR == numel(FirmFun)
-        error('Corner solution to search problem')
-      end
       if AR <= 0
         error('Firm value at entry at negative')
       end
       EnteringP0(iz)      = A0(BR);
-      FirmObj(iz)         = AR;
-      EnteringW0(iz)      = W0_grid(BR); 
+      EnteringF0(iz)      = AR./q(theta(BR));
+      EnteringW0(iz)      = W0_grid(BR);
       
       %For the case with PC, the multipler is a constant from entry
       EnteringLam_Idx(iz) = BR;

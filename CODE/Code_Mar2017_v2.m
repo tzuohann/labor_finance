@@ -11,13 +11,13 @@ function Code_Mar2017_v2()
   % Model parameters
   %%%%%%%%%%%%%%%%%%%%%%
   K                   = 1;            %Fixed required capital normalized to 1.
-  tau                 = 0.2;          %Taxes
+  tau                 = 0.1;          %Taxes
   r                   = 0.5;          %Return on capital.
   R                   = r/(1-tau);    %Gross return on capital
   rra                 = 0.5;          %Relative risk aversion.
   BETA                = 1/(1+r);      %Discount factor
   delta               = 0.05;         %Exogenous separation probability.
-  gamma_matching      = 0.5;          %Matching elasticity parameter
+  gamma_matching      = 0.5;            %Matching elasticity parameter
   b                   = 0;            %Value of home production
   psi                 = 0;            %fraction of recovered firm value if failed search
   
@@ -29,13 +29,13 @@ function Code_Mar2017_v2()
   
   %Worker productivity shock
   nPhi                = 30;
-  rho_Phi             = 0.9;
-  delta_Phi           = 0.15;
-  mean_Phi            = 0.10;
-  
-  mPhi                = 1;
-  Phi_grid            = linspace(-1,0.1,nPhi)';
-  pi_Phi              = create_y_mat(nPhi,Phi_grid,rho_Phi,delta_Phi);
+  rho_Phi             = 0.0000001;
+  mean_Phi            = 0.12;
+  sigma_Phi           = 0.2;
+  m_Phi               = 3;
+  [Phi_grid, pi_Phi]  = mytauchen(mean_Phi,rho_Phi,sigma_Phi,nPhi,m_Phi);
+  %Make this random
+  pi_Phi(:)           = 1/nPhi;
   
   % Initial productivity distrib
   init_Prod           = pi_Phi^100;
@@ -44,27 +44,24 @@ function Code_Mar2017_v2()
   %%%%%%%%%%%%%%%%%%%%%%
   % Technical parameters
   %%%%%%%%%%%%%%%%%%%%%%
-  nL                  = 2000;
-  LambdaMax           = 0.75;
+  nL                  = 1000;
+  LambdaMax           = 0.5;
   Lambda_vect         = linspace(0,LambdaMax,nL);   % Lagrange multiplier grid
   Lambda_vect_ws0     = (Lambda_vect/(1-tau)).^(1/rra);
   
   % inner loop
   Niter               = 500;
-  CV_tol              = 0.0000000001;
+  CV_tol              = 0.00001;
   
   % outer loop
   maxIter_U           = 1000;
-  CV_tol_U            = 0.0000000001;
+  CV_tol_U            = 0.00001;
   
   %%% Optimizing grid over Debt D
   %Choose debt so that it is both inbetween 0 and 1 and increases
   %separations as a function of D
-  nD                  = 14;
-  D_grid              = 1/(1-tau) + Phi_grid(1:nD)/r;
-  
-  nD                  = 4;
-  D_grid              = linspace(D_grid(1),D_grid(end),nD);
+  nD                  = 20;
+  D_grid              = linspace(0,0.99*K,nD);
   
   if any(K - D_grid) <= 0
     error('Cost of entry must be weakly positive. Check K - D_grid')
@@ -72,6 +69,9 @@ function Code_Mar2017_v2()
   
   %%% Bringing the unemployment value limits in the outer loop closer
   uSqueezeFactor      = 10;
+  
+  %Plot the setup of the problem to get a sense of how it works.
+  setupPlot
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
@@ -100,10 +100,10 @@ function Code_Mar2017_v2()
     U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra)/(1-BETA);
     
     %Check that there is entry at U_min
-    [~,~,~,~,~,~,FirmObj] = solveGivenU(...
+    [~,~,~,~,~,~,EnteringF0,~,~,theta_star] = solveGivenU(...
       CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
       Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
-    if FirmObj > ke
+    if BETA*EnteringF0*q(theta_star) > ke
     else
       error('No entry at U_min')
     end
@@ -125,19 +125,35 @@ function Code_Mar2017_v2()
       %Lp_star is unused because in PC case, Lambda' - Lambda
       %EU_vect is unused because there is only one aggregate state
       [TP,Lp_star,w_star_v,EU_vect,...
-        E,V,FirmObj,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
+        E,V,EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
         CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
         Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
       
       %Update U_u and U_l given solution to problem
+      if isnan(q(theta_star))
+        FirmObj = -666;
+      else
+        FirmObj = BETA.*EnteringF0.*q(theta_star);
+      end
       for iz = 1:nZ
-        if FirmObj(iz)>=ke
+        if FirmObj(iz)>=ke %(This captures the case when FirmObj is nan which happens when U is too high)
           U_l(iz)=(U_u(iz)+(uSqueezeFactor - 1)*U_l(iz))/uSqueezeFactor;
         else
           U_u(iz)=((uSqueezeFactor - 1)*U_u(iz)+U_l(iz))/uSqueezeFactor;
         end
       end
-      tol_U = (FirmObj - ke)^2;
+      
+      tol_U = abs(FirmObj - ke);
+      
+    end
+    
+    if EnteringLam_Idx == 1 || EnteringLam_Idx == nL
+      iD
+      if EnteringLam_Idx == 1
+        warning('Solution is Lambda = 0, workers get 0 at entry, makes no sense.')
+      elseif EnteringLam_Idx == nL
+        warning('Solution is lambda = LambdaMax, make lambda grid larger and rerun.')
+      end
     end
     
     EnteringW_err(iD) = EnteringW_D_err(sep_pol,delta,init_Prod,E(:,EnteringLam_Idx),nPhi,U,EnteringW0);
@@ -146,7 +162,7 @@ function Code_Mar2017_v2()
     Vstar_err(iD)     = Vstar_D_err(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,V(:,EnteringLam_Idx(iz)));
     
     %What the firm compares to ke
-    EnteringF_D(iD)     = FirmObj./q(theta_star);
+    EnteringF_D(iD)     = FirmObj;
     %Firm matching probability q
     Q_D(iD)             = q(theta_star);
     %Worker matching probability p
@@ -176,33 +192,9 @@ function Code_Mar2017_v2()
     [massE_D(:,iD), massU(iD)] = calcEmpDist(nPhi,pi_Phi,sep_pol,delta,P_D(iD),init_Prod);
     massEnt(iD)         = theta_star.*massU(iD);
     
-    %Understanding where we can get a hump
-    
-    %ROE period output of economy / capital injected in each period
-    ROE_D1(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(massEnt(iD).*(K - D));
-    %ROE period output of economy / capital injected and used in each period
-    ROE_D2(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(Q_D(iD).*massEnt(iD).*(K - D));
-    %ROE period output of economy / capital injected by all firms
-    ROE_D3(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(sum(massE_D(:,iD)).*(K - D));
-    %ROE period output of economy / K - D
-    ROE_D4(:,iD)         = (nansum(massE_D(:,iD).*(wages_D(:,iD) + dividends_D(:,iD))) + b.*massU(iD))/(K - D);
-    %ROE period VALUE / K - D
-    ROE_D5(:,iD)         = (EnteringF_D(iD) + EnteringLam(iD)*EnteringW_D(iD))/(K - D);
-    %ROE period VALUE / K - D
-    ROE_D6(:,iD)         = Q_D(iD).*(EnteringF_D(iD) + EnteringLam(iD)*EnteringW_D(iD))/(K - D);
-    %ROE period VALUE / K - D
-    ROE_D7(:,iD)         = nansum(massE_D(:,iD).*TP_D(:,iD))/(K - D);
-    %ROE period VALUE / K - D
-    ROE_D8(:,iD)         = Q_D(iD)*(init_Prod'*(sepPol_D(:,iD).*TP_D(:,iD)))/(K - D);
-    %ROE period VALUE / K - D
-    ROE_D9(:,iD)         = (init_Prod'*(sepPol_D(:,iD).*TP_D(:,iD)))/(K - D);
   end
   
   save
   checkingPlots
-  EnteringW_err
-  U_err
-  Estar_err
-  Vstar_err
   
 end
