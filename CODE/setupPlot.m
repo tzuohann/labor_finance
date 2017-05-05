@@ -1,4 +1,7 @@
 figure(9987)
+if any(K - D_grid) <= 0
+  error('Cost of entry must be weakly positive. Check K - D_grid')
+end
 for iD = 1:nD
   D                 = D_grid(iD);
   preTaxOutput      = outputFunc(K,r,tau,Phi_grid,D);

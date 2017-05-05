@@ -9,7 +9,7 @@ function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
     %FOC shows that marginal E in each state is lambda
     separationProb          = max(delta,sep_pol);
     W0_grid                 = init_Prod'*(bsxfun(@plus,bsxfun(@times,(1-separationProb),E),bsxfun(@times,separationProb,U)));
-    JV0                     = ((1-separationProb)'.*init_Prod')*V; %+ Value Vacancy = 0 becaus psi = 0
+    F0_grid                 = ((1-separationProb)'.*init_Prod')*V; %+ Value Vacancy = 0 becaus psi = 0
     feasSet                 = true(size(W0_grid));
     %Off the bat, anything less than U0 is a no-go
     feasSet(W0_grid < U)    = false;
@@ -29,7 +29,7 @@ function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
     end
     theta     = 1./qinv(A0);
     
-    FirmFun                   = q(theta).*JV0;
+    FirmFun                   = q(theta).*F0_grid;
     FirmFun(feasSet == false) = nan;
     
     if all(isnan(FirmFun))

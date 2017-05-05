@@ -23,7 +23,7 @@ function [E,V] = calcEV(TP,nPhi,nL,Lambda_vect,U0,sep_pol,psi,K,D)
   for iphi=1:nPhi
     
     if sep_pol(iphi) ==0
-      V(iphi,:) = TP(iphi,:) - Lambda_vect(iphi,:).*E(iphi,:);
+      V(iphi,:) = TP(iphi,:) - Lambda_vect.*E(iphi,:);
     else
       V(iphi,:) = psi.*(K-D);  %% testing with K-D instead of 0
     end

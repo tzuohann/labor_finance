@@ -19,57 +19,32 @@ subplot(2,2,4)
 plot(D_grid,[Estar_err;Vstar_err],'-*','LineWidth',3);
 legend({'E error','V error'})
 title('Eqbm Errors')
+figureFullScreen(2)
 
 figure(3)
 subplot(2,2,1)
-plot(D_grid, [EnteringW_D;EnteringF_D],'-*','LineWidth',3);
-legend({'W','F'})
+plot(D_grid, [EnteringW_D;EnteringF_D;EnteringW_D+EnteringF_D],'-*','LineWidth',3);
+legend({'W','F','W+F'})
+title('W and F')
 subplot(2,2,2)
-plot(D_grid,EnteringW_D+EnteringF_D,'-*','LineWidth',3);
-legend({'W + F '})
-subplot(2,2,3)
 plot(D_grid,U_D - utilFunc(b,rra),'-*','LineWidth',3);
-legend({'U - u(b)'})
-subplot(2,2,4)
-plot(D_grid,EnteringW_D-U_D,'-*','LineWidth',3);
-legend({'W - U'})
-
-
-
 hold on
-plot(D_grid, EnteringW_D,'-*','LineWidth',3);
-plot(D_grid, U_D,'-*','LineWidth',3);
-hold off
-legend({'W','U'})
-title('W and U')
-subplot(2,2,2)
-plot(D_grid, EnteringF_D,'-*','LineWidth',3);
-title('F (value condition on matching)')
-subplot(2,2,4)
-plot(D_grid,init_Prod'*TP_D,'-*','LineWidth',3);
-title('Expected TP')
+plot(D_grid,EnteringW_D-U_D,'-*','LineWidth',3);
+legend({'U - u(b)','W - U'})
+title('W - U and U - u(b)')
+figureFullScreen(3)
 
-subplot(2,2,4)
-plot(Phi_grid,wages_D,'-*','LineWidth',3)
-bla = {};
-for i1 = 1:nD
-  bla{i1} = num2str(i1);
-end
-legend(bla)
-title('Wages')
-
-figure(3)
+figure(4)
 subplot(2,2,1)
-plot(D_grid, EnteringW_D - U_D,'-*','LineWidth',3);
-title('W - U')
+plot(D_grid, Q_D.*(EnteringF_D + EnteringW_D)./(K-D),'-*','LineWidth',3);
+title('q(theta)*(F+W)/(K-D)')
 subplot(2,2,2)
-plot(D_grid, P_D.*EnteringW_D,'-*','LineWidth',3);
-title('p(theta)*W')
+plot(D_grid, (Q_D.*(EnteringF_D + EnteringW_D) + (1-Q_D).*U_D)./(K-D),'-*','LineWidth',3);
+title('[q*(F+W) + (1-q)U]/(K-D)')
 subplot(2,2,3)
-plot(D_grid, P_D.*(EnteringW_D - U_D),'-*','LineWidth',3);
-title('p(theta)*(W - U)')
+plot(D_grid, Q_D.*(EnteringF_D + EnteringW_D),'-*','LineWidth',3);
+title('[q*(F+W)]')
 subplot(2,2,4)
-plot(D_grid, Q_D.*EnteringF_D,'-*','LineWidth',3);
-title('q(theta)*F')
-
-
+plot(D_grid, (Q_D.*(EnteringF_D + EnteringW_D) + (1-Q_D).*U_D)./(K-D),'-*','LineWidth',3);
+title('[q*(F+W) + (1-q)U]')
+figureFullScreen(4)
