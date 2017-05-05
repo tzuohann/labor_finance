@@ -40,9 +40,7 @@ function Code_Mar2017_v2()
     U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra)/(1-BETA);
     
     %Check that there is entry at U_min
-    [~,~,~,~,~,~,EnteringF0,~,~,theta_star] = solveGivenU(...
-      CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
-      Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
+    [~,~,~,~,~,~,EnteringF0,~,~,theta_star] = solveGivenU(CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,pi_z,r,K,D,tau,w_star_pre_cons,Ppsi,nZ,init_Prod,b,rra);
     if BETA*EnteringF0*q(theta_star) > ke
     else
       error('No entry at U_min')
@@ -67,7 +65,7 @@ function Code_Mar2017_v2()
       [TP,Lp_star,w_star_v,EU_vect,...
         E,V,EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
         CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
-        Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,psi,nZ,init_Prod,b,rra);
+        Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,Ppsi,nZ,init_Prod,b,rra);
       
       %Update U_u and U_l given solution to problem
       if isnan(q(theta_star))

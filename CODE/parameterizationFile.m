@@ -13,7 +13,7 @@ BETA                = 1/(1+r);      %Discount factor
 delta               = 0.05;         %Exogenous separation probability.
 gamma_matching      = 0.5;            %Matching elasticity parameter
 b                   = 0;            %Value of home production
-psi                 = 0;            %fraction of recovered firm value if failed search
+Ppsi                = 0;            %fraction of recovered firm value if failed search
 
 %Aggregate productivity shock -- muted for now
 z_0                 = 1;
