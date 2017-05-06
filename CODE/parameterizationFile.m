@@ -8,10 +8,10 @@ K                   = 1;            %Fixed required capital normalized to 1.
 tau                 = 0.1;          %Taxes
 r                   = 0.5;          %Return on capital.
 R                   = r/(1-tau);    %Gross return on capital
-rra                 = 0.5;          %Relative risk aversion.
+rra                 = 0.3;          %Relative risk aversion.
 BETA                = 1/(1+r);      %Discount factor
 delta               = 0.05;         %Exogenous separation probability.
-gamma_matching      = 0.5;            %Matching elasticity parameter
+gamma_matching      = 1;            %Matching elasticity parameter
 b                   = 0;            %Value of home production
 Ppsi                = 0;            %fraction of recovered firm value if failed search
 
@@ -24,7 +24,7 @@ iz                  = 1;
 %Worker productivity shock
 nPhi                = 30;
 rho_Phi             = 0.0000001;
-mean_Phi            = 0.12;
+mean_Phi            = 0.1;
 sigma_Phi           = 0.2;
 m_Phi               = 3;
 [Phi_grid, pi_Phi]  = mytauchen(mean_Phi,rho_Phi,sigma_Phi,nPhi,m_Phi);
@@ -56,6 +56,7 @@ CV_tol_U            = 0.00001;
 %separations as a function of D
 nD                  = 20;
 D_grid              = linspace(0,0.99*K,nD);
+% D_grid              = linspace(0,0.052105263157895,nD);
 
 %%% Bringing the unemployment value limits in the outer loop closer
 uSqueezeFactor      = 10;

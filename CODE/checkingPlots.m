@@ -33,8 +33,10 @@ plot(D_grid,EnteringW_D-U_D,'-*','LineWidth',3);
 legend({'U - u(b)','W - U'})
 title('W - U and U - u(b)')
 subplot(2,2,3)
-plot(D_grid,init_Prod'*((1 - sepPol_D).*TP_D),'-*','LineWidth',3);
-title('Expected TP*')
+plot(D_grid,init_Prod'*((1 - sepPol_D).*TP_D + bsxfun(@times,sepPol_D,EnteringLam.*U_D)),'-*','LineWidth',3);
+title('Expected TP* less LambdaU')
+subplot(2,2,4)
+title('PV Output')
 figureFullScreen(3)
 
 figure(4)
