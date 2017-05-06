@@ -36,20 +36,21 @@ subplot(2,2,3)
 plot(D_grid,init_Prod'*((1 - sepPol_D).*TP_D + bsxfun(@times,sepPol_D,EnteringLam.*U_D)),'-*','LineWidth',3);
 title('Expected TP* less LambdaU')
 subplot(2,2,4)
+plot(D_grid,Q_D.*ExpPVOutput_D./(K-D_grid),'-*','LineWidth',3);
 title('PV Output')
 figureFullScreen(3)
 
 figure(4)
 subplot(2,2,1)
-plot(D_grid, Q_D.*(EnteringF_D + EnteringW_D)./(K-D),'-*','LineWidth',3);
+plot(D_grid, Q_D.*(EnteringF_D + EnteringW_D)./(K-D_grid),'-*','LineWidth',3);
 title('q(theta)*(F+W)/(K-D)')
 subplot(2,2,2)
-plot(D_grid, (Q_D.*(EnteringF_D + EnteringW_D) + (1-Q_D).*U_D)./(K-D),'-*','LineWidth',3);
+plot(D_grid, (Q_D.*(EnteringF_D + EnteringW_D) + (1-Q_D).*U_D)./(K-D_grid),'-*','LineWidth',3);
 title('[q*(F+W) + (1-q)U]/(K-D)')
 subplot(2,2,3)
-plot(D_grid, Q_D.*(EnteringF_D + EnteringW_D),'-*','LineWidth',3);
-title('[q*(F+W)]')
+plot(D_grid, Q_D.*(EnteringF_D + EnteringW_D)./(K-D_grid),'-*','LineWidth',3);
+title('[q*(F+W)]/(K-D)')
 subplot(2,2,4)
-plot(D_grid, (Q_D.*(EnteringF_D + EnteringW_D) + (1-Q_D).*U_D)./(K-D),'-*','LineWidth',3);
-title('[q*(F+W) + (1-q)U]')
+plot(D_grid, (Q_D.*(EnteringF_D + EnteringW_D) + (1-Q_D).*U_D)./(K-D_grid),'-*','LineWidth',3);
+title('[q*(F+W) + (1-q)U]/(K-D)')
 figureFullScreen(4)

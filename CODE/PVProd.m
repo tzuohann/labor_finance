@@ -1,12 +1,22 @@
-function output = PVProd(nPhi,sepPol_D,delta,R,K,Phi_grid,r,D,wages,tau,BETA,pi_Phi,Vstar_D)
-  for ip = 1:nPhi
-    if sepPol_D(ip) == 1
-      V_test(ip,1) = 0'; %psi assumed to be zero here
-    else
-    sp = max(sepPol_D,delta);
-    div_test(ip,1) = (R*K + Phi_grid(ip) - r*D - wages(ip))*(1-tau);
-    V_test(ip,1) = div_test(ip) + BETA*pi_Phi(ip,:)*((1-sp).*Vstar_D);
+function V_next = PVProd(nPhi,sepPol,delta,R,K,Phi_grid,r,D,wages,tau,BETA,pi_Phi,CV_tol)
+  %Calculates the present value of payments to firm and worker
+  V_next = zeros(nPhi,1);
+  diff   = 1;
+  sp = max(sepPol,delta);
+  while diff > CV_tol
+    V_prev = V_next;
+    for ip = 1:nPhi
+      if sepPol(ip) == 1
+        V_next(ip,:) = 0; %Psi = 0 assumed for now
+      else
+        %o = (R*K + Phi_grid(ip) - r*D - wages(ip,:))*(1-tau) + wages(ip,:);
+        o = (R*K + Phi_grid(ip) - r*D)*(1-tau);
+        if o < 0
+          error('Output Less than Zero')
+        end
+        V_next(ip,1) = o + BETA*pi_Phi(ip,:)*((1-sp).*V_prev);
+      end
     end
+    diff = max(abs(V_prev - V_next));
   end
-  output = max(abs(V_test - Vstar_D));
 end

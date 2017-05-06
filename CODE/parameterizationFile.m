@@ -24,7 +24,7 @@ iz                  = 1;
 %Worker productivity shock
 nPhi                = 30;
 rho_Phi             = 0.0000001;
-mean_Phi            = 0.1;
+mean_Phi            = 0.2;
 sigma_Phi           = 0.2;
 m_Phi               = 3;
 [Phi_grid, pi_Phi]  = mytauchen(mean_Phi,rho_Phi,sigma_Phi,nPhi,m_Phi);
@@ -38,8 +38,8 @@ init_Prod           = init_Prod(1,:)';
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nL                  = 1000;
-LambdaMax           = 0.5;
+nL                  = 2000;
+LambdaMax           = 0.75;
 Lambda_vect         = linspace(0,LambdaMax,nL);   % Lagrange multiplier grid
 Lambda_vect_ws0     = (Lambda_vect/(1-tau)).^(1/rra);
 

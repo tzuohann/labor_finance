@@ -98,7 +98,10 @@ function Code_Mar2017_v2()
     U_err(iD)         = U_D_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U);
     Estar_err(iD)     = Estar_D_err(sep_pol,delta,pi_Phi,w_star_v(:,EnteringLam_Idx(iz)),rra,BETA,E(:,EnteringLam_Idx),nPhi,U);
     Vstar_err(iD)     = Vstar_D_err(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,V(:,EnteringLam_Idx(iz)));
+    PVOutput          = PVProd(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,CV_tol);
     
+    %Expected dividends plus wages
+    ExpPVOutput_D(iD)   = init_Prod'*PVOutput;
     %What the firm compares to ke
     EnteringF_D(iD)     = FirmObj;
     %Firm matching probability q
