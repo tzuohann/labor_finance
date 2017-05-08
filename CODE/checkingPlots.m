@@ -27,7 +27,7 @@ plot(D_grid, [EnteringW_D;EnteringF_D;EnteringW_D+EnteringF_D],'-*','LineWidth',
 legend({'W','F','W+F'})
 title('W and F')
 subplot(2,2,2)
-plot(D_grid,U_D - utilFunc(b,rra),'-*','LineWidth',3);
+plot(D_grid,U_D - utilFunc(b,rra,typeu),'-*','LineWidth',3);
 hold on
 plot(D_grid,EnteringW_D-U_D,'-*','LineWidth',3);
 legend({'U - u(b)','W - U'})

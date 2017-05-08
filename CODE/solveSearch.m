@@ -1,5 +1,5 @@
 function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,b,rra,Lambda_vect,sep_pol)
+    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,b,rra,Lambda_vect,sep_pol,typeu,pi_z)
   
   EU_vect                   = pi_z*(U(:));
   for iz=1:nZ
@@ -16,7 +16,7 @@ function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
     feasSet(W0_grid < U)    = false;
     
     %Maximizing the worker's search problem
-    rho(iz)         = (U(iz) - utilFunc(b,rra) - BETA* EU_vect(iz));
+    rho(iz)         = (U(iz) - utilFunc(b,rra,typeu) - BETA* EU_vect(iz));
     A0              = rho(iz)./(BETA*(W0_grid - EU_vect(iz)));
     
     %If A0 > 1, this means that the firm is offering so little that the

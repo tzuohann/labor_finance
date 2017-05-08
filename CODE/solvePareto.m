@@ -6,8 +6,7 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
   w_star_v                  = w_star_pre;
   iLp_star(sep_pol == 1,:)  = nan;
   w_star_v(sep_pol == 1,:)  = nan;
-  
-  TP                        = repmat(Lambda_vect.*0,nPhi,1);
+  TP                        = zeros(nPhi,nL);
   
   U2                        = (max(sep_pol,delta)).*U';
   EsigU                     = pi_Phi*U2(:);
@@ -24,7 +23,13 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
     P = TP;
     switch commitType
       case{'perfect'}
-        [TP,iLp_star] = calcPC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,U,Obj_Pre,BETA,nL);
+        EP       = BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),P);
+        iLp_star = repmat(1:nL,nPhi,1);
+        for iphi = 1:nPhi
+          if sep_pol(iphi) < 1
+            TP(iphi,:)         = Obj_Pre(iphi,:) + EP(iphi,:);
+          end
+        end
       case{'limited'}
         [TP,iLp_star] = calcLC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,Lambda_vect,Obj_Pre,BETA,nL);
       otherwise
@@ -53,14 +58,4 @@ function [TP,iLp_star] = calcLC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,Lambda_v
   end
 end
 
-function [TP,iLp_star] = calcPC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,Obj_Pre,BETA,nL)
-  EP   = BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),P);
-  for iL = 1:nL
-    for iphi = 1:nPhi
-      if sep_pol(iphi) < 1
-        iLp_star(iphi,iL)   = iL;
-        TP(iphi,iL)         = Obj_Pre(iphi,iL) + EP(iphi,iL);
-      end
-    end
-  end
-end
+

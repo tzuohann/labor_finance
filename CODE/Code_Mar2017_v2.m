@@ -32,17 +32,17 @@ function Code_Mar2017_v2()
     posDiv                      = bsxfun(@minus,preTaxOutput,w_star0) >= 0;
     w_star_pre                  = bsxfun(@times,w_star0,posDiv) + bsxfun(@times,w_cons,(1-posDiv));
     w_star_pre(w_star_pre <= 0) = nan;
-    w_star_pre_cons             = utilFunc(w_star_pre,rra);
+    w_star_pre_cons             = utilFunc(w_star_pre,rra,typeu);
     
     %lowest possible utlity is consuming b forever
-    U_min   = utilFunc(b,rra)/(1-BETA);
+    U_min   = utilFunc(b,rra,typeu)/(1-BETA);
     %highest possible utlity is consuming all production
-    U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra)/(1-BETA);
+    U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra,typeu)/(1-BETA);
     
     %Check that there is entry at U_min
-    [~,~,~,~,~,~,EnteringF0,~,~,theta_star] = solveGivenU(CV_tol,Niter,nPhi,...
+    [~,~,~,~,~,EnteringF0,~,~,theta_star] = solveGivenU(CV_tol,Niter,nPhi,...
       nL,sep_pol,delta,pi_Phi,Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,...
-      pi_z,r,K,D,tau,w_star_pre_cons,Ppsi,nZ,init_Prod,b,rra,commitType);
+      pi_z,r,K,D,tau,w_star_pre_cons,Ppsi,nZ,init_Prod,b,rra,commitType,typeu);
     if BETA*EnteringF0*q(theta_star) > ke
     else
       error('No entry at U_min')
@@ -64,11 +64,11 @@ function Code_Mar2017_v2()
       %Solve the entire problem given U
       %Lp_star is unused because in PC case, Lambda' - Lambda
       %EU_vect is unused because there is only one aggregate state
-      [TP,iLp_star,w_star_v,EU_vect,...
+      [TP,iLp_star,w_star_v,...
         E,V,EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
         CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
         Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,...
-        Ppsi,nZ,init_Prod,b,rra,commitType);
+        Ppsi,nZ,init_Prod,b,rra,commitType,typeu);
       
       %Update U_u and U_l given solution to problem
       if isnan(q(theta_star))
@@ -98,8 +98,8 @@ function Code_Mar2017_v2()
     end
     
     EnteringW_err(iD) = EnteringW_D_err(sep_pol,delta,init_Prod,E(:,EnteringLam_Idx),nPhi,U,EnteringW0);
-    U_err(iD)         = U_D_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U);
-    Estar_err(iD)     = Estar_D_err(sep_pol,delta,pi_Phi,w_star_v(:,EnteringLam_Idx(iz)),rra,BETA,E(:,EnteringLam_Idx),nPhi,U);
+    U_err(iD)         = U_D_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U,typeu);
+    Estar_err(iD)     = Estar_D_err(sep_pol,delta,pi_Phi,w_star_v(:,EnteringLam_Idx(iz)),rra,BETA,E(:,EnteringLam_Idx),nPhi,U,typeu);
     Vstar_err(iD)     = Vstar_D_err(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,V(:,EnteringLam_Idx(iz)));
     PVOutput          = PVProd(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,CV_tol);
     
