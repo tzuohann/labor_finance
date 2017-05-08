@@ -1,6 +1,7 @@
 function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,EU_vect,b,rra,Lambda_vect,sep_pol)
+    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,b,rra,Lambda_vect,sep_pol)
   
+  EU_vect                   = pi_z*(U(:));
   for iz=1:nZ
     
     %Firm offers contracts which workers are indifferent towards.

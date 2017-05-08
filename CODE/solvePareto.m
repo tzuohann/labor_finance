@@ -1,23 +1,18 @@
-function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
-    Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons)
+function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
+    Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,commitType)
   
   iLp_star                  = ones(nPhi,nL);
   Lp_star                   = ones(nPhi,nL);
-  w_star_v                  = ones(nPhi,nL);
+  w_star_v                  = w_star_pre;
   iLp_star(sep_pol == 1,:)  = nan;
-  Lp_star(sep_pol == 1,:)   = nan;
   w_star_v(sep_pol == 1,:)  = nan;
-  %What's is the right lower bound for P 0, LambdaU, or else
-  %Because E can be below U in PC case.
-  TP                        = repmat(Lambda_vect.*U,nPhi,1);
   
-  EU_vect                   = pi_z*(U(:));
-    
+  TP                        = repmat(Lambda_vect.*0,nPhi,1);
+  
   U2                        = (max(sep_pol,delta)).*U';
   EsigU                     = pi_Phi*U2(:);
-  
   Obj_Pre     = r*K + (repmat(Phi_grid,1,nL) - D*r - w_star_pre)*(1-tau) ...
-              + repmat(Lambda_vect,nPhi,1).*(w_star_pre_cons + BETA*repmat(EsigU,1,nL)); 
+    + repmat(Lambda_vect,nPhi,1).*(w_star_pre_cons + BETA*repmat(EsigU,1,nL));
   
   tol  = 1;
   Iter = 0;
@@ -26,34 +21,46 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_po
     if Iter == Niter
       error('Maximum Iteration TP reached')
     end
-    
-    P    = TP;
-    % Expectations over phi shock
-    EP   = pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),P);
-        
-    for iphi = 1:nPhi
-      
-      if sep_pol(iphi) < 1   
-        
-        EP_Phi0 = squeeze(EP(iphi,:));
-        %What's is the right lower bound for P 0, LambdaU, or else
-        %Because E can be below U in PC case.
-        max_EP_Phi0 = max(EP_Phi0,Lambda_vect.*U);
-        
-        for ig = 1:nL
-          
-          iLp_star(iphi,ig)   = ig;
-          Lp_star(iphi,ig)    = Lambda_vect(ig);
-          w_star_v(iphi,ig)   = w_star_pre(iphi,ig);         
-          TP(iphi,ig)         = Obj_Pre(iphi,ig) + BETA*max_EP_Phi0(ig);
-          
-        end
-        
-      end
-      
+    P = TP;
+    switch commitType
+      case{'perfect'}
+        [TP,iLp_star] = calcPC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,U,Obj_Pre,BETA,nL);
+      case{'limited'}
+        [TP,iLp_star] = calcLC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,Lambda_vect,Obj_Pre,BETA,nL);
+      otherwise
+        error('Commitment type not specifed correctly.')
     end
     
     tol = max(max(abs(TP - P)));
     
+  end
+end
+
+function [TP,iLp_star] = calcLC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,Lambda_vect,U,Obj_Pre,BETA,nL)
+  sep_pol = max(sep_pol,delta);
+  for iphi = 1:nPhi
+    if sep_pol(iphi) < 1
+      for iL = 1:nL
+        TP2 = zeros(nPhi,1);
+        for iphip = 1:nPhi
+          [TP2(iphip,1),B0]         = min((1-sep_pol(iphip))*P(iphip,iL:nL) + (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-sep_pol(iphip))*U);
+          B                         = B0+iL-1;
+          iLp_star(iphi,iphip,iL)   = B;
+        end
+        TP(iphi,iL)                 = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,iL);
+      end
+    end
+  end
+end
+
+function [TP,iLp_star] = calcPC(TP,iLp_star,pi_Phi,sep_pol,delta,P,nPhi,Obj_Pre,BETA,nL)
+  EP   = BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),P);
+  for iL = 1:nL
+    for iphi = 1:nPhi
+      if sep_pol(iphi) < 1
+        iLp_star(iphi,iL)   = iL;
+        TP(iphi,iL)         = Obj_Pre(iphi,iL) + EP(iphi,iL);
+      end
+    end
   end
 end
