@@ -31,7 +31,7 @@ function Code_Mar2017_v2()
     w_cons                      = (r/(1-tau)*K +(Phi_grid - D*r));
     posDiv                      = bsxfun(@minus,preTaxOutput,w_star0) >= 0;
     w_star_pre                  = bsxfun(@times,w_star0,posDiv) + bsxfun(@times,w_cons,(1-posDiv));
-    w_star_pre(w_star_pre <= 0) = nan;
+    w_star_pre(w_star_pre < 0)  = nan;
     w_star_pre_cons             = utilFunc(w_star_pre,rra,typeu);
     
     %lowest possible utlity is consuming b forever

@@ -43,9 +43,9 @@ function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
     else
       
       [AR , BR]       = max(FirmFun);
-      if AR <= 0
-        error('Firm value at entry at negative')
-      end
+%       if AR <= 0
+%         error('Firm value at entry at negative')
+%       end
       EnteringP0(iz)      = A0(BR);
       EnteringF0(iz)      = AR./q(theta(BR));
       EnteringW0(iz)      = W0_grid(BR);
