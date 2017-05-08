@@ -9,8 +9,8 @@ function V_next = PVProd(nPhi,sepPol,delta,R,K,Phi_grid,r,D,wages,tau,BETA,pi_Ph
       if sepPol(ip) == 1
         V_next(ip,:) = 0; %Psi = 0 assumed for now
       else
-        %o = (R*K + Phi_grid(ip) - r*D - wages(ip,:))*(1-tau) + wages(ip,:);
-        o = (R*K + Phi_grid(ip) - r*D)*(1-tau);
+        o = (R*K + Phi_grid(ip) - r*D - wages(ip,:))*(1-tau) + wages(ip,:);
+        %o = (R*K + Phi_grid(ip) - r*D)*(1-tau);
         if o < 0
           error('Output Less than Zero')
         end

@@ -103,7 +103,7 @@ function Code_Mar2017_v2()
     %Expected dividends plus wages
     ExpPVOutput_D(iD)   = init_Prod'*PVOutput;
     %What the firm compares to ke
-    EnteringF_D(iD)     = FirmObj;
+    EnteringF_D(iD)     = EnteringF0;
     %Firm matching probability q
     Q_D(iD)             = q(theta_star);
     %Worker matching probability p

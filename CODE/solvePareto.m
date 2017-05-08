@@ -7,6 +7,8 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_po
   iLp_star(sep_pol == 1,:)  = nan;
   Lp_star(sep_pol == 1,:)   = nan;
   w_star_v(sep_pol == 1,:)  = nan;
+  %What's is the right lower bound for P 0, LambdaU, or else
+  %Because E can be below U in PC case.
   TP                        = repmat(Lambda_vect.*U,nPhi,1);
   
   EU_vect                   = pi_z*(U(:));
@@ -34,6 +36,8 @@ function [TP,Lp_star,w_star_v,EU_vect] = solvePareto(CV_tol,Niter,nPhi,nL,sep_po
       if sep_pol(iphi) < 1   
         
         EP_Phi0 = squeeze(EP(iphi,:));
+        %What's is the right lower bound for P 0, LambdaU, or else
+        %Because E can be below U in PC case.
         max_EP_Phi0 = max(EP_Phi0,Lambda_vect.*U);
         
         for ig = 1:nL
