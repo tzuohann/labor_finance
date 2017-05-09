@@ -16,7 +16,7 @@ pcolor(D_grid,Phi_grid,bla)
 title('Employment Mass')
 figureFullScreen(2)
 subplot(2,2,4)
-plot(D_grid,[Estar_err;Vstar_err],'-*','LineWidth',3);
+plot(D_grid,[Estar_err_D;Vstar_err_D],'-*','LineWidth',3);
 legend({'E error','V error'})
 title('Eqbm Errors')
 figureFullScreen(2)

@@ -11,7 +11,7 @@ function Code_Mar2017_v2()
   parameterizationFile
   
   %Plot the setup of the problem to get a sense of how it works.
-%   setupPlot
+  setupPlot
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
@@ -88,6 +88,7 @@ function Code_Mar2017_v2()
       
     end
     
+    %CHeck solution for correctness
     if EnteringLam_Idx == 1 || EnteringLam_Idx == nL
       iD
       if EnteringLam_Idx == 1
@@ -97,11 +98,11 @@ function Code_Mar2017_v2()
       end
     end
     
-    EnteringW_err(iD) = EnteringW_D_err(sep_pol,delta,init_Prod,E(:,EnteringLam_Idx),nPhi,U,EnteringW0);
-    U_err(iD)         = U_D_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U,typeu);
-    Estar_err(iD)     = Estar_D_err(sep_pol,delta,pi_Phi,w_star_v(:,EnteringLam_Idx(iz)),rra,BETA,E(:,EnteringLam_Idx),nPhi,U,typeu);
-    Vstar_err(iD)     = Vstar_D_err(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,V(:,EnteringLam_Idx(iz)));
-    PVOutput          = PVProd(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,CV_tol);
+    EnteringW_err_D(iD) = EnteringW_err(sep_pol,delta,init_Prod,E(:,EnteringLam_Idx),nPhi,U,EnteringW0);
+    U_err_D(iD)         = U_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U,typeu);
+    Estar_err_D(iD)     = Estar_err(sep_pol,delta,pi_Phi,w_star_v,rra,BETA,E,nPhi,U,typeu,iLp_star,nL);
+    Vstar_err_D(iD)     = Vstar_err(sep_pol,delta,pi_Phi,w_star_v,BETA,V,nPhi,iLp_star,nL,R,K,Phi_grid,r,D,tau);
+    PVOutput            = PVProd(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,CV_tol);
     
     %Expected dividends plus wages
     ExpPVOutput_D(iD)   = init_Prod'*PVOutput;

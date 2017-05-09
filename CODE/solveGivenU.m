@@ -6,7 +6,7 @@ function [TP,iLp_star,w_star_v,...
   
   %Solve the SPP
   [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
-    Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,commitType);
+    Phi_grid,BETA,Lambda_vect,w_star_pre,U,r,K,D,tau,w_star_pre_cons,commitType);
   
   %Converting the solution from Lagrange multiplier space to promised value space
   [E,V] = calcEV(TP,nPhi,nL,Lambda_vect,U,sep_pol,Ppsi,K,D);
