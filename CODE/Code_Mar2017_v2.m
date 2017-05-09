@@ -11,7 +11,7 @@ function Code_Mar2017_v2()
   parameterizationFile
   
   %Plot the setup of the problem to get a sense of how it works.
-  setupPlot
+  %setupPlot
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
@@ -51,7 +51,7 @@ function Code_Mar2017_v2()
     %Initialize U levels
     U_l     = U_min*ones(nZ,1);
     U_u     = U_max*ones(nZ,1);
-    tol_U = 1;
+    tol_U = 10000000;
     iter_U = 0;
     while(tol_U > CV_tol_U &&  iter_U < maxIter_U )
       %Update U
@@ -84,7 +84,8 @@ function Code_Mar2017_v2()
         end
       end
       
-      tol_U = abs(FirmObj - ke);
+      disp('Updated')
+      tol_U = abs(FirmObj - ke)
       
     end
     

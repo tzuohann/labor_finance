@@ -14,7 +14,7 @@ delta               = 0.05;         %Exogenous separation probability.
 gamma_matching      = 1.25;         %Matching elasticity parameter
 b                   = 0;          %Value of home production
 Ppsi                = 0;            %fraction of recovered firm value if failed search
-commitType          = 'perfect';    %Limited or perfect;
+commitType          = 'limited';    %Limited or perfect;
 typeu               = 1;            %Utility type
 
 %Aggregate productivity shock -- muted for now
@@ -24,7 +24,7 @@ pi_z                = 1;
 iz                  = 1;
 
 %Worker productivity shock
-nPhi                = 50;
+nPhi                = 10;
 rho_Phi             = 0.0000001;
 mean_Phi            = 0.3;
 sigma_Phi           = 0.2;
@@ -47,17 +47,17 @@ Lambda_vect_ws0     = Lambda_util_type(rra,Lambda_vect,tau,typeu);
 
 % inner loop
 Niter               = 500;
-CV_tol              = 0.00000001;
+CV_tol              = 0.000001;
 
 % outer loop
 maxIter_U           = 1000;
-CV_tol_U            = 0.01;
+CV_tol_U            = 10;
 
 %%% Optimizing grid over Debt D
 %Choose debt so that it is both inbetween 0 and 1 and increases
 %separations as a function of D
-nD                  = 10;
-D_grid              = linspace(0.3,0.5,nD);
+nD                  = 3;
+D_grid              = linspace(0.2,0.9,nD);
 
 %%% Bringing the unemployment value limits in the outer loop closer
 uSqueezeFactor      = 10;

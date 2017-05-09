@@ -12,6 +12,15 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
   Obj_Pre     = r*K + (repmat(Phi_grid,1,nL) - D*r - w_star_pre)*(1-tau) ...
     + repmat(Lambda_vect,nPhi,1).*(w_star_pre_cons + BETA*repmat(EsigU,1,nL));
   
+  %Helper variables for limited commitment case
+  UCons = zeros(nPhi,nL,nL);
+  for iphi = 1:nPhi
+    for iL = 1:nL
+      UCons(iphi,iL:nL,iL) = (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphi),delta))*U;
+    end
+  end
+  SepP = zeros(nPhi,nL);
+  
   tol  = 1;
   Iter = 0;
   while (tol > CV_tol && Iter < Niter )
@@ -28,48 +37,21 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
         TP(sep_pol < 1,:)         = Obj_Pre(sep_pol < 1,:) + EP(sep_pol < 1,:);
       case{'limited'}
         
-        % FAST
-        %Can still precompute the newMin line for even more gain.
-        for iphi = 1:nPhi
-          if sep_pol(iphi) < 1
-            TP2 = zeros(nPhi,nL);
-            for iphip = 1:nPhi
-              %Solve the most constrained case first.
-              iL                          = nL;
-              TP2(iphip,iL)               = min((1-max(sep_pol(iphip),delta))*P(iphip,iL:nL) + (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphip),delta))*U);
-              runningMin                  = TP2(iphip,iL);
-              runningMinLoc               = nL;
-              iLp_star(iphi,iphip,iL)     = runningMinLoc;
-              for iL = nL-1:-1:1
-                newMin  = (1-max(sep_pol(iphip),delta))*P(iphip,iL) + (Lambda_vect(iL) - Lambda_vect(nL))*(1-max(sep_pol(iphip),delta))*U;
-                if newMin < runningMin
-                  runningMin    = newMin;
-                  runningMinLoc = iL;
-                end
-                TP2(iphip,iL)             = runningMin;
-                iLp_star(iphi,iphip,iL)   = runningMinLoc;
-              end
-            end
-            TP(iphi,:)                 = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,:);
-          end
+        
+        for iPhi = 1:nPhi
+          SepP(iPhi,:) = (1-max(sep_pol(iPhi),delta))*P(iPhi,:);
         end
         
-        %         %SLOW use to verify
-        %         for iphi = 1:nPhi
-        %           if sep_pol(iphi) < 1
-        %             for iL = 1:nL
-        %               TP2 = zeros(nPhi,1);
-        %               for iphip = 1:nPhi
-        %                 [TP2(iphip,1),B0]         = min((1-max(sep_pol(iphip),delta))*P(iphip,iL:nL) + (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphip),delta))*U);
-        %                 B                         = B0+iL-1;
-        %                 iLp_star(iphi,iphip,iL)   = B;
-        %               end
-        %               TPtake2(iphi,iL)                 = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,iL);
-        %             end
-        %           end
-        %         end
-        
-        
+        for iphi = 1:nPhi
+          if sep_pol(iphi) < 1
+            for iL = 1:nL
+              [TP2,B0]              = min(SepP(:,iL:nL) + UCons(:,iL:nL,iL),[],2);
+              B                     = B0+iL-1;
+              iLp_star(iphi,:,iL)   = B;
+              TP(iphi,iL)           = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,iL);
+            end
+          end
+        end
         
       otherwise
         error('Commitment type not specifed correctly.')
