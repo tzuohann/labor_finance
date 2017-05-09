@@ -24,7 +24,7 @@ pi_z                = 1;
 iz                  = 1;
 
 %Worker productivity shock
-nPhi                = 10;
+nPhi                = 5;
 rho_Phi             = 0.0000001;
 mean_Phi            = 0.3;
 sigma_Phi           = 0.2;
@@ -40,24 +40,24 @@ init_Prod           = init_Prod(1,:)';
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nL                  = 2000;
+nL                  = 1000;
 LambdaMax           = 0.75;
 Lambda_vect         = linspace(0,LambdaMax,nL);   % Lagrange multiplier grid
 Lambda_vect_ws0     = Lambda_util_type(rra,Lambda_vect,tau,typeu);
 
 % inner loop
 Niter               = 500;
-CV_tol              = 0.000001;
+CV_tol              = 0.0000001;
 
 % outer loop
 maxIter_U           = 1000;
-CV_tol_U            = 10;
+CV_tol_U            = 0.1;
 
 %%% Optimizing grid over Debt D
 %Choose debt so that it is both inbetween 0 and 1 and increases
 %separations as a function of D
-nD                  = 3;
-D_grid              = linspace(0.2,0.9,nD);
+nD                  = 5;
+D_grid              = linspace(0.3,0.5,nD);
 
 %%% Bringing the unemployment value limits in the outer loop closer
 uSqueezeFactor      = 10;

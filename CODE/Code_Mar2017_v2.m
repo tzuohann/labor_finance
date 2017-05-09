@@ -84,9 +84,8 @@ function Code_Mar2017_v2()
         end
       end
       
-      disp('Updated')
-      tol_U = abs(FirmObj - ke)
-      
+      tol_U = abs(FirmObj - ke);
+      sprintf('iD = %s, UIter = %s, tol_U = %s',num2str(iD),num2str(iter_U),num2str(tol_U))
     end
     
     %CHeck solution for correctness

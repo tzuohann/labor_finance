@@ -20,6 +20,9 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
     end
   end
   SepP = zeros(nPhi,nL);
+  TP2  = zeros(nPhi,nL);
+  B2   = zeros(nPhi,nL);
+  
   
   tol  = 1;
   Iter = 0;
@@ -37,18 +40,38 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
         TP(sep_pol < 1,:)         = Obj_Pre(sep_pol < 1,:) + EP(sep_pol < 1,:);
       case{'limited'}
         
+        %         %SLOW use to verify
+        %         for iphi = 1:nPhi
+        %           if sep_pol(iphi) < 1
+        %             for iL = 1:nL
+        %               TP2 = zeros(nPhi,1);
+        %               for iphip = 1:nPhi
+        %                 [TP2(iphip,1),B0]         = min((1-max(sep_pol(iphip),delta))*P(iphip,iL:nL) + (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphip),delta))*U);
+        %                 B                         = B0+iL-1;
+        %                 iLp_star(iphi,iphip,iL)   = B;
+        %               end
+        %               TP(iphi,iL)                 = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,iL);
+        %             end
+        %           end
+        %         end
         
+        %FAST
         for iPhi = 1:nPhi
           SepP(iPhi,:) = (1-max(sep_pol(iPhi),delta))*P(iPhi,:);
+        end
+        
+        TP2(:) = 0; 
+        B2(:)  = 0; 
+        for iL = 1:nL
+          [TP2(:,iL),B0]              = min(SepP(:,iL:nL) + UCons(:,iL:nL,iL),[],2);
+          B2(:,iL)                    = B0+iL-1;
         end
         
         for iphi = 1:nPhi
           if sep_pol(iphi) < 1
             for iL = 1:nL
-              [TP2,B0]              = min(SepP(:,iL:nL) + UCons(:,iL:nL,iL),[],2);
-              B                     = B0+iL-1;
-              iLp_star(iphi,:,iL)   = B;
-              TP(iphi,iL)           = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,iL);
+              TP(iphi,iL)             = BETA.*pi_Phi(iphi,:)*TP2(:,iL) + Obj_Pre(iphi,iL);
+              iLp_star(iphi,:,iL)     = B2(:,iL);
             end
           end
         end
@@ -63,6 +86,3 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
     end
   end
 end
-
-
-
