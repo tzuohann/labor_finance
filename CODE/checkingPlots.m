@@ -1,3 +1,6 @@
+close all
+setupPlot
+
 figure(2)
 subplot(2,2,1)
 plot(D_grid, [P_D;Q_D],'-*','LineWidth',3);
@@ -29,7 +32,7 @@ title('W and F')
 subplot(2,2,2)
 plot(D_grid,U_D - utilFunc(b,rra,typeu),'-*','LineWidth',3);
 hold on
-plot(D_grid,EnteringW_D-U_D,'-*','LineWidth',3);
+plot(D_grid,EnteringW_D-U_D,'-','LineWidth',3);
 legend({'U - u(b)','W - U'})
 title('W - U and U - u(b)')
 subplot(2,2,3)

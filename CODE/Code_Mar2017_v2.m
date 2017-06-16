@@ -10,9 +10,6 @@ function Code_Mar2017_v2()
   %Use a new file for each parameterization that does something
   parameterizationFile
   
-  %Plot the setup of the problem to get a sense of how it works.
-  %setupPlot
-  
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
@@ -85,7 +82,7 @@ function Code_Mar2017_v2()
       end
       
       tol_U = abs(FirmObj - ke);
-      sprintf('iD = %s, UIter = %s, tol_U = %s',num2str(iD),num2str(iter_U),num2str(tol_U))
+      disp(sprintf('iD = %s, UIter = %s, tol_U = %s',num2str(iD),num2str(iter_U),num2str(tol_U)));
     end
     
     %CHeck solution for correctness

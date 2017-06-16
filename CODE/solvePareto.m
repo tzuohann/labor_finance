@@ -23,7 +23,6 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
   TP2  = zeros(nPhi,nL);
   B2   = zeros(nPhi,nL);
   
-  
   tol  = 1;
   Iter = 0;
   while (tol > CV_tol && Iter < Niter )
@@ -60,21 +59,19 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
           SepP(iPhi,:) = (1-max(sep_pol(iPhi),delta))*P(iPhi,:);
         end
         
-        TP2(:) = 0; 
-        B2(:)  = 0; 
+        TP2(:) = 0;
+        B2(:)  = 0;
         for iL = 1:nL
           [TP2(:,iL),B0]              = min(SepP(:,iL:nL) + UCons(:,iL:nL,iL),[],2);
-          B2(:,iL)                    = B0+iL-1;
+          iLp_star(:,:,iL)            = repmat(B0'+iL-1,nPhi,1);
         end
         
         for iphi = 1:nPhi
           if sep_pol(iphi) < 1
-            for iL = 1:nL
-              TP(iphi,iL)             = BETA.*pi_Phi(iphi,:)*TP2(:,iL) + Obj_Pre(iphi,iL);
-              iLp_star(iphi,:,iL)     = B2(:,iL);
-            end
+            TP(iphi,:)             = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,:);
           end
         end
+        
         
       otherwise
         error('Commitment type not specifed correctly.')
