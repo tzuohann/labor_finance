@@ -11,7 +11,7 @@ close all
 param
 
 %alpha grid. Given parameters we start with lowest alpha and go almost to 1
-alpha = linspace(0.85,0.9999,20);
+alpha = linspace(0.75,0.9999,20);
 
 %phi grid. Useful to compute integrals
 phi_vec = linspace(phi_low,phi_up,40000);
@@ -39,11 +39,11 @@ for ia = 1:length(alpha) %loop over alpha, we do for all the possible alphas
     %Value of employment in the third period
     for ip = 1:length(phi_vec)
         if phi_vec(ip) < phi_db
-            E3_vec(ip) = utilFunc(b,sigma,1);
+            E3_vec(ip) = utilFunc(b,ssigma,1);
         else if phi_vec(ip) >= phi_db && phi_vec(ip) <= phi_dw
-                E3_vec(ip) = utilFunc((R - r*alpha(ia) + phi_vec(ip)),sigma,1);
+                E3_vec(ip) = utilFunc((R - r*alpha(ia) + phi_vec(ip)),ssigma,1);
             else if phi_vec(ip) > phi_dw
-                    E3_vec(ip) = utilFunc(w,sigma,1);
+                    E3_vec(ip) = utilFunc(w,ssigma,1);
                 end
             end
         end
@@ -51,22 +51,22 @@ for ia = 1:length(alpha) %loop over alpha, we do for all the possible alphas
     E3 = sum(E3_vec)/length(phi_vec);
     
     %Limited commitment threshold. Below phi_lim workers prefers to break the match
-    phi_lim = max(phi_e,phi_vec(find((utilFunc(w_dist,sigma,1) + BETA*E3 ...
-        - (1+BETA)*utilFunc(b,sigma,1)) > 0,1,'first')));
+    phi_lim = max(phi_e,phi_vec(find((utilFunc(w_dist,ssigma,1) + BETA*E3 ...
+        - (1+BETA)*utilFunc(b,ssigma,1)) > 0,1,'first')));
     
     %Boundaries for the value of Unemplyment in period 1
-    U_min = (1+BETA+BETA^2)*utilFunc(b,sigma,1);
-    U_max = utilFunc(b,sigma,1) ...
-        + BETA*utilFunc(phi_up,sigma,1) + BETA^2*utilFunc(phi_up,sigma,1);
+    U_min = (1+BETA+BETA^2)*utilFunc(b,ssigma,1);
+    U_max = utilFunc(b,ssigma,1) ...
+        + BETA*utilFunc(phi_up,ssigma,1) + BETA^2*utilFunc(phi_up,ssigma,1);
     
     %Value of emplyment (just) in period 2. It does not account for E3!
     for ip = 1:length(phi_vec)
         if phi_vec(ip) < phi_e
-            E2_vec(ip) = utilFunc(b,sigma,1);
+            E2_vec(ip) = utilFunc(b,ssigma,1);
         else if phi_vec(ip) >= phi_e && phi_vec(ip) <= phi_dw
-                E2_vec(ip) = utilFunc((R - r*alpha(ia) + phi_vec(ip)),sigma,1);
+                E2_vec(ip) = utilFunc((R - r*alpha(ia) + phi_vec(ip)),ssigma,1);
             else if phi_vec(ip) > phi_dw
-                    E2_vec(ip) = utilFunc(w,sigma,1);
+                    E2_vec(ip) = utilFunc(w,ssigma,1);
                 end
             end
         end
@@ -74,8 +74,8 @@ for ia = 1:length(alpha) %loop over alpha, we do for all the possible alphas
     E2 = sum(E2_vec)/length(phi_vec);
     
     %Values of Unemployment in period 2 and 3
-    U2 = (1+BETA)*utilFunc(b,sigma,1);
-    U3 = utilFunc(b,sigma,1);
+    U2 = (1+BETA)*utilFunc(b,ssigma,1);
+    U3 = utilFunc(b,ssigma,1);
     
     %Value of running a business (just) in period 2. It does not account for V3!
     for ip = 1:length(phi_vec)
@@ -107,7 +107,7 @@ for ia = 1:length(alpha) %loop over alpha, we do for all the possible alphas
         U = (U_min + U_max)/2;
         
         %Probability of finding a match for a worker
-        num_p_theta = U - (1+BETA+BETA^2)*utilFunc(b,sigma,1); %numerator
+        num_p_theta = U - (1+BETA+BETA^2)*utilFunc(b,ssigma,1); %numerator
         for ip = 1:length(phi_vec)
             if phi_vec(ip) < phi_e
                 den_p_theta_vec(ip) = BETA*(E2 + BETA*U3 - U2);
