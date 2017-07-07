@@ -1,4 +1,4 @@
-%3-Period Model. In the third period worker gets b in any case and firm
+%4-Period Model. In the third period worker gets b in any case and firm
 %gets V_3 = (1-tau)*(R-r*alpha+phi-b) if and only if V_2 > 0.
 %Here perfect commitment since to be alive it is enough that
 %phi > r*alpha - R
