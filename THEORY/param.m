@@ -11,7 +11,8 @@ gamma = 0.75; %Matching elasticity parameter
 b = 0.1; %Value of home production
 phi_low = -1; %lower bound for phi
 phi_up = 1; %upper bound for phi
-whichCommitment = 'limited'; %perfect vs limited commitment
+whichCommitment = 'perfect'; %perfect vs limited commitment
+fix_cost = 0.45; %Fixed cost of entry. Should be equal to K (equal to 1)
 
 %Technical Parameters
 tol             = 10^(-8); %tolerance to get convergence
@@ -20,8 +21,8 @@ max_iter_alpha  = 20; %maximum number of iteration for the following alpha loop
 alpha_test      = 0.01; %initial value of alpha
 err_alpha       = 1; %initial value of err_alpha
 k               = 0; %initial value for counting the iterations of the loops
-alpha_low       = 0.75;
-alpha_high      = 0.999;
+alpha_low       = 0.5;
+alpha_high      = 4;
 lenAalpha       = 20;
 lenPphi         = 50000;
 
