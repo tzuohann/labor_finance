@@ -31,7 +31,7 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
     
     %Boundaries of U
     U_min = (1+BETA+BETA^2)*utilFunc(b,ssigma,1); % minimum value of unemployment
-    wStarMax = prodFn(R,max(phi_vec),alpha,r);
+    wStarMax = prodFn(R,max(phi_vec),alpha,r,prod_func_type);
     U_max     = utilFunc(b,ssigma,1) ...
         + BETA*((phi_e - phi_low)/(phi_up - phi_low)*utilFunc(b,ssigma,1) ...
         + (wStarMax^(2-ssigma) - b^(2-ssigma))...
@@ -55,7 +55,7 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
     
     %Useful to check if analytical f and g is correct
     %f_discrete = getf(wStarMax,phi_db,phi_e,phi_d_fun,alpha,phi_lim_fun(wStarMax),U);
-    %g_discrete = getg(0.7,alpha,phi_d_fun,phi_lim_fun(wStarMax),phi_e);
+    g_discrete = getg(0.6,alpha,phi_d_fun,phi_lim_fun(wStarMax),phi_e,prod_func_type);
     
     %Useful to check if analytical phi_lim is correct
     %phi_lim_fun = @(wStar) max(phi_e,getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,alpha));

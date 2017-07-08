@@ -11,8 +11,9 @@ gamma = 0.75; %Matching elasticity parameter
 b = 0.1; %Value of home production
 phi_low = -1; %lower bound for phi
 phi_up = 1; %upper bound for phi
-whichCommitment = 'perfect'; %perfect vs limited commitment
+whichCommitment = 'limited'; %perfect vs limited commitment
 fix_cost = 0.45; %Fixed cost of entry. Should be equal to K (equal to 1)
+prod_func_type = 2; %We use different production function to get the hump-shaped U
 
 %Technical Parameters
 tol             = 10^(-8); %tolerance to get convergence
@@ -24,7 +25,7 @@ k               = 0; %initial value for counting the iterations of the loops
 alpha_low       = 0.5;
 alpha_high      = 4;
 lenAalpha       = 20;
-lenPphi         = 50000;
+lenPphi         = 5000;
 
 %Grids
 %alpha grid. Given parameters we start with lowest alpha and go almost to 1
