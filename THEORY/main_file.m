@@ -10,6 +10,9 @@ param
 %Auxiliary functions
 phi_e_func = @(Aalpha) r*Aalpha - R; %boundary, alpha-varying must be inside the loop
 
+for is = 1:length(sigma_vec)  %Loop for the sigma varying
+    disp(num2str(is))
+
 %Evaluate optimal w, U, vacancies given alpha
 for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
     disp(num2str(ia))
@@ -17,6 +20,7 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
     err_U = 1; %initial value for err_U
     k = 0; %initial value for counting the iterations of the loops
     alpha = alpha_vec(ia);
+    ssigma = sigma_vec(is); %sigma varying
     
     phi_e = phi_e_func(alpha);
     phi_d_fun = @(w) phi_e + w ; %boundary, alpha-varying must be inside the loop
@@ -55,7 +59,7 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
     
     %Useful to check if analytical f and g is correct
     %f_discrete = getf(wStarMax,phi_db,phi_e,phi_d_fun,alpha,phi_lim_fun(wStarMax),U);
-    g_discrete = getg(0.6,alpha,phi_d_fun,phi_lim_fun(wStarMax),phi_e,prod_func_type);
+    %g_discrete = getg(0.6,alpha,phi_d_fun,phi_lim_fun(wStarMax),phi_e,prod_func_type);
     
     %Useful to check if analytical phi_lim is correct
     %phi_lim_fun = @(wStar) max(phi_e,getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,alpha));
@@ -156,31 +160,44 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
     obj_store(ia) = -obj(wstar);
 end
 
-for i = 1:length(alpha_vec)
-    alpha = alpha_vec(i);
-    zer(i) = (phi_d_fun(w_store(i)-phi_e)/(phi_up-phi_low)*(1-tau)*(r*alpha - R)...
-        + (1-tau)*(1/(phi_up - phi_low)*(1/2*(phi_up^2 - phi_d_fun(w_store(i))^2) - w_store(i)))...
-        + alpha*r*tau);
-end
+% for i = 1:length(alpha_vec)
+%     alpha = alpha_vec(i);
+%     zer(i) = (phi_d_fun(w_store(i)-phi_e)/(phi_up-phi_low)*(1-tau)*(r*alpha - R)...
+%         + (1-tau)*(1/(phi_up - phi_low)*(1/2*(phi_up^2 - phi_d_fun(w_store(i))^2) - w_store(i)))...
+%         + alpha*r*tau);
+% end
 
-%Display
-[U_maximized location] = max(U_store)
-alpha_maximand = alpha_vec(location)
+%Storing the optimal U and alpha for sigma varying
+[U_maximized location] = max(U_store);
+alpha_maximand = alpha_vec(location);
+w_star_maximand = w_store(location);
+vacancies_maximand = vacancies(location);
+p_theta_maximand = p_theta(location);
+q_theta_maximand = q_theta(location);
+U_maximized_store(is) = U_maximized;
+alpha_maximand_store(is) = alpha_maximand;
+w_maximand_store(is) = w_star_maximand;
+vacancies_maximand_store(is) = vacancies_maximand;
+p_maximand_store(is) = p_theta_maximand;
+q_maximand_store(is) = q_theta_maximand;
+end  %Loop for the sigma varying
+
 
 %Figure
 % plot(alpha,vacancies,'LineWidth',2)
 % hold on
-figure(1)
-plot(alpha_vec,U_store,'LineWidth',2)
-hold on
-plot(alpha_vec,w_store,'LineWidth',2)
-hold on
-plot(alpha_vec,p_theta,'LineWidth',2)
-hold on
-plot(alpha_vec,q_theta,'LineWidth',2)
-legend('U','w','p(\theta)','q(\theta)','location','northwest') %'Vacancies',
-grid on
-xlabel('\alpha') % x-axis label
+% figure(1)
+% plot(alpha_vec,U_store,'LineWidth',2)
+% hold on
+% plot(alpha_vec,w_store,'LineWidth',2)
+% hold on
+% plot(alpha_vec,p_theta,'LineWidth',2)
+% hold on
+% plot(alpha_vec,q_theta,'LineWidth',2)
+% legend('U','w','p(\theta)','q(\theta)','location','northwest') %'Vacancies',
+% grid on
+% xlabel('\alpha') % x-axis label
+
 
 % figure(2)
 % plot(alpha_vec, phi_lim_fun(w_store),'LineWidth',2)
@@ -190,3 +207,22 @@ xlabel('\alpha') % x-axis label
 % grid on
 % xlabel('\alpha') % x-axis label
 
+figure(3)
+plot(sigma_vec,alpha_maximand_store,'LineWidth',2)
+hold on
+plot(sigma_vec,U_maximized_store,'LineWidth',2)
+hold on
+plot(sigma_vec,w_maximand_store,'LineWidth',2)
+hold on
+plot(sigma_vec,vacancies_maximand_store,'LineWidth',2)
+hold on
+plot(sigma_vec,p_maximand_store,'LineWidth',2)
+hold on
+plot(sigma_vec,q_maximand_store,'LineWidth',2)
+legend('Optimal \alpha','Optimal U','Optimal w','Optimal vacancies',...
+       'Optimal p(\theta)','Optimal q(\theta)','location','northwest') %'Vacancies',
+grid on
+xlabel('\sigma') % x-axis label
+title('Perfect Commitment, \phi = 0.5, fix cost = 0.01, b = 0.1')
+
+save('limited_b01_phi05_f001')
