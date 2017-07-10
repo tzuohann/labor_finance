@@ -1,6 +1,6 @@
-function g_discrete = getg(wStar,aalpha,phi_d_fun,phi_lim,phi_e);
+function g_discrete = getg(wStar,aalpha,phi_d_fun,phi_lim,phi_e,prod_func_type);
     globalDeclaration;
-    Eprof = calcExpectedProf(wStar,aalpha,phi_d_fun);
+    Eprof = calcExpectedProf(wStar,aalpha,phi_d_fun,prod_func_type);
     g_discrete = 0;
     switch whichCommitment
         case{'perfect'}
