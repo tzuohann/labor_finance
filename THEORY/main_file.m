@@ -17,7 +17,7 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
   
   %Evaluate optimal w, U, vacancies given alpha
   for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
-    
+    disp(num2str(ia))
     %Technical parameters
     err_U     = 1; %initial value for err_U
     k         = 0; %initial value for counting the iterations of the loops
@@ -48,7 +48,7 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
         err_U = abs(U_max - U_min);
       else
           
-        f =@(w) getf(w,phi_db,phi_e,phi_d_fun,aalpha,U);
+        f =@(w) 1; % getf(w,phi_db,phi_e,phi_d_fun,aalpha,U);
         g =@(w) getg(w,aalpha,phi_d_fun,phi_lim,phi_e);
         
         obj = @(w) -((1 - f(w).^gamma).^(1/gamma).*g(w)); %We max this guy!
@@ -62,8 +62,8 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
           U_max = U;
         end
         err_alpha = abs(fix_cost + obj(wstar));
-        err_U = abs(U_max - U_min);
-        err_U = err_U + err_alpha;
+        err_U = abs(U_max - U_min)
+%         err_U = err_U + err_alpha;
       end
       
       if k == max_iter
@@ -98,17 +98,17 @@ end
 %Figure
 % plot(alpha,vacancies,'LineWidth',2)
 % hold on
-% figure(1)
-% plot(alpha_vec,U_store,'LineWidth',2)
-% hold on
-% plot(alpha_vec,w_store,'LineWidth',2)
-% hold on
-% plot(alpha_vec,p_theta,'LineWidth',2)
-% hold on
-% plot(alpha_vec,q_theta,'LineWidth',2)
-% legend('U','w','p(\theta)','q(\theta)','location','northwest') %'Vacancies',
-% grid on
-% xlabel('\alpha') % x-axis label
+figure(1)
+plot(alpha_vec,U_store,'LineWidth',2)
+hold on
+plot(alpha_vec,w_store,'LineWidth',2)
+hold on
+plot(alpha_vec,p_theta,'LineWidth',2)
+hold on
+plot(alpha_vec,q_theta,'LineWidth',2)
+legend('U','w','p(\theta)','q(\theta)','location','northwest') %'Vacancies',
+grid on
+xlabel('\alpha') % x-axis label
 
 
 % figure(2)
