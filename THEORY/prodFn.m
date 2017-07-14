@@ -1,5 +1,4 @@
 function preTaxoutput = prodFn(R,phi,alpha,r,prod_func_type,delta)
-    
     %Calculate pretax output assuming K = 1
     %Right now we have two types of production function. The original one
     %1. (1-tau)(R - alpha*r + phi - w) and the new one
