@@ -1,4 +1,4 @@
-function U = getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,ptheta)
+function [U, limitIntegral] = getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,ptheta)
   globalDeclaration
   %Calculate U ASSUMING that probabily of finding a job is ptheta
   phi_lim       = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,aalpha);

@@ -2,7 +2,7 @@
 %firm quitting and worker consuming b.
 %In period 1, all workers are unemployed and consume b
 %All action is therefore in second period.
-%Under limited commitment, workers can quite in period 2.
+%Under limited commitment, workers can quit in period 2.
 %Phi_e is when exit is forced.
 %Phi_d is where firm becomes distressed
 %Phi_lim is where worker quits firm in the limited commitment case
@@ -52,20 +52,20 @@ for ialpha = 1:numel(alphaGrid)
     phi_db = phi_up;
   end
   if phi_db < phi_e
-    error('Phi_e is not greater than phi_db')
+    error('Phi_e is not greater than phi_db') 
   end
-  wStar               = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
-  U(ialpha)           = getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,ptheta);
-  phi_e_vec(ialpha)   = phi_e;
-  phi_dw_vec(ialpha)  = phi_d_fun(wStar,aalpha);
-  phi_db_vec(ialpha)  = phi_d_fun(b,aalpha);
-  wStar_vec(ialpha)   = wStar;
+  wStar                                   = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
+  [U(ialpha) limitIntegral_vec(ialpha)]   = getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,ptheta);
+  phi_e_vec(ialpha)                       = phi_e;
+  phi_dw_vec(ialpha)                      = phi_d_fun(wStar,aalpha);
+  phi_db_vec(ialpha)                      = phi_d_fun(b,aalpha);
+  wStar_vec(ialpha)                       = wStar;
 end
-subplot(2,1,1)
+subplot(1,2,1)
 plotyy(alphaGrid,[U;ones(size(U)).*(1+BETA+BETA^2)*utilFunc(b,ssigma,1)],alphaGrid,wStar_vec);
 legend({'U','Umin','wstar'})
-subplot(2,1,2)
+subplot(1,2,2)
 plot(alphaGrid,[phi_e_vec;phi_db_vec]);
 legend({'phi_e','phi_db'})
 figure(2)
-plot(U)
+plot(alphaGrid,limitIntegral_vec)

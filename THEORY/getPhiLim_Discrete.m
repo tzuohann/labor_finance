@@ -12,7 +12,7 @@ function phi_lim = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,alpha)
     error('Worker does not accept the job because in all states of world, worker is better off in U')
   elseif utilFunc(minProd,ssigma,1) + BETA*E3 >= (1+BETA)*utilFunc(b,ssigma,1)
     %Worker will never quit in second period
-    phi_lim       = max(phi_vec);
+    phi_lim       = phi_e; %Here the
   else
     targetProd      = ((1-ssigma)*((1+BETA)*utilFunc(b,ssigma,1) - BETA*E3))^(1/(1-ssigma));
     minProb         = @(phi) (prodFn(R,phi,alpha,r,prod_func_type,delta) - targetProd).^2;
