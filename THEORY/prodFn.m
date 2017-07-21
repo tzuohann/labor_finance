@@ -16,11 +16,11 @@ function preTaxoutput = prodFn(R,phi,alpha,r,prod_func_type,delta)
     elseif prod_func_type == 5
         preTaxoutput = R - alpha*r + alpha*phi;
     elseif prod_func_type == 6
-        preTaxoutput = (1+alpha)*R - alpha*r + phi*(1+alpha)^delta;
+        preTaxoutput = (1+alpha)*R - alpha*r + phi*(1+alpha).^delta;
     elseif prod_func_type == 7
         preTaxoutput = (1+alpha*phi)*R - alpha*r;
     elseif prod_func_type == 8
-        preTaxoutput = phi*R*(alpha)^delta - r*alpha;
+        preTaxoutput = phi*R*(alpha).^delta - r*alpha;
     end
 end
 

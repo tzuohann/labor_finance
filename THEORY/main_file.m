@@ -62,8 +62,8 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
           U_max = U;
         end
         err_alpha = abs(fix_cost + obj(wstar));
-        err_U = abs(U_max - U_min)
-%         err_U = err_U + err_alpha;
+        err_U = abs(U_max - U_min);
+        err_U = err_U + err_alpha
       end
       
       if k == max_iter

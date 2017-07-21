@@ -8,8 +8,12 @@ function phi_lim = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,alpha)
   %At phi_min, LHS lower, and phi_max LHS higher
   maxProd         = prodFn(R,max(phi_vec),alpha,r,prod_func_type,delta);
   minProd         = prodFn(R,min(phi_vec),alpha,r,prod_func_type,delta);
-  if utilFunc(maxProd,ssigma,1) + BETA*E3 <= (1+BETA)*utilFunc(b,ssigma,1)
-    error('Worker does not accept the job because in all states of world, worker is better off in U')
+  if minProd <= 0
+      minProd = 0;
+  end
+  expProd         = prodFn(R,mean(phi_vec),alpha,r,prod_func_type,delta);
+  if utilFunc(expProd,ssigma,1) + BETA*E3 <= (1+BETA)*utilFunc(b,ssigma,1)
+    error('Worker does not accept the job, in expectation being unemployed is strictly better. To fix the problem you may either decrease b, increase the mean value of phi, or change the boundary of alpha')
   elseif utilFunc(minProd,ssigma,1) + BETA*E3 >= (1+BETA)*utilFunc(b,ssigma,1)
     %Worker will never quit in second period
     phi_lim       = phi_e; 
