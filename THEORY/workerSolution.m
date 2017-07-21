@@ -10,26 +10,26 @@
 %At fixed cost = 0, p(theta) = 1 and workers own the whole firm
 %We must be able to get a hump shape in the worker's choice in this setup
 
-clear
-% close all
+clear 
+close all
 globalDeclaration
 tau             = 0; %Taxes - %If zero no anymore tax shields!
 r               = 0.1; %Return on capital.
 R               = r/(1-tau); %Gross return on capital
 ssigma          = 0.5; %Relative risk aversion.
-delta           = 0.5; %decreasing return to scale active if production number 3
+delta           = 0.5; %decreasing return to scale active if production number 8
 if ssigma == 1
   error('Use Log C')
 end
 BETA            = 1/(1+r); %Discount factor
 gamma           = 1.6; %Matching elasticity parameter
-b               = 0.13; %Value of home production
-phi_low         = -0.5; %lower bound for phi
+b               = 0.2; %Value of home production
+phi_low         = -1; %lower bound for phi
 phi_up          = 4; %upper bound for phi
 whichCommitment = 'limited'; %perfect vs limited commitment
 fix_cost        = 0; %Fixed cost of entry. Should be equal to K (equal to 1)
 prod_func_type  = 8; %We use different production function to get the hump-shaped U
-alphaGrid       = linspace(0.5,3.5,200);
+alphaGrid       = linspace(2,6,200);
 phi_vec         = linspace(phi_low,phi_up,100000);
 
 phi_e_func      = make_phi_e_func();
@@ -63,8 +63,8 @@ for ialpha = 1:numel(alphaGrid)
   phi_lim_vec(ialpha)                     = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,aalpha);
 end
 
-[a, b] = max(U)
-wStar_vec(b)
+[aa, bb] = max(U)
+w_opt = wStar_vec(bb)
 
 subplot(1,2,1)
 hold on
@@ -74,15 +74,7 @@ subplot(1,2,2)
 hold on
 plot(alphaGrid,[phi_e_vec;phi_db_vec]);
 legend({'phi_e','phi_db'})
-figure(2)
-hold on
-plot(alphaGrid,limitIntegral_vec)
 
-figure(3)
-hold on
-plot(alphaGrid,U,'.')
-Ul=U
-save Ul Ul
-
-% figure(4)
-% plot([phi_lim_vec - phi_e_vec])
+% figure(2)
+% hold on
+% plot(alphaGrid,U,'.')

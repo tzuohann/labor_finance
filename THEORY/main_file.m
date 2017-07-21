@@ -37,7 +37,7 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
       
       %wmin has to be a function of U while w_max doesn't change
       w_min   = getWMin(U,phi_d_fun,phi_db,phi_e,aalpha);
-      w_max   = prodFn(R,max(phi_vec),aalpha,r,prod_func_type);
+      w_max   = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
       gridW   = linspace(w_min,w_max,100);
       phi_lim = getPhiLim_Discrete(phi_d_fun,phi_db,gridW(end),phi_e,aalpha);
       
