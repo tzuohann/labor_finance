@@ -14,7 +14,7 @@ clear
 close all
 globalDeclaration
 tau             = 0; %Taxes - %If zero no anymore tax shields!
-r               = 0.1; %Return on capital.
+r               = 0.01; %Return on capital.
 R               = r/(1-tau); %Gross return on capital
 ssigma          = 0.4; %Relative risk aversion.
 delta           = 0.5; %decreasing return to scale active if production number 8
@@ -23,33 +23,27 @@ if ssigma == 1
 end
 BETA            = 1/(1+r); %Discount factor
 gamma           = 1.6; %Matching elasticity parameter
-b               = 0; %Value of home production
-phi_low         = -0.54; %lower bound for phi
+b               = 0.01; %Value of home production
+phi_low         = -0.5; %lower bound for phi
 phi_up          = 4; %upper bound for phi
+if phi_low > phi_up
+    error('phi_low cannot be greater than phi_up')
+end
 whichCommitment = 'perfect'; %perfect vs limited commitment
 fix_cost        = 0; %Fixed cost of entry. Should be equal to K (equal to 1)
 prod_func_type  = 8; %We use different production function to get the hump-shaped U
-
-% Check the boundary of the production function
-alphaGrid_test  = linspace(0,20,10000);
-prod_zeros = prodFn(R,mean(phi_vec),alphaGrid_test,r,prod_func_type,delta);
-alpha_max_lim = alphaGrid_test(find(prod_zeros'>0,1,'last'));
-alpha_min_lim = alphaGrid_test(find(prod_zeros'>0,1,'first'));
-alpha_min       = 0.1;
-alpha_max       = 2;
-if alpha_max > alpha_max_lim
-    error('Expected valued of production is negative for alpha_max. alpha_max is too high.')
-end
-if alpha_min < alpha_min_lim
-    error('Expected valued of production is negative for alpha_min. alpha_min is too small.')
-end
-
-alphaGrid       = linspace(alpha_min,alpha_max,200);
 phi_vec         = linspace(phi_low,phi_up,100000);
-
 phi_e_func      = make_phi_e_func();
 phi_d_fun       = make_phi_d_func(phi_e_func);
 ptheta          = 1;
+alpha_min       = 0.4;
+alpha_max       = 1;
+alphaGrid       = linspace(alpha_min,alpha_max,200);
+% Check the boundary of the production function
+all_prodFn      = prodFn(R,max(phi_vec),alphaGrid,r,prod_func_type,delta);
+if all_prodFn < b
+    error('Expected valued of production is always smaller than the reservation value.')
+end
 
 for ialpha = 1:numel(alphaGrid)
   aalpha          = alphaGrid(ialpha);
@@ -69,14 +63,33 @@ for ialpha = 1:numel(alphaGrid)
   if phi_db < phi_e
     error('Phi_e is not greater than phi_db') 
   end
-  wStar                                 = prodFn(R,mean(phi_vec),aalpha,r,prod_func_type,delta);
-%   if getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,...
-%      whichCommitment,b,phi_vec,ssigma,BETA,ptheta) <= 10^(-5)
-%       error('U is negative, parameter space is not feasible')
-%   else
+  
+  %wStar is the maximum level of the production, firm gives everything to
+  %the worker always
+  wStar             = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
+  
+  %Checking the feasibility of the problem
+  period          = 2;
+  E2              = calcExpectedUtil(period,wStar,phi_db,phi_e,phi_d_fun,aalpha,[]);
+  period          = 3;
+  E3              = calcExpectedUtil(period,wStar,phi_db,phi_e,phi_d_fun,aalpha,[]);
+  phi_lim         = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,aalpha);
+    switch whichCommitment
+    case {'perfect'}
+      limitIntegral = sum(phi_vec < phi_e)./numel(phi_vec);
+    case{'limited'}
+      limitIntegral = sum(phi_vec < phi_lim)./numel(phi_vec);
+    otherwise
+      error('Perfect or Limited for now')
+    end
+   if E2 + BETA*(1-limitIntegral)*E3 ...
+         + BETA*limitIntegral*utilFunc(b,ssigma,1) <= (1+BETA)*utilFunc(b,ssigma,1)
+    error('Worker does not accept the job, the expected utility of being employed is smaller thant the expected utility of being unemployed. To fix the problem you may either decrease b, increase the mean value of phi, or change the boundary of alpha')
+   end
+   
+  %Evaluating the remaing variable 
   U(ialpha)                             = getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,...
                                           whichCommitment,b,phi_vec,ssigma,BETA,ptheta);
-%   end
   phi_e_vec(ialpha)                     = phi_e;
   phi_dw_vec(ialpha)                    = phi_d_fun(wStar,aalpha);
   phi_db_vec(ialpha)                    = phi_d_fun(b,aalpha);
@@ -85,18 +98,23 @@ for ialpha = 1:numel(alphaGrid)
                                           wStar,phi_e,aalpha);
 end
 
-[aa, bb] = max(U)
+[aa, bb] = max(U);
+if bb == length(alphaGrid)
+    error('alpha_max is too small. The maximization problem is constrained by alpha_max.')
+elseif bb == 1
+    error('alpha_min is too large. The maximization problem is constrained by alpha_min.')
+end
 w_opt = wStar_vec(bb)
 
-subplot(1,2,1)
-hold on
-plotyy(alphaGrid,[U;ones(size(U)).*(1+BETA+BETA^2)*utilFunc(b,ssigma,1)],alphaGrid,wStar_vec);
-legend({'U','Umin','wstar'})
-subplot(1,2,2)
-hold on
-plot(alphaGrid,[phi_e_vec;phi_db_vec]);
-legend({'phi_e','phi_db'})
-
-% figure(2)
+% subplot(1,2,1)
 % hold on
-% plot(alphaGrid,U,'.')
+% plotyy(alphaGrid,[U;ones(size(U)).*(1+BETA+BETA^2)*utilFunc(b,ssigma,1)],alphaGrid,wStar_vec);
+% legend({'U','Umin','wstar'})
+% subplot(1,2,2)
+% hold on
+% plot(alphaGrid,[phi_e_vec;phi_db_vec]);
+% legend({'phi_e','phi_db'})
+
+figure(2)
+hold on
+plot(alphaGrid,U,'.')
