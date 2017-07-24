@@ -1,8 +1,6 @@
 function phi_lim = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,alpha)
   globalDeclaration
-  %Expected value of employment in the second and third period
-  period          = 2;
-  E2              = calcExpectedUtil(period,wStar,phi_db,phi_e,phi_d_fun,alpha,[]);
+  %Expected value of employment in the third period
   period          = 3;
   E3              = calcExpectedUtil(period,wStar,phi_db,phi_e,phi_d_fun,alpha,[]);
   %Make sure a solution exists first

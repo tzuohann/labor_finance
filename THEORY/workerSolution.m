@@ -40,8 +40,8 @@ alpha_min       = 0.4;
 alpha_max       = 1;
 alphaGrid       = linspace(alpha_min,alpha_max,200);
 % Check the boundary of the production function
-all_prodFn      = prodFn(R,max(phi_vec),alphaGrid,r,prod_func_type,delta);
-if all_prodFn < b
+prodFn_max      = prodFn(R,max(phi_vec),alphaGrid,r,prod_func_type,delta);
+if prodFn_max < b
     error('Expected valued of production is always smaller than the reservation value.')
 end
 
