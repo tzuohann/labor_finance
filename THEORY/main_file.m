@@ -42,12 +42,13 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
             U       = (U_min + U_max)/2; %bisectional U
             
             %Checking the feasibility of the problem
-            wStar_up             = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
-            period               = 2;
-            E2_up                = calcExpectedUtil(period,wStar_up,phi_db,phi_e,phi_d_fun,aalpha,[]);
-            period               = 3;
-            E3_up                = calcExpectedUtil(period,wStar_up,phi_db,phi_e,phi_d_fun,aalpha,[]);
-            phi_lim              = getPhiLim_Discrete(phi_d_fun,phi_db,wStar_up,phi_e,aalpha);
+            wStar_up       = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
+            phi_lim        = getPhiLim_Discrete(phi_d_fun,phi_db,wStar_up,phi_e,aalpha);
+            period         = 2;
+            E2_up          = calcExpectedUtil(period,wStar_up,phi_db,phi_e,phi_d_fun,aalpha,phi_lim);
+            period         = 3;
+            E3_up          = calcExpectedUtil(period,wStar_up,phi_db,phi_e,phi_d_fun,aalpha,[]);
+            
             if phi_lim < phi_e
                 error('phi_lim cannot be smaller than phi_e.')
             end
@@ -69,7 +70,7 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
             if w_min <= 0
                 error('w_min cannot be lower than zero.')
             end
-            w_max   = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
+            w_max    = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
             if w_max <= w_min
                 error('w_max cannot be smaller than w_min. The problem may be the parameterization.')
             end
@@ -90,7 +91,6 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
                 g = @(w) getg(w,aalpha,phi_d_fun,phi_lim,phi_e);
                 
                 obj = @(w) -((1 - f(w).^gamma).^(1/gamma).*g(w)); %We max this guy!
-                
                 options = optimoptions('fmincon','Display','None');
                 wstar = fmincon(obj,(w_min + w_max)/2,[],[],[],[],w_min,w_max,[],options);
                 
@@ -104,7 +104,7 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
                 if err_U < 10^(-14)
                     error('Fix cost is too high to find a solution. If fix cost is already very close to zero then either b is too high, or phi_vec is too low.')
                 end
-                err_both = err_U + err_alpha
+                err_both = err_U + err_alpha;
             end
             
             if k == max_iter
@@ -128,17 +128,18 @@ for is = 1:length(sigma_vec)  %Loop for the sigma varying
     elseif location == 1
         error('Corner solution. Most likely alpha_min is too large. The maximization problem is constrained by alpha_min.')
     end
-    alpha_maximand = alpha_vec(location);
-    w_star_maximand = w_store(location);
-    vacancies_maximand = vacancies(location);
-    p_theta_maximand = p_theta(location);
-    q_theta_maximand = q_theta(location);
-    U_maximized_store(is) = U_maximized;
-    alpha_maximand_store(is) = alpha_maximand;
-    w_maximand_store(is) = w_star_maximand;
-    vacancies_maximand_store(is) = vacancies_maximand;
-    p_maximand_store(is) = p_theta_maximand;
-    q_maximand_store(is) = q_theta_maximand;
+    location
+%     alpha_maximand = alpha_vec(location);
+%     w_star_maximand = w_store(location);
+%     vacancies_maximand = vacancies(location);
+%     p_theta_maximand = p_theta(location);
+%     q_theta_maximand = q_theta(location);
+%     U_maximized_store(is) = U_maximized;
+%     alpha_maximand_store(is) = alpha_maximand;
+%     w_maximand_store(is) = w_star_maximand;
+%     vacancies_maximand_store(is) = vacancies_maximand;
+%     p_maximand_store(is) = p_theta_maximand;
+%     q_maximand_store(is) = q_theta_maximand;
 end
 
 %Figure
