@@ -33,7 +33,7 @@ phi_up          = 1; %upper bound for phi
 phi_vec         = linspace(phi_low,phi_up,100000);
 alpha_min       = 0.1;
 alpha_max       = 0.22;
-alphaGrid       = linspace(alpha_min,alpha_max,200);
+alpha_vec       = linspace(alpha_min,alpha_max,4);
 if alpha_min > alpha_max
   error('alpha_min cannot be greater than alpha_max')
 end

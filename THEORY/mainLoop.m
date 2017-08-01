@@ -3,7 +3,7 @@ function [U,phi_e_vec,phi_dw_vec,phi_db_vec,wStar_vec,phi_lim_vec] = mainLoop()
   phi_e_func      = make_phi_e_func();
   phi_d_fun       = make_phi_d_func(phi_e_func);
   ptheta          = 1;
-  for ialpha = 1:numel(alphaGrid)
+  for ialpha = 1:numel(alpha_vec)
     aalpha          = alphaGrid(ialpha);
     % Check the boundary of the production function
     prodFn_max      = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);

@@ -1,5 +1,4 @@
 function f_discrete = getf(wStar,phi_db,phi_e,phi_d_fun,aalpha,U_given)
-  globalDeclaration
   
   phi_lim       = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,aalpha);
   
