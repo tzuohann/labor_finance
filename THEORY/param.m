@@ -14,22 +14,23 @@ function [params,tech] = param()
   params.Lifetime_Achievement_Award  = params.E3_fix/2; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
   params.whichE3         = 'exogenous'; %exogenous vs endogenous expected value in the third period
-  params.fix_cost        = 0.01; %Fixed cost of entry. Should be equal to K (equal to 1)
+  params.fix_cost        = 0.05; %Fixed cost of entry. Should be equal to K (equal to 1)
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
   params.prod_func_type  = 8; %We use different production function to get the hump-shaped U
   params.delta           = 0.5; %decreasing return to scale active if production number 8
   assert(params.delta < 1,'The production function implies increasing returns to scale.')
+  typeu                  = 1;
   
   params.phi_e_func      = make_phi_e_func(params.prod_func_type,params.r,params.R,params.delta);
   params.phi_d_fun       = make_phi_d_func(params.phi_e_func,params.prod_func_type,params.R,params.r,params.delta);
-  
+  params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
-  alpha_min       = 0.1;
+  alpha_min       = 0.105;
   alpha_max       = 0.2;
-  lenAalpha       = 2;
+  lenAalpha       = 20;
   phi_low         = 0; %lower bound for phi
   phi_up          = 1; %upper bound for phi
-  lenPphi         = 10000;
+  lenPphi         = 20000;
   
   %Grids
   %alpha grid. Given parameters we start with lowest alpha and go almost to 1

@@ -9,11 +9,11 @@ function phi_lim = getPhiLim_Discrete(params,aalpha,phi_e,wStarMax)
   if minProd <= 0
     minProd = 0;
   end
-  if utilFunc(minProd,ssigma,1) + BETA*E3 >= (1+BETA)*utilFunc(b,ssigma,1)
+  if utilFunc(minProd) + BETA*E3 >= (1+BETA)*utilFunc(b)
     phi_lim       = phi_e;
     warning('Worker will never quit in second period')
   else
-    targetProd      = ((1-ssigma)*((1+BETA)*utilFunc(b,ssigma,1) - BETA*E3))^(1/(1-ssigma));
+    targetProd      = ((1-ssigma)*((1+BETA)*utilFunc(b) - BETA*E3))^(1/(1-ssigma));
     minProb         = @(phi) (prodFn(R,phi,aalpha,r,prod_func_type,delta) - targetProd).^2;
     options         = optimoptions('fminunc');
     options.TolFun  = 1e-10;

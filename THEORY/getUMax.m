@@ -1,12 +1,10 @@
-function [UMax,wStarMax,E2Max] = getUMax(params,aalpha,phi_e,phi_db,output)
-  eval(reshape(structvars(params)',1,[]));
+function [UMax,E2Max,E3Max] = getUMax(params,aalpha,phi_e,output,U_min)
   wStarMax  = output(end);
-  E3Max     = getE3(params,aalpha,wStarMax);
-  if strcmp(whichCommitment,'limited')
-    phi_cutoff   = getPhiLim_Discrete(params,aalpha,phi_e,wStarMax);
-  elseif strcmp(whichCommitment,'perfect')
-    phi_cutoff   = phi_e;
-  end
+  E3Max     = getE3(params,wStarMax,output);
+  phi_cutoff = getPhiCutoff(params,aalpha,phi_e,wStarMax);
   E2Max     = calcExpectedUtil(params,output,phi_cutoff,wStarMax);
-  UMax = utilFunc(b,ssigma,1) + BETA*E2Max + BETA^2*E3Max;
+  UMax = params.utilFunc(params.b) + params.BETA*E2Max + params.BETA^2*E3Max;
+  if U_min >= UMax
+    error('U_min cannot be greater than U_max. The problem may be the parameterization.')
+  end
 end
