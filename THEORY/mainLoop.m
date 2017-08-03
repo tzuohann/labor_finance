@@ -1,10 +1,23 @@
 function [U,phi_e_vec,phi_dw_vec,phi_db_vec,wStar_vec,phi_lim_vec] = mainLoop()
   globalDeclaration
-  phi_e_func      = make_phi_e_func();
-  phi_d_fun       = make_phi_d_func(phi_e_func);
+  params.b = b;
+  params.whichE3 = whichE3;
+  params.E3_fix = E3_fix;
+  params.R = R;
+  params.r = r;
+  params.phi_vec = phi_vec;
+  params.prod_func_type = prod_func_type;
+  params.delta = delta;
+  params.utilFunc = utilFunc;
+  params.BETA = BETA;
+  params.ssigma = ssigma;
+  params.whichCommitment = whichCommitment;
+  
+  phi_e_func      = make_phi_e_func(prod_func_type,r,R,delta);
+  phi_d_fun       = make_phi_d_func(phi_e_func,prod_func_type,R,r,delta);
   ptheta          = 1;
   for ialpha = 1:numel(alpha_vec)
-    aalpha          = alphaGrid(ialpha);
+    aalpha          = alpha_vec(ialpha);
     % Check the boundary of the production function
     prodFn_max      = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
     if prodFn_max < b
@@ -30,38 +43,32 @@ function [U,phi_e_vec,phi_dw_vec,phi_db_vec,wStar_vec,phi_lim_vec] = mainLoop()
     %wStar is the maximum level of the production, firm gives everything to
     %the worker always
     wStar           = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
+    output          = prodFn(R,phi_vec,aalpha,r,prod_func_type,delta);
     
     %Checking the feasibility of the problem
-    phi_lim         = getPhiLim_Discrete(phi_d_fun,phi_db,wStar,phi_e,aalpha);
-    if phi_lim < phi_e
-      error('phi_lim cannot be smaller than phi_e')
-    end
-    period          = 2;
-    E2              = calcExpectedUtil(period,wStar,phi_db,phi_e,phi_d_fun,aalpha,phi_lim);
-    period          = 3;
-    E3              = calcExpectedUtil(period,wStar,phi_db,phi_e,phi_d_fun,aalpha,phi_lim);
+    phi_cutoff      = getPhiCutoff(params,aalpha,phi_e,wStar);
+    E2              = calcExpectedUtil(params,output,phi_cutoff,wStar);
+    E3              = getE3(params,wStar,output);
     
     switch whichCommitment
       case{'perfect'}
         limitIntegral = sum(phi_vec < phi_e)./numel(phi_vec);
       case{'limited'}
-        limitIntegral = sum(phi_vec < phi_lim)./numel(phi_vec);
+        limitIntegral = sum(phi_vec < phi_cutoff)./numel(phi_vec);
       otherwise
         error('Perfect or Limited for now')
     end
     if E2 + BETA*(1-limitIntegral)*E3 ...
-        + BETA*limitIntegral*utilFunc(b,ssigma,1) <= (1+BETA)*utilFunc(b,ssigma,1)
+        + BETA*limitIntegral*utilFunc(b) <= (1+BETA)*utilFunc(b)
       error('Worker does not accept the job, the expected utility of being employed is smaller thant the expected utility of being unemployed. To fix the problem you may either decrease b, increase the mean value of phi, or change the boundary of alpha')
     end
     
     %Evaluating the remaing variable
-    U(ialpha)                             = getU(wStar,phi_d_fun,phi_db,phi_e,aalpha,...
-      whichCommitment,b,phi_vec,ssigma,BETA,ptheta);
+    U(ialpha)                             = getU(params,output,phi_cutoff,wStar,ptheta,aalpha);
     phi_e_vec(ialpha)                     = phi_e;
     phi_dw_vec(ialpha)                    = phi_d_fun(wStar,aalpha);
     phi_db_vec(ialpha)                    = phi_d_fun(b,aalpha);
     wStar_vec(ialpha)                     = wStar;
-    phi_lim_vec(ialpha)                   = getPhiLim_Discrete(phi_d_fun,phi_db,...
-      wStar,phi_e,aalpha);
+    phi_lim_vec(ialpha)                   = phi_cutoff;
   end
 end

@@ -33,11 +33,56 @@ loc_lc    = location;
 max_U_lc  = U_maximized;
 
 figure(1)
+subplot(2,1,1)
 plot(tech.alpha_vec,U_store_p,'.-')
 hold on
 plot(tech.alpha_vec,U_store_lc,'.-')
 legend({'PC','LC'})
 plot(tech.alpha_vec(loc_pc),max_U_pc,'o')
 plot(tech.alpha_vec(loc_lc),max_U_lc,'o')
+title('U')
 hold off
+subplot(2,1,2)
+plot(tech.alpha_vec,phi_lim_store_p,'.-')
+hold on
+plot(tech.alpha_vec,phi_lim_store_lc,'.-')
+legend({'PC','LC'})
+title('Phi Cutoff')
+hold off
+
+figure(2)
+subplot(2,1,1)
+plot(tech.alpha_vec,w_store_p,'.-')
+hold on
+plot(tech.alpha_vec,w_store_lc,'.-')
+legend({'PC','LC'})
+title('unconstrainted wages')
+hold off
+subplot(2,1,2)
+plot(tech.alpha_vec,vacancies_p,'.-')
+hold on
+plot(tech.alpha_vec,vacancies_lc,'.-')
+legend({'PC','LC'})
+title('vacancies')
+hold off
+
+
+
+figure(3)
+subplot(2,1,1)
+plot(tech.alpha_vec,obj_store_p./q_theta_p,'.-')
+hold on
+plot(tech.alpha_vec,obj_store_lc./q_theta_lc,'.-')
+legend({'PC','LC'})
+title('unconstrainted wages')
+hold off
+subplot(2,1,2)
+plot(tech.alpha_vec,q_theta_p,'.-')
+hold on
+plot(tech.alpha_vec,q_theta_lc,'.-')
+legend({'PC','LC'})
+title('vacancies')
+hold off
+
+
 

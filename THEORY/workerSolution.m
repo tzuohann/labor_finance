@@ -30,13 +30,15 @@ fix_cost        = 0; %Fixed cost of entry. Should be equal to K (equal to 1)
 prod_func_type  = 8; %We use different production function to get the hump-shaped U
 phi_low         = 0; %lower bound for phi
 phi_up          = 1; %upper bound for phi
-phi_vec         = linspace(phi_low,phi_up,100000);
-alpha_min       = 0.1;
-alpha_max       = 0.22;
-alpha_vec       = linspace(alpha_min,alpha_max,4);
+phi_vec         = linspace(phi_low,phi_up,5000);
+alpha_min       = 0.05;
+alpha_max       = 0.5;
+alpha_vec       = linspace(alpha_min,alpha_max,1000);
 if alpha_min > alpha_max
   error('alpha_min cannot be greater than alpha_max')
 end
+utilFunc = makeUtilFunc(ssigma,1);
+
 
 whichCommitment = 'perfect'; %perfect vs limited commitment
 [U_p,phi_e_p,phi_dw_p,phi_db_p,wStar_p,phi_lim_p] = mainLoop();
@@ -45,7 +47,7 @@ whichCommitment = 'limited'; %perfect vs limited commitment
 
 [aa, bb] = max(U_p);
 % [aa_E3 bb_E3] = max(E3_vec);
-if bb == length(alphaGrid)
+if bb == length(alpha_vec)
   error('alpha_max is too small. The maximization problem is constrained by alpha_max.')
 elseif bb == 1
   error('alpha_min is too large. The maximization problem is constrained by alpha_min.')
@@ -54,7 +56,7 @@ bbp = bb;
 
 [aa, bb] = max(U_lc);
 % [aa_E3 bb_E3] = max(E3_vec);
-if bb == length(alphaGrid)
+if bb == length(alpha_vec)
   error('alpha_max is too small. The maximization problem is constrained by alpha_max.')
 elseif bb == 1
   error('alpha_min is too large. The maximization problem is constrained by alpha_min.')
@@ -62,19 +64,19 @@ end
 bblc = bb;
 
 subplot(2,1,1)
-plot(alphaGrid,U_p,'.-')
+plot(alpha_vec,U_p,'.-')
 hold on
-plot(alphaGrid,U_lc,'.-')
+plot(alpha_vec,U_lc,'.-')
 legend({'PC','LC'})
-plot(alphaGrid(bbp),U_p(bbp),'o')
-plot(alphaGrid(bblc),U_lc(bblc),'o')
+plot(alpha_vec(bbp),U_p(bbp),'o')
+plot(alpha_vec(bblc),U_lc(bblc),'o')
 hold off
 
 subplot(2,1,2)
-plot(alphaGrid,wStar_p,'.-')
+plot(alpha_vec,wStar_p,'.-')
 hold on
-plot(alphaGrid,wStar_lc,'.-')
+plot(alpha_vec,wStar_lc,'.-')
 legend({'PC','LC'})
-plot(alphaGrid(bbp),wStar_p(bbp),'o')
-plot(alphaGrid(bblc),wStar_lc(bblc),'o')
+plot(alpha_vec(bbp),wStar_p(bbp),'o')
+plot(alpha_vec(bblc),wStar_lc(bblc),'o')
 hold off
