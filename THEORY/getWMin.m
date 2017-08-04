@@ -9,3 +9,7 @@ function wMin = getWMin(params,Utarget,aalpha,phi_e,output)
       (getU(params,output,phi_cutoff,wStar,ptheta,aalpha)...
       - Utarget).^2,(wstarmax + wstarmin)/2,[],[],[],[],wstarmin,wstarmax,[],options);
 end
+
+ 
+
+U = u(b) + beta E2(w) + phi_cutoff*beta*u(b) + (1-phi_cutoff)*E3 

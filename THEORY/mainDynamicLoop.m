@@ -14,14 +14,12 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,phi_e_store,phi_li
     %These quantities depend only on alpha and not on U
     phi_e     = phi_e_func(aalpha);
     output    = prodFn(R,phi_vec,aalpha,r,prod_func_type,delta);
-    wStar_up  = output(end);
-    %aalpha, phi_e, output
     
     %Boundaries of U
     U_min                   = (1+BETA+BETA^2)*utilFunc(b);
     [U_max,E2_up,E3_up]     = getUMax(params,aalpha,phi_e,output,U_min);
     checkFeasibility(params,aalpha,phi_e,E2_up,E3_up,output)
-    
+    solved = 1;
     while err_both > tol && k < max_iter
       k       = k + 1; %Iteration
       U       = (U_min + U_max)/2; %bisectional U
@@ -33,13 +31,12 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,phi_e_store,phi_li
       end
       w_max    = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
       if w_max <= w_min
-        error('w_max cannot be smaller than w_min. The problem may be the parameterization.')
+        error('w_max cannot be smaller than w_min.')
       end
       gridW   = linspace(w_min,w_max,100);
       
       %First ensure that for U, there is a solution to the problem
       if getf(params,gridW(end),phi_e,aalpha,U,output) > 1
-        disp('U is too large, lower U')
         U_max = U; %Bisection U, we decrease it
       else
         
@@ -47,7 +44,8 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,phi_e_store,phi_li
         g = @(w) getg(params,w,aalpha,output,phi_e);
         obj = @(w) getObjFunc(w,params,aalpha,phi_e,output,U); %We max this guy!
         
-        options = optimoptions('fmincon','Display','None');
+        options = optimoptions('fmincon','Display','None','TolX',tol,'TolFun',tol);
+        
         if ia == 1
           wstar = fmincon(obj,(w_min + w_max)/2,[],[],[],[],w_min,w_max,[],options);
         else
@@ -66,24 +64,39 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,phi_e_store,phi_li
           U_min
           fix_cost
           -obj(wstar)
-          error('Fix cost is too high to find a solution. No solution even at U = Umin')
+          warning('Fix cost is too high to find a solution. No solution even at U = Umin');
+          solved = 0;
+          err_both = 0;
+        else
+          err_both = err_U + err_alpha;
         end
-        err_both = err_U + err_alpha;
       end
       
       if k == max_iter
-        error('No Feasible Solution')
+        warning('No Feasible Solution')
+        solved = 0;
       end
     end
     
-    U_store(ia)         = U;
-    w_store(ia)         = wstar;
-    vacancies(ia)       = (f(wstar)^(-gamma_matching) - 1)^(-1/gamma_matching);
-    p_theta(ia)         = f(wstar);
-    q_theta(ia)         = p_theta(ia)/vacancies(ia);
-    obj_store(ia)       = -obj(wstar);
-    phi_e_store(ia)     = phi_e;
-    phi_lim_store(ia)   = getPhiCutoff(params,aalpha,phi_e,wstar);
+    if solved == 1
+      U_store(ia)         = U;
+      w_store(ia)         = wstar;
+      vacancies(ia)       = (f(wstar)^(-gamma_matching) - 1)^(-1/gamma_matching);
+      p_theta(ia)         = f(wstar);
+      q_theta(ia)         = p_theta(ia)/vacancies(ia);
+      obj_store(ia)       = -obj(wstar);
+      phi_e_store(ia)     = phi_e;
+      phi_lim_store(ia)   = getPhiCutoff(params,aalpha,phi_e,wstar);
+    else
+      U_store(ia)         = nan;
+      w_store(ia)         = nan;
+      vacancies(ia)       = nan;
+      p_theta(ia)         = nan;
+      q_theta(ia)         = nan;
+      obj_store(ia)       = nan;
+      phi_e_store(ia)     = nan;
+      phi_lim_store(ia)   = nan;
+    end
   end
 end
 

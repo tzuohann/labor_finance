@@ -74,14 +74,30 @@ plot(tech.alpha_vec,obj_store_p./q_theta_p,'.-')
 hold on
 plot(tech.alpha_vec,obj_store_lc./q_theta_lc,'.-')
 legend({'PC','LC'})
-title('unconstrainted wages')
+title('profits condition on matching')
 hold off
 subplot(2,1,2)
 plot(tech.alpha_vec,q_theta_p,'.-')
 hold on
 plot(tech.alpha_vec,q_theta_lc,'.-')
 legend({'PC','LC'})
-title('vacancies')
+title('q theta')
+hold off
+
+figure(4)
+subplot(2,1,1)
+plot(tech.alpha_vec,phi_e_store_p,'.-')
+hold on
+plot(tech.alpha_vec,phi_e_store_lc,'.-')
+legend({'PC','LC'})
+title('phi e')
+hold off
+subplot(2,1,2)
+plot(tech.alpha_vec,p_theta_p,'.-')
+hold on
+plot(tech.alpha_vec,p_theta_lc,'.-')
+legend({'PC','LC'})
+title('p theta')
 hold off
 
 
