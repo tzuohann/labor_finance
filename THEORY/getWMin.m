@@ -12,4 +12,4 @@ end
 
  
 
-U = u(b) + beta E2(w) + phi_cutoff*beta*u(b) + (1-phi_cutoff)*E3 
+% U = u(b) + beta E2(w) + phi_cutoff*beta*u(b) + (1-phi_cutoff)*E3 

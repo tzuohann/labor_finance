@@ -1,6 +1,9 @@
 function preTaxoutput = prodFn(R,phi,alpha,r,prod_func_type,delta)
     %Calculate pretax output assuming K = 1
     %Right now we have two types of production function. The original one
+    if prod_func_type ~= 8
+      error('phi_lim solved assuming prodfunctype is 8')
+    end
     if prod_func_type == 1
         preTaxoutput = R - alpha*r + phi;
         %U just decreases as a function of alpha until worker is at Umin

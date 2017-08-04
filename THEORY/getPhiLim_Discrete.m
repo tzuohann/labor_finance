@@ -13,13 +13,16 @@ function phi_lim = getPhiLim_Discrete(params,aalpha,phi_e,wStarMax)
     phi_lim       = phi_e;
     warning('Worker will never quit in second period')
   else
-    targetProd      = ((1-ssigma)*((1+BETA)*utilFunc(b) - BETA*E3))^(1/(1-ssigma));
-    minProb         = @(phi) (prodFn(R,phi,aalpha,r,prod_func_type,delta) - targetProd).^2;
-    options         = optimoptions('fminunc');
-    options.TolFun  = 1e-10;
-    options.TolX    = 1e-10;
-    options = optimoptions(@fminunc,'Display','iter','Algorithm','quasi-newton');
-    options.Display = 'off';
-    phi_lim         = fminunc(minProb,max(phi_vec),options);
+    
+    phi_lim         = aalpha^(1-delta) + aalpha^-delta*((1+BETA)*utilFunc(b) - BETA*E3);
+    
+%     targetProd      = ((1-ssigma)*((1+BETA)*utilFunc(b) - BETA*E3))^(1/(1-ssigma));
+%     minProb         = @(phi) (prodFn(R,phi,aalpha,r,prod_func_type,delta) - targetProd).^2;
+%     options         = optimoptions('fminunc');
+%     options.TolFun  = 1e-10;
+%     options.TolX    = 1e-10;
+%     options = optimoptions(@fminunc,'Display','iter','Algorithm','quasi-newton');
+%     options.Display = 'off';
+%     phi_lim         = fminunc(minProb,max(phi_vec),options);
   end
 end

@@ -5,100 +5,157 @@ close all
 %Parameterization
 [params,tech] = param();
 
+%Computations
 params.whichCommitment = 'perfect';
-[U_store_p,w_store_p,vacancies_p,p_theta_p,q_theta_p,obj_store_p,phi_e_store_p,phi_lim_store_p] = mainDynamicLoop(params,tech);
+model = 'sp';
+[s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+ s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+ s.(model).E1] = mainDynamicLoop(params,tech);
 params.whichCommitment = 'limited';
-[U_store_lc,w_store_lc,vacancies_lc,p_theta_lc,q_theta_lc,obj_store_lc,phi_e_store_lc,phi_lim_store_lc] = mainDynamicLoop(params,tech);
-%Storing the optimal U and alpha for sigma varying
-[U_maximized , location] = max(U_store_p);
-if location == length(tech.alpha_vec)
-  warning('Perfect Commitment')
-  warning('Corner solution. The maximization problem is constrained by alpha_max.')
-elseif location == 1
-  warning('Perfect Commitment')
-  warning('Corner solution. The maximization problem is constrained by alpha_min.')
-end
-loc_pc    = location;
-max_U_pc  = U_maximized;
+model = 'sl';
+[s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+ s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+ s.(model).E1] = mainDynamicLoop(params,tech);
+params.whichCommitment = 'perfect'; %perfect vs limited commitment
+model = 'wp';
+[s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+ s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+ s.(model).E1] = mainLoop(params,tech);
+params.whichCommitment = 'limited'; %perfect vs limited commitment
+model = 'wl';
+[s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+ s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+ s.(model).E1] = mainLoop(params,tech);
 
-[U_maximized , location] = max(U_store_lc);
-if location == length(tech.alpha_vec)
-  warning('Limited Commitment')
-  warning('Corner solution. The maximization problem is constrained by alpha_max.')
-elseif location == 1
-  warning('Limited Commitment')
-  warning('Corner solution. The maximization problem is constrained by alpha_min.')
-end
-loc_lc    = location;
-max_U_lc  = U_maximized;
+lines       = {'k-','k--','k-.','k:'};
+models = {'sp','sl','wp','wl'};
 
-figure(1)
+aaa = 1;
+figure(aaa*4+1)
+
 subplot(2,1,1)
-plot(tech.alpha_vec,U_store_p,'.-')
 hold on
-plot(tech.alpha_vec,U_store_lc,'.-')
-legend({'PC','LC'})
-plot(tech.alpha_vec(loc_pc),max_U_pc,'o')
-plot(tech.alpha_vec(loc_lc),max_U_lc,'o')
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).U,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  [~,loc(i1)] = max(s.(models{i1}).U);
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).U(loc(i1)),'ks')
+end
 title('U')
 hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+
 subplot(2,1,2)
-plot(tech.alpha_vec,phi_lim_store_p,'.-')
 hold on
-plot(tech.alpha_vec,phi_lim_store_lc,'.-')
-legend({'PC','LC'})
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).wstar,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).wstar(loc(i1)),'ks')
+end
+title('wstar')
+hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+
+
+figure(aaa*4+2)
+subplot(2,1,1)
+hold on
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).philim,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).philim(loc(i1)),'ks')
+end
 title('Phi Cutoff')
 hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 
-figure(2)
-subplot(2,1,1)
-plot(tech.alpha_vec,w_store_p,'.-')
-hold on
-plot(tech.alpha_vec,w_store_lc,'.-')
-legend({'PC','LC'})
-title('unconstrainted wages')
-hold off
 subplot(2,1,2)
-plot(tech.alpha_vec,vacancies_p,'.-')
 hold on
-plot(tech.alpha_vec,vacancies_lc,'.-')
-legend({'PC','LC'})
-title('vacancies')
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).E1,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).E1(loc(i1)),'ks')
+end
+title('E1')
 hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 
-
-
-figure(3)
+figure(aaa*4+3)
 subplot(2,1,1)
-plot(tech.alpha_vec,obj_store_p./q_theta_p,'.-')
 hold on
-plot(tech.alpha_vec,obj_store_lc./q_theta_lc,'.-')
-legend({'PC','LC'})
-title('profits condition on matching')
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).obj./s.(models{i1}).q,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).obj(loc(i1)) ./ s.(models{i1}).q(loc(i1)),'ks')
+end
+title('Profits When Matched')
 hold off
-subplot(2,1,2)
-plot(tech.alpha_vec,q_theta_p,'.-')
-hold on
-plot(tech.alpha_vec,q_theta_lc,'.-')
-legend({'PC','LC'})
-title('q theta')
-hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 
-figure(4)
+subplot(2,1,2)
+hold on
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).q,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).q(loc(i1)),'ks')
+end
+title('qtheta')
+hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+
+
+
+figure(aaa*4+4)
 subplot(2,1,1)
-plot(tech.alpha_vec,phi_e_store_p,'.-')
 hold on
-plot(tech.alpha_vec,phi_e_store_lc,'.-')
-legend({'PC','LC'})
-title('phi e')
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).theta,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).theta(loc(i1)),'ks')
+end
+title('theta')
 hold off
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+
 subplot(2,1,2)
-plot(tech.alpha_vec,p_theta_p,'.-')
 hold on
-plot(tech.alpha_vec,p_theta_lc,'.-')
-legend({'PC','LC'})
-title('p theta')
+for i1 = 1:4
+  plot(tech.alpha_vec,s.(models{i1}).p,lines{i1})
+end
+legend(models)
+for i1 = 1:4
+  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).p(loc(i1)),'ks')
+end
+title('ptheta')
 hold off
-
-
-
+axis tight
+V = axis;
+axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])

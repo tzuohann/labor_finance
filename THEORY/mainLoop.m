@@ -1,17 +1,8 @@
-function [U,phi_e_vec,phi_dw_vec,phi_db_vec,wStar_vec,phi_lim_vec] = mainLoop()
-  globalDeclaration
-  params.b = b;
-  params.whichE3 = whichE3;
-  params.E3_fix = E3_fix;
-  params.R = R;
-  params.r = r;
-  params.phi_vec = phi_vec;
-  params.prod_func_type = prod_func_type;
-  params.delta = delta;
-  params.utilFunc = utilFunc;
-  params.BETA = BETA;
-  params.ssigma = ssigma;
-  params.whichCommitment = whichCommitment;
+function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
+    phi_e_store,phi_lim_store,w_store_max,w_store_min,E1_store] = mainLoop(params,tech)
+  
+  eval(reshape(structvars(params)',1,[]));
+  eval(reshape(structvars(tech)',1,[]));
   
   phi_e_func      = make_phi_e_func(prod_func_type,r,R,delta);
   phi_d_fun       = make_phi_d_func(phi_e_func,prod_func_type,R,r,delta);
@@ -64,11 +55,18 @@ function [U,phi_e_vec,phi_dw_vec,phi_db_vec,wStar_vec,phi_lim_vec] = mainLoop()
     end
     
     %Evaluating the remaing variable
-    U(ialpha)                             = getU(params,output,phi_cutoff,wStar,ptheta,aalpha);
-    phi_e_vec(ialpha)                     = phi_e;
-    phi_dw_vec(ialpha)                    = phi_d_fun(wStar,aalpha);
-    phi_db_vec(ialpha)                    = phi_d_fun(b,aalpha);
-    wStar_vec(ialpha)                     = wStar;
-    phi_lim_vec(ialpha)                   = phi_cutoff;
+    U_store(ialpha)                       = getU(params,output,phi_cutoff,wStar,ptheta,aalpha);
+    phi_e_store(ialpha)                   = phi_e;
+    phi_dw_store(ialpha)                  = phi_d_fun(wStar,aalpha);
+    phi_db_store(ialpha)                  = phi_d_fun(b,aalpha);
+    w_store(ialpha)                       = wStar;
+    phi_lim_store(ialpha)                 = phi_cutoff;
+    w_store_max(ialpha)                   = wStar;
+    w_store_min(ialpha)                   = wStar;
+    vacancies(ialpha)                     = nan;
+    p_theta(ialpha)                       = 1;
+    q_theta(ialpha)                       = nan;
+    obj_store(ialpha)                     = nan;
+    E1_store(ialpha)                      = E2;
   end
 end
