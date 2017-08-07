@@ -10,8 +10,7 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
     disp(['alpha = ',num2str(ia)])
     %Technical parameters
     err_alpha          = 1; %initial value for err_U
-    k                 = 0; %initial value for counting the iterations of the loops
-    aalpha            = alpha_vec(ia);
+    aalpha             = alpha_vec(ia);
     
     %These quantities depend only on alpha and not on U
     phi_e     = phi_e_func(aalpha);
@@ -59,19 +58,35 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
       E1_store(ia)          = calcExpectedUtil(params,output,phi_lim_store(ia),wstar);
       
     else
-      U_store(ia)           = nan;
-      w_store(ia)           = nan;
-      vacancies(ia)         = nan;
-      p_theta(ia)           = nan;
-      q_theta(ia)           = nan;
-      obj_store(ia)         = nan;
-      phi_e_store(ia)       = nan;
-      phi_lim_store(ia)     = nan;
-      w_store_max(ia)       = nan;
-      w_store_min(ia)       = nan;
-      phi_dw_store(ia)      = nan;
-      phi_db_store(ia)      = nan;
-      E1_store(ia)          = nan;
+        if firmValUMax      > fix_cost
+            U_store(ia)           = -0.2;
+            vacancies(ia)         = -0.2;
+            p_theta(ia)           = -0.2;
+            q_theta(ia)           = -0.2;
+            obj_store(ia)         = -0.2;
+            phi_e_store(ia)       = -0.2;
+            phi_lim_store(ia)     = -0.2;
+            w_store_max(ia)       = -0.2;
+            w_store_min(ia)       = -0.2;
+            phi_dw_store(ia)      = -0.2;
+            phi_db_store(ia)      = -0.2;
+            E1_store(ia)          = -0.2;
+            warning('firmValUMax is less than the cost of entry. No solution available')
+        elseif firmValUMin  < fix_cost
+            U_store(ia)           = +0.2;
+            vacancies(ia)         = +0.2;
+            p_theta(ia)           = +0.2;
+            q_theta(ia)           = +0.2;
+            obj_store(ia)         = +0.2;
+            phi_e_store(ia)       = +0.2;
+            phi_lim_store(ia)     = +0.2;
+            w_store_max(ia)       = +0.2;
+            w_store_min(ia)       = +0.2;
+            phi_dw_store(ia)      = +0.2;
+            phi_db_store(ia)      = +0.2;
+            E1_store(ia)          = +0.2;
+            warning('firmValUMin is greater than the cost of entry. No solution available')
+        end
     end
   end
 end
