@@ -14,7 +14,11 @@ function phi_lim = getPhiLim_Discrete(params,aalpha,phi_e,wStarMax)
     warning('Worker will never quit in second period')
   else
     
-    phi_lim         = aalpha^(1-delta) + aalpha^-delta*((1+BETA)*utilFunc(b) - BETA*E3);
+    phi_lim         = aalpha^(1-delta) ...
+        + aalpha^(-delta)*((1-ssigma)*((1+BETA)*utilFunc(b) - BETA*E3))^(1/(1-ssigma));
+    if phi_lim < phi_e
+        error('phi_lim cannot be smaller than phi_e')
+    end
     
 %     targetProd      = ((1-ssigma)*((1+BETA)*utilFunc(b) - BETA*E3))^(1/(1-ssigma));
 %     minProb         = @(phi) (prodFn(R,phi,aalpha,r,prod_func_type,delta) - targetProd).^2;
