@@ -30,163 +30,185 @@ model = 'sl';
 %  s.(model).E1] = mainLoop(params,tech);
 
 %%
+for bla = 0:46;
+    load(['p',num2str(bla)])
+    %Plotting one big figure with all the imporant graphs
+    figure(bla+1)
+    
+    %Common features of the figure
+    lines           = {'k-','k--'};     %{'k-','k--','k-.','k:'};
+    color           = {'b','r'};        %{'b','r','c','m'};
+    models          = {'sp','sl'};      %{'sp','sl','wp','wl'};
+    
+    %Plotting U
+    subplot(2,4,1)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).U,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))*U_min,'LineWidth',2,'color','k')
+    for i1 = 1:length(models)
+        [~,loc(i1)] = max(s.(models{i1}).U);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).U(loc(i1)),'ks')
+    end
+    title('U','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting wstar
+    subplot(2,4,5)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).wstar,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    plot(tech.alpha_vec,s.(model).wmax,'LineWidth',2,'color','k')
+    for i1 = 1:length(models)
+        [~,loc_w(i1)] = max(s.(models{i1}).wstar);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).wstar(loc(i1)),'ks')
+        plot(tech.alpha_vec(loc_w(i1)),s.(models{i1}).wstar(loc_w(i1)),'*')
+    end
+    title('w*','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting phi_cutoff
+    subplot(2,4,2)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).philim,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).philim(loc(i1)),'ks')
+    end
+    title('\phi Cutoff','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting E2 - that happens in the second period!
+    subplot(2,4,6)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).E1,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    for i1 = 1:length(models)
+        [~,loc_E(i1)] = max(s.(models{i1}).E1);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).E1(loc(i1)),'ks')
+        plot(tech.alpha_vec(loc_E(i1)),s.(models{i1}).E1(loc_E(i1)),'*')
+    end
+    title('E2','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting profits when matched
+    subplot(2,4,3)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).obj./s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    for i1 = 1:length(models)
+        [~,loc_prof(i1)] = max(s.(models{i1}).obj./s.(models{i1}).q);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).obj(loc(i1)) ./ s.(models{i1}).q(loc(i1)),'ks')
+        plot(tech.alpha_vec(loc_prof(i1)),s.(models{i1}).obj(loc_prof)./s.(models{i1}).q(loc_prof),'*')
+    end
+    title('\pi if matched','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting q(theta)
+    subplot(2,4,7)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    for i1 = 1:length(models)
+        [~,loc_q(i1)] = min(s.(models{i1}).q);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).q(loc(i1)),'ks')
+        plot(tech.alpha_vec(loc_q(i1)),s.(models{i1}).q(loc_q(i1)),'*')
+    end
+    title('q(\theta)','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting theta
+    subplot(2,4,4)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).theta,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    for i1 = 1:length(models)
+        [~,loc_theta(i1)] = max(s.(models{i1}).theta);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).theta(loc(i1)),'ks')
+        plot(tech.alpha_vec(loc_theta(i1)),s.(models{i1}).theta(loc_theta(i1)),'*')
+    end
+    title('\theta','FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    %Plotting p(theta)
+    subplot(2,4,8)
+    hold on
+    for i1 = 1:length(models)
+        plot(tech.alpha_vec,s.(models{i1}).p,lines{i1},'LineWidth', 2,'color',color{i1})
+    end
+    for i1 = 1:length(models)
+        [~,loc_p(i1)] = max(s.(models{i1}).p);
+        plot(tech.alpha_vec(loc(i1)),s.(models{i1}).p(loc(i1)),'ks')
+        plot(tech.alpha_vec(loc_p(i1)),s.(models{i1}).p(loc_p(i1)),'*')
+    end
+    title('p(\theta)', 'FontSize', 20)
+    hold off
+    axis tight
+    V = axis;
+    axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
+    grid on
+    
+    % Construct a Legend with the data from the sub-plots
+    hL = legend(models);
+    % Programatically move the Legend
+    newPosition = [0.2 -0.05 0.6 0.2];
+    newUnits = 'normalized';
+    set(hL,'Position', newPosition,'Units', newUnits);
+    hL.Orientation = 'horizontal';
+    hL.FontSize = 16;
+    
+    set(gcf,'position',[2737 -127 1920 963])
+end
 
-%Plotting one big figure with all the imporant graphs
-figure(1)
-
-%Common features of the figure
-lines           = {'k-','k--'};     %{'k-','k--','k-.','k:'};
-color           = {'b','r'};        %{'b','r','c','m'};
-models          = {'sp','sl'};      %{'sp','sl','wp','wl'};
-
-%Plotting U
-subplot(2,4,1)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).U,lines{i1},'LineWidth', 2,'color',color{i1})
+%%
+bla = [1,5,4,3,2];
+for i1 = bla;
+    figure(i1);
+    if i1 == 1
+        for i2 = 1:8
+            subplot(2,4,i2)
+            axiis{i2} = axis;
+        end
+    else
+        for i2 = 1:8
+            subplot(2,4,i2)
+            axis(axiis{i2});
+        end
+    end
+    pause(0.5);
 end
-plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))*U_min,'LineWidth',2,'color','k')
-for i1 = 1:length(models)
-    [~,loc(i1)] = max(s.(models{i1}).U);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).U(loc(i1)),'ks')
-end
-title('U','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting wstar
-subplot(2,4,5)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).wstar,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-plot(tech.alpha_vec,s.(model).wmax,'LineWidth',2,'color','k')
-for i1 = 1:length(models)
-    [~,loc_w(i1)] = max(s.(models{i1}).wstar);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).wstar(loc(i1)),'ks')
-    plot(tech.alpha_vec(loc_w(i1)),s.(models{i1}).wstar(loc_w(i1)),'*')
-end
-title('w*','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting phi_cutoff
-subplot(2,4,2)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).philim,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-for i1 = 1:length(models)
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).philim(loc(i1)),'ks')
-end
-title('\phi Cutoff','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting E2 - that happens in the second period!
-subplot(2,4,6)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).E1,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-for i1 = 1:length(models)
-    [~,loc_E(i1)] = max(s.(models{i1}).E1);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).E1(loc(i1)),'ks')
-    plot(tech.alpha_vec(loc_E(i1)),s.(models{i1}).E1(loc_E(i1)),'*')
-end
-title('E2','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting profits when matched
-subplot(2,4,3)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).obj./s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-for i1 = 1:length(models)
-    [~,loc_prof(i1)] = max(s.(models{i1}).obj./s.(models{i1}).q);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).obj(loc(i1)) ./ s.(models{i1}).q(loc(i1)),'ks')
-    plot(tech.alpha_vec(loc_prof(i1)),s.(models{i1}).obj(loc_prof)./s.(models{i1}).q(loc_prof),'*')
-end
-title('\pi if matched','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting q(theta)
-subplot(2,4,7)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-for i1 = 1:length(models)
-    [~,loc_q(i1)] = min(s.(models{i1}).q);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).q(loc(i1)),'ks')
-    plot(tech.alpha_vec(loc_q(i1)),s.(models{i1}).q(loc_q(i1)),'*')
-end
-title('q(\theta)','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting theta
-subplot(2,4,4)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).theta,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-for i1 = 1:length(models)
-    [~,loc_theta(i1)] = max(s.(models{i1}).theta);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).theta(loc(i1)),'ks')
-    plot(tech.alpha_vec(loc_theta(i1)),s.(models{i1}).theta(loc_theta(i1)),'*')
-end
-title('\theta','FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-%Plotting p(theta)
-subplot(2,4,8)
-hold on
-for i1 = 1:length(models)
-    plot(tech.alpha_vec,s.(models{i1}).p,lines{i1},'LineWidth', 2,'color',color{i1})
-end
-for i1 = 1:length(models)
-    [~,loc_p(i1)] = max(s.(models{i1}).p);
-    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).p(loc(i1)),'ks')
-    plot(tech.alpha_vec(loc_p(i1)),s.(models{i1}).p(loc_p(i1)),'*')
-end
-title('p(\theta)', 'FontSize', 20)
-hold off
-axis tight
-V = axis;
-axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-grid on
-
-% Construct a Legend with the data from the sub-plots
-hL = legend(models);
-% Programatically move the Legend
-newPosition = [0.2 -0.05 0.6 0.2];
-newUnits = 'normalized';
-set(hL,'Position', newPosition,'Units', newUnits);
-hL.Orientation = 'horizontal';
-hL.FontSize = 16;
