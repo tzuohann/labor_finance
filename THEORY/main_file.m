@@ -1,6 +1,6 @@
 %Clearing and closing
-clear 
-% close all
+clear all
+close all
 
 %Parameterization
 [params,tech] = param();
@@ -9,13 +9,13 @@ clear
 params.whichCommitment = 'perfect';
 model = 'sp';
 [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
- s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
- s.(model).E1] = mainDynamicLoop(params,tech);
+    s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+    s.(model).E1,U_min] = mainDynamicLoop(params,tech);
 params.whichCommitment = 'limited';
 model = 'sl';
 [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
- s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
- s.(model).E1] = mainDynamicLoop(params,tech);
+    s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+    s.(model).E1,U_min] = mainDynamicLoop(params,tech);
 
 %Worker Solution
 % params.whichCommitment = 'perfect'; %perfect vs limited commitment
@@ -29,6 +29,8 @@ model = 'sl';
 %  s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
 %  s.(model).E1] = mainLoop(params,tech);
 
+%%
+
 %Plotting one big figure with all the imporant graphs
 figure(1)
 
@@ -41,11 +43,12 @@ models          = {'sp','sl'};      %{'sp','sl','wp','wl'};
 subplot(2,4,1)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).U,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).U,lines{i1},'LineWidth', 2,'color',color{i1})
 end
+plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))*U_min,'LineWidth',2,'color','k')
 for i1 = 1:length(models)
-  [~,loc(i1)] = max(s.(models{i1}).U);
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).U(loc(i1)),'ks')
+    [~,loc(i1)] = max(s.(models{i1}).U);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).U(loc(i1)),'ks')
 end
 title('U','FontSize', 20)
 hold off
@@ -58,10 +61,13 @@ grid on
 subplot(2,4,5)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).wstar,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).wstar,lines{i1},'LineWidth', 2,'color',color{i1})
 end
+plot(tech.alpha_vec,s.(model).wmax,'LineWidth',2,'color','k')
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).wstar(loc(i1)),'ks')
+    [~,loc_w(i1)] = max(s.(models{i1}).wstar);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).wstar(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc_w(i1)),s.(models{i1}).wstar(loc_w(i1)),'*')
 end
 title('w*','FontSize', 20)
 hold off
@@ -74,10 +80,10 @@ grid on
 subplot(2,4,2)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).philim,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).philim,lines{i1},'LineWidth', 2,'color',color{i1})
 end
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).philim(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).philim(loc(i1)),'ks')
 end
 title('\phi Cutoff','FontSize', 20)
 hold off
@@ -90,10 +96,12 @@ grid on
 subplot(2,4,6)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).E1,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).E1,lines{i1},'LineWidth', 2,'color',color{i1})
 end
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).E1(loc(i1)),'ks')
+    [~,loc_E(i1)] = max(s.(models{i1}).E1);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).E1(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc_E(i1)),s.(models{i1}).E1(loc_E(i1)),'*')
 end
 title('E2','FontSize', 20)
 hold off
@@ -106,10 +114,12 @@ grid on
 subplot(2,4,3)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).obj./s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).obj./s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
 end
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).obj(loc(i1)) ./ s.(models{i1}).q(loc(i1)),'ks')
+    [~,loc_prof(i1)] = max(s.(models{i1}).obj./s.(models{i1}).q);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).obj(loc(i1)) ./ s.(models{i1}).q(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc_prof(i1)),s.(models{i1}).obj(loc_prof)./s.(models{i1}).q(loc_prof),'*')
 end
 title('\pi if matched','FontSize', 20)
 hold off
@@ -122,10 +132,12 @@ grid on
 subplot(2,4,7)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).q,lines{i1},'LineWidth', 2,'color',color{i1})
 end
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).q(loc(i1)),'ks')
+    [~,loc_q(i1)] = min(s.(models{i1}).q);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).q(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc_q(i1)),s.(models{i1}).q(loc_q(i1)),'*')
 end
 title('q(\theta)','FontSize', 20)
 hold off
@@ -138,10 +150,12 @@ grid on
 subplot(2,4,4)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).theta,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).theta,lines{i1},'LineWidth', 2,'color',color{i1})
 end
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).theta(loc(i1)),'ks')
+    [~,loc_theta(i1)] = max(s.(models{i1}).theta);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).theta(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc_theta(i1)),s.(models{i1}).theta(loc_theta(i1)),'*')
 end
 title('\theta','FontSize', 20)
 hold off
@@ -154,10 +168,12 @@ grid on
 subplot(2,4,8)
 hold on
 for i1 = 1:length(models)
-  plot(tech.alpha_vec,s.(models{i1}).p,lines{i1},'LineWidth', 2,'color',color{i1})
+    plot(tech.alpha_vec,s.(models{i1}).p,lines{i1},'LineWidth', 2,'color',color{i1})
 end
 for i1 = 1:length(models)
-  plot(tech.alpha_vec(loc(i1)),s.(models{i1}).p(loc(i1)),'ks')
+    [~,loc_p(i1)] = max(s.(models{i1}).p);
+    plot(tech.alpha_vec(loc(i1)),s.(models{i1}).p(loc(i1)),'ks')
+    plot(tech.alpha_vec(loc_p(i1)),s.(models{i1}).p(loc_p(i1)),'*')
 end
 title('p(\theta)', 'FontSize', 20)
 hold off

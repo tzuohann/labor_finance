@@ -20,7 +20,7 @@ function [params,tech] = param()
   params.Lifetime_Achievement_Award  = 0.5; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
   params.whichE3         = 'exogenous'; %exogenous vs endogenous expected value in the third period
-  params.fix_cost        = 0.15; %Fixed cost of entry. Should be equal to K (equal to 1)
+  params.fix_cost        = 0.3; %Fixed cost of entry. Should be equal to K (equal to 1)
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
   params.prod_func_type  = 8; %We use different production function to get the hump-shaped U
   params.delta           = 0.1; %decreasing return to scale active if production number 8
@@ -33,7 +33,7 @@ function [params,tech] = param()
   %Technical Parameters
   alpha_min       = 0.001;
   alpha_max       = 0.2;
-  lenAalpha       = 30;
+  lenAalpha       = 20;
   phi_low         = 0; %lower bound for phi
   phi_up          = 1; %upper bound for phi
   lenPphi         = 50000;

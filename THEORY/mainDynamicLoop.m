@@ -1,5 +1,5 @@
 function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
-    phi_e_store,phi_lim_store,w_store_max,w_store_min,E1_store]...
+    phi_e_store,phi_lim_store,w_store_max,w_store_min,E1_store,U_min]...
     = mainDynamicLoop(params,tech)
   
   eval(reshape(structvars(params)',1,[]));
@@ -59,33 +59,35 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
       
     else
         if firmValUMax      > fix_cost
-            U_store(ia)           = -0.2;
-            vacancies(ia)         = -0.2;
-            p_theta(ia)           = -0.2;
-            q_theta(ia)           = -0.2;
-            obj_store(ia)         = -0.2;
-            phi_e_store(ia)       = -0.2;
-            phi_lim_store(ia)     = -0.2;
-            w_store_max(ia)       = -0.2;
-            w_store_min(ia)       = -0.2;
-            phi_dw_store(ia)      = -0.2;
-            phi_db_store(ia)      = -0.2;
-            E1_store(ia)          = -0.2;
-            warning('firmValUMax is less than the cost of entry. No solution available')
+            U_store(ia)           = NaN;
+            vacancies(ia)         = NaN;
+            p_theta(ia)           = NaN;
+            q_theta(ia)           = NaN;
+            obj_store(ia)         = NaN;
+            phi_e_store(ia)       = NaN;
+            phi_lim_store(ia)     = NaN;
+            w_store(ia)           = NaN;
+            w_store_max(ia)       = NaN;
+            w_store_min(ia)       = NaN;
+            phi_dw_store(ia)      = NaN;
+            phi_db_store(ia)      = NaN;
+            E1_store(ia)          = NaN;
+            warning('firmValUMax is greater than the cost of entry. No solution available')
         elseif firmValUMin  < fix_cost
-            U_store(ia)           = +0.2;
-            vacancies(ia)         = +0.2;
-            p_theta(ia)           = +0.2;
-            q_theta(ia)           = +0.2;
-            obj_store(ia)         = +0.2;
-            phi_e_store(ia)       = +0.2;
-            phi_lim_store(ia)     = +0.2;
-            w_store_max(ia)       = +0.2;
-            w_store_min(ia)       = +0.2;
-            phi_dw_store(ia)      = +0.2;
-            phi_db_store(ia)      = +0.2;
-            E1_store(ia)          = +0.2;
-            warning('firmValUMin is greater than the cost of entry. No solution available')
+            U_store(ia)           = NaN;
+            vacancies(ia)         = NaN;
+            p_theta(ia)           = NaN;
+            q_theta(ia)           = NaN;
+            obj_store(ia)         = NaN;
+            phi_e_store(ia)       = NaN;
+            phi_lim_store(ia)     = NaN;
+            w_store(ia)           = NaN;
+            w_store_max(ia)       = NaN;
+            w_store_min(ia)       = NaN;
+            phi_dw_store(ia)      = NaN;
+            phi_db_store(ia)      = NaN;
+            E1_store(ia)          = NaN;
+            warning('firmValUMin is smaller than the cost of entry. No solution available')
         end
     end
   end
