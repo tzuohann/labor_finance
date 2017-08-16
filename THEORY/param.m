@@ -1,4 +1,4 @@
-function [params,tech] = param()
+function [params,tech] = param(i_FC)
   %Global variables consume the most running time.
   
   %Economic Parameters
@@ -9,18 +9,22 @@ function [params,tech] = param()
   if params.ssigma == 0
       display('Worker is risk neutral')
   end
-  assert(params.ssigma >= 0 || params.ssigma < 1,'ssigma must be [0,1)')
+  assert(params.ssigma  >= 0 || params.ssigma < 1,'ssigma must be [0,1)')
   params.BETA            = 1/(1+params.r); %Discount factor
   params.gamma_matching  = 1; %Matching elasticity parameter
-  params.b               = 0.1; %Value of home production
+  params.b               = 0.12; %Value of home production
   if params.b == 0
       warning('b is equal to zero: wp should be equal to wl and sp should be equal to sl.')
   end
   params.E3_fix          = 0.12; %Exogenous value of E3.If whichE3 is endogenous doesnt matter
   params.Lifetime_Achievement_Award  = 0.5; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
-  params.whichE3         = 'exogenous'; %exogenous vs endogenous expected value in the third period
-  params.fix_cost        = 0.3; %Fixed cost of entry. Should be equal to K (equal to 1)
+  params.whichE3         = 'endogenous'; %exogenous vs endogenous expected value in the third period
+  params.FC_min          = 0.012;
+  params.FC_max          = 0.07;
+  params.length_FC       = 40;
+  params.fix_cost_grid   = linspace(params.FC_min,params.FC_max,params.length_FC); %Fixed cost of entry. Should be equal to K (equal to 1)
+  params.fix_cost        = params.fix_cost_grid(i_FC);
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
   params.prod_func_type  = 8; %We use different production function to get the hump-shaped U
   params.delta           = 0.1; %decreasing return to scale active if production number 8
@@ -31,18 +35,19 @@ function [params,tech] = param()
   params.phi_d_fun       = make_phi_d_func(params.phi_e_func,params.prod_func_type,params.R,params.r,params.delta);
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
-  alpha_min       = 0.001;
-  alpha_max       = 0.2;
-  lenAalpha       = 20;
+  alpha_min       = 0.0425;
+  alpha_max       = 0.0425;
+  params.alpha_fix= 0.0425;
+  lenAalpha       = 1;
   phi_low         = 0; %lower bound for phi
   phi_up          = 1; %upper bound for phi
-  lenPphi         = 50000;
+  lenPphi         = 10000;
   
   %Grids
   %alpha grid. Given parameters we start with lowest alpha and go almost to 1
-  params.phi_vec     = linspace(phi_low,phi_up,lenPphi);
+  params.phi_vec   = linspace(phi_low,phi_up,lenPphi);
   tech.alpha_vec   = linspace(alpha_min,alpha_max,lenAalpha);
-  tech.tol         = 10^(-5); %tolerance to get convergence
+  tech.tol         = 10^(-8); %tolerance to get convergence
   
   
   %Checking if b is too high for this production function
