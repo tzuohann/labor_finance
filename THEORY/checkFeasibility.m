@@ -1,5 +1,5 @@
-function checkFeasibility(params,aalpha,phi_e,E2_up,E3_up,output)
-  phi_cutoff = getPhiCutoff(params,aalpha,phi_e,max(output));
+function checkFeasibility(params,aalpha,phi_e,E2_up,E3_up,output,phi_db)
+  phi_cutoff = getPhiCutoff(params,aalpha,phi_e,max(output),output,phi_db);
   %Checking the feasibility of the problem
   if phi_cutoff < phi_e
     error('phi_lim cannot be smaller than phi_e.')
