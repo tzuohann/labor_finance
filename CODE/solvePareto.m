@@ -1,5 +1,5 @@
 function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
-    Phi_grid,BETA,Lambda_vect,w_star_pre,U,r,K,D,tau,w_star_pre_cons,commitType)
+    Phi_grid,BETA,Lambda_vect,w_star_pre,U,r,K,D,tau,w_star_pre_cons,commitType,preTaxOutput)
   
   iLp_star                  = ones(nPhi,nPhi,nL);
   w_star_v                  = w_star_pre;
@@ -9,16 +9,9 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
   
   U2                        = (max(sep_pol,delta)).*U';
   EsigU                     = pi_Phi*U2(:);
-  Obj_Pre     = r*K + (repmat(Phi_grid,1,nL) - D*r - w_star_pre)*(1-tau) ...
+  Obj_Pre                   = bsxfun(@minus,preTaxOutput,w_star_pre)*(1-tau) ...
     + repmat(Lambda_vect,nPhi,1).*(w_star_pre_cons + BETA*repmat(EsigU,1,nL));
   
-  %Helper variables for limited commitment case
-  UCons = zeros(nPhi,nL,nL);
-  for iphi = 1:nPhi
-    for iL = 1:nL
-      UCons(iphi,iL:nL,iL) = (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphi),delta))*U;
-    end
-  end
   SepP = zeros(nPhi,nL);
   TP2  = zeros(nPhi,nL);
   B2   = zeros(nPhi,nL);
@@ -39,20 +32,13 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
         TP(sep_pol < 1,:)         = Obj_Pre(sep_pol < 1,:) + EP(sep_pol < 1,:);
       case{'limited'}
         
-        %         %SLOW use to verify
-        %         for iphi = 1:nPhi
-        %           if sep_pol(iphi) < 1
-        %             for iL = 1:nL
-        %               TP2 = zeros(nPhi,1);
-        %               for iphip = 1:nPhi
-        %                 [TP2(iphip,1),B0]         = min((1-max(sep_pol(iphip),delta))*P(iphip,iL:nL) + (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphip),delta))*U);
-        %                 B                         = B0+iL-1;
-        %                 iLp_star(iphi,iphip,iL)   = B;
-        %               end
-        %               TP(iphi,iL)                 = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,iL);
-        %             end
-        %           end
-        %         end
+        %Helper variables for limited commitment case
+        UCons = zeros(nPhi,nL,nL);
+        for iphi = 1:nPhi
+          for iL = 1:nL
+            UCons(iphi,iL:nL,iL) = (Lambda_vect(iL) - Lambda_vect(iL:nL))*(1-max(sep_pol(iphi),delta))*U;
+          end
+        end
         
         %FAST
         for iPhi = 1:nPhi
@@ -68,10 +54,12 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
         
         for iphi = 1:nPhi
           if sep_pol(iphi) < 1
-            TP(iphi,:)             = BETA.*pi_Phi(iphi,:)*TP2 + Obj_Pre(iphi,:);
+            TP(iphi,:)                = Obj_Pre(iphi,:) + BETA.*pi_Phi(iphi,:)*TP2;
           end
         end
         
+        %This is imposing that U cannot be less than E
+        TP(bsxfun(@lt,TP,Lambda_vect*U)) = 0;
         
       otherwise
         error('Commitment type not specifed correctly.')

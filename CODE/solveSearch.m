@@ -1,5 +1,6 @@
 function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
-    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,b,rra,Lambda_vect,sep_pol,typeu,pi_z)
+    solveSearch(nZ,init_Prod,delta,E,V,U,BETA,b,rra,Lambda_vect,sep_pol,...
+    typeu,pi_z,gamma_matching)
   
   EU_vect                   = pi_z*(U(:));
   for iz=1:nZ
@@ -28,9 +29,9 @@ function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
     if any(A0(feasSet) > 1) || any(A0(feasSet) < 0)
       error('Matching probability error')
     end
-    theta     = 1./qinv(A0);
+    theta     = 1./qinv(A0,gamma_matching);
     
-    FirmFun                   = q(theta).*F0_grid;
+    FirmFun                   = q(theta,gamma_matching).*F0_grid;
     FirmFun(feasSet == false) = nan;
     
     if all(isnan(FirmFun))
@@ -47,7 +48,7 @@ function [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
 %         error('Firm value at entry at negative')
 %       end
       EnteringP0(iz)      = A0(BR);
-      EnteringF0(iz)      = AR./q(theta(BR));
+      EnteringF0(iz)      = AR./q(theta(BR),gamma_matching);
       EnteringW0(iz)      = W0_grid(BR);
       
       %For the case with PC, the multipler is a constant from entry

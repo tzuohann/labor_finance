@@ -1,46 +1,44 @@
-function Code_Mar2017_v2()
-  %%%%% worker utility U(c)= C^(1-rra)/(1-rra)
-  %%%%% mathing function is CES as in schaal
-  
-  clear
-  close all
-  global gamma_matching
-  
-  %Make comments in the parameterizationFile on what is going on.
-  %Use a new file for each parameterization that does something
-  parameterizationFile
+function [U_D,EnteringW_err_D,U_err_D,Estar_err_D,Vstar_err_D,ExpPVOutput_D,...
+    EnteringF_D,Q_D,P_D,EnteringW_D,EnteringLam_Idx_D,EnteringLam,sepPol_D,...
+    wages_D,dividends_D,TP_D,Estar_D,Vstar_D,massE_D,massU,massEnt]...
+    = mainDynamicLoop(K,tau,r,R,rra,BETA,delta,gamma_matching,b,Ppsi,...
+    commitType,typeu,costofentry,prodcurve,Phi_grid,D_grid,Lambda_vect_ws0,...
+    CV_tol,Niter,nPhi,nL,pi_Phi,Lambda_vect,pi_z,nZ,init_Prod,CV_tol_U,...
+    maxIter_U,uSqueezeFactor)
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
-  for iD = 1:nD
+  for iD = 5%1:numel(D_grid)
     D = D_grid(iD);
-    ke = K - D;
+    ke = costofentry;
+    disp(' ')
     disp(['Calculating for iD = ',num2str(iD)])
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %%%%%%%%%Variables that only depend on D %%%%%%%%%%%%%
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    preTaxOutput                = outputFunc(K,r,tau,Phi_grid,D);
+    preTaxOutput                = outputFunc(K,r,tau,Phi_grid,D,prodcurve);
     sep_pol                     = preTaxOutput*(1-tau) <= 0;  %Endogenous separation policy
     %Wages and utility from consuming wages
     w_star0                     = Lambda_vect_ws0;
-    w_cons                      = (r/(1-tau)*K +(Phi_grid - D*r));
+    w_cons                      = preTaxOutput;
     posDiv                      = bsxfun(@minus,preTaxOutput,w_star0) >= 0;
     w_star_pre                  = bsxfun(@times,w_star0,posDiv) + bsxfun(@times,w_cons,(1-posDiv));
     w_star_pre(w_star_pre < 0)  = nan;
     w_star_pre_cons             = utilFunc(w_star_pre,rra,typeu);
     
     %lowest possible utlity is consuming b forever
-    U_min   = utilFunc(b,rra,typeu)/(1-BETA);
-    %highest possible utlity is consuming all production
-    U_max   = utilFunc(max(preTaxOutput)*(1-tau),rra,typeu)/(1-BETA);
+    U_min                       = utilFunc(b,rra,typeu)/(1-BETA);
+    %highest possible utlity is consuming all production always
+    U_max                       = utilFunc(max(preTaxOutput)*(1-tau),rra,typeu)/(1-BETA);
     
     %Check that there is entry at U_min
     [~,~,~,~,~,EnteringF0,~,~,theta_star] = solveGivenU(CV_tol,Niter,nPhi,...
       nL,sep_pol,delta,pi_Phi,Phi_grid,BETA,Lambda_vect,w_star_pre,U_min,...
-      pi_z,r,K,D,tau,w_star_pre_cons,Ppsi,nZ,init_Prod,b,rra,commitType,typeu);
-    if BETA*EnteringF0*q(theta_star) > ke
+      pi_z,r,K,D,tau,w_star_pre_cons,Ppsi,nZ,init_Prod,b,rra,commitType,typeu,...
+      preTaxOutput,gamma_matching);
+    if BETA*EnteringF0*q(theta_star,gamma_matching) > ke
     else
       error('No entry at U_min')
     end
@@ -48,7 +46,7 @@ function Code_Mar2017_v2()
     %Initialize U levels
     U_l     = U_min*ones(nZ,1);
     U_u     = U_max*ones(nZ,1);
-    tol_U = 10000000;
+    tol_U   = 10000000;
     iter_U = 0;
     while(tol_U > CV_tol_U &&  iter_U < maxIter_U )
       %Update U
@@ -65,13 +63,13 @@ function Code_Mar2017_v2()
         E,V,EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = solveGivenU(...
         CV_tol,Niter,nPhi,nL,sep_pol,delta,pi_Phi,...
         Phi_grid,BETA,Lambda_vect,w_star_pre,U,pi_z,r,K,D,tau,w_star_pre_cons,...
-        Ppsi,nZ,init_Prod,b,rra,commitType,typeu);
+        Ppsi,nZ,init_Prod,b,rra,commitType,typeu,preTaxOutput,gamma_matching);
       
       %Update U_u and U_l given solution to problem
-      if isnan(q(theta_star))
+      if isnan(q(theta_star,gamma_matching))
         FirmObj = -666;
       else
-        FirmObj = BETA.*EnteringF0.*q(theta_star);
+        FirmObj = BETA.*EnteringF0.*q(theta_star,gamma_matching);
       end
       for iz = 1:nZ
         if FirmObj(iz)>=ke %(This captures the case when FirmObj is nan which happens when U is too high)
@@ -82,7 +80,10 @@ function Code_Mar2017_v2()
       end
       
       tol_U = abs(FirmObj - ke);
-      disp(sprintf('iD = %s, UIter = %s, tol_U = %s',num2str(iD),num2str(iter_U),num2str(tol_U)));
+      disp(sprintf('iD = %3i, iU = %3i, tol_U = %6.2d, ke = %6.2d',iD,iter_U,tol_U,ke))
+      disp(sprintf('FO = %6.2d, Ul = %6.2d, U = %6.2d, Uu = %6.2d',FirmObj,U_l,U,U_u));
+      EnteringLam_Idx
+      disp('')
     end
     
     %CHeck solution for correctness
@@ -96,7 +97,7 @@ function Code_Mar2017_v2()
     end
     
     EnteringW_err_D(iD) = EnteringW_err(sep_pol,delta,init_Prod,E(:,EnteringLam_Idx),nPhi,U,EnteringW0);
-    U_err_D(iD)         = U_err(b,rra,BETA,theta_star*q(theta_star),EnteringW0,U,typeu);
+    U_err_D(iD)         = U_err(b,rra,BETA,theta_star*q(theta_star,gamma_matching),EnteringW0,U,typeu);
     Estar_err_D(iD)     = Estar_err(sep_pol,delta,pi_Phi,w_star_v,rra,BETA,E,nPhi,U,typeu,iLp_star,nL);
     Vstar_err_D(iD)     = Vstar_err(sep_pol,delta,pi_Phi,w_star_v,BETA,V,nPhi,iLp_star,nL,R,K,Phi_grid,r,D,tau);
     PVOutput            = PVProd(nPhi,sep_pol,delta,R,K,Phi_grid,r,D,w_star_v(:,EnteringLam_Idx(iz)),tau,BETA,pi_Phi,CV_tol);
@@ -106,9 +107,9 @@ function Code_Mar2017_v2()
     %What the firm compares to ke
     EnteringF_D(iD)     = EnteringF0;
     %Firm matching probability q
-    Q_D(iD)             = q(theta_star);
+    Q_D(iD)             = q(theta_star,gamma_matching);
     %Worker matching probability p
-    P_D(iD)             = theta_star*q(theta_star);
+    P_D(iD)             = theta_star*q(theta_star,gamma_matching);
     %Promised worker value conditional on matching.
     %This is what's offered in the search market.
     EnteringW_D(iD)     = EnteringW0;
@@ -135,8 +136,4 @@ function Code_Mar2017_v2()
     massEnt(iD)         = theta_star.*massU(iD);
     
   end
-  
-  save
-  checkingPlots
-  
 end

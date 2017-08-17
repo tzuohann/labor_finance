@@ -2,8 +2,7 @@
 % job filling probability function
 % p is convex, q=p/x is concave
 %
-function res = qinv(A0)
-  global gamma_matching
+function res = qinv(A0,gamma_matching)
   
   %global m
   %gamma=1.59929;

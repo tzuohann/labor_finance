@@ -4,8 +4,8 @@ if any(K - D_grid) <= 0
 end
 for iD = 1:nD
   D                 = D_grid(iD);
-  preTaxOutput      = outputFunc(K,r,tau,Phi_grid,D);
-  sPol_D(:,iD)    = preTaxOutput*(1-tau) <= 0;
+  preTaxOutput      = outputFunc(K,r,tau,Phi_grid,D,prodcurve);
+  sPol_D(:,iD)      = preTaxOutput*(1-tau) <= 0;
 end
 subplot(2,2,2)
 h = pcolor(D_grid,Phi_grid,double(sPol_D));
