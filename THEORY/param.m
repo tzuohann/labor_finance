@@ -20,10 +20,12 @@ function [params,tech] = param(i_FC)
   params.Lifetime_Achievement_Award  = 0.5; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
   params.whichE3         = 'endogenous'; %exogenous vs endogenous expected value in the third period
-  params.FC_min          = 0.012;
-  params.FC_max          = 0.07;
+  params.FC_min1         = 0.012;
+  params.FC_max1         = 0.022;
+  params.FC_min2         = 0.022;
+  params.FC_max2         = 0.07;
   params.length_FC       = 40;
-  params.fix_cost_grid   = linspace(params.FC_min,params.FC_max,params.length_FC); %Fixed cost of entry. Should be equal to K (equal to 1)
+  params.fix_cost_grid   = [linspace(params.FC_min1,params.FC_max1,params.length_FC)]; %Fixed cost of entry. Should be equal to K (equal to 1)
   params.fix_cost        = params.fix_cost_grid(i_FC);
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
   params.prod_func_type  = 8; %We use different production function to get the hump-shaped U
