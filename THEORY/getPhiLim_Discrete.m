@@ -1,4 +1,5 @@
 function phi_lim = getPhiLim_Discrete(params,aalpha,phi_e,wStar,phi_db,output)
+
   eval(reshape(structvars(params)',1,[]))
   %Expected value of employment in the third period
   E3              = getE3(params,wStar,output,aalpha,phi_db);
@@ -10,11 +11,11 @@ function phi_lim = getPhiLim_Discrete(params,aalpha,phi_e,wStar,phi_db,output)
     minProd = 0;
   end
   if utilFunc(minProd) + BETA*E3 >= (1+BETA)*utilFunc(b)
-    phi_lim       = phi_e;
+    phi_lim = phi_e;
     warning('Worker will never quit in second period')
   else
     
-    phi_lim         = aalpha^(1-delta) ...
+    phi_lim = aalpha^(1-delta) ...
         + aalpha^(-delta)*((1-ssigma)*((1+BETA)*utilFunc(b) - BETA*E3))^(1/(1-ssigma));
     if phi_lim < phi_e
         error('phi_lim cannot be smaller than phi_e')

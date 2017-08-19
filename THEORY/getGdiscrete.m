@@ -1,4 +1,6 @@
-function g_discrete    = getGdiscrete(limitIntegral,wStar,output,BETA,whichE3,Lifetime_Achievement_Award)
+function g_discrete    = getGdiscrete(limitIntegral,wStar,output,BETA,...
+    whichE3,Lifetime_Achievement_Award)
+
   Eprof         = calcExpectedProf(wStar,output);
   switch whichE3
     case{'endogenous'}
