@@ -8,14 +8,14 @@ i_FC = 1;
 
 for i_FC = 1:length(params.fix_cost_grid)
       
-      BaseName            = 'File_focus';
+      BaseName            = 'File_b_dot2';
       FileName            = [BaseName, '_i_FC',num2str(i_FC)];
       load(FileName)
       
       %Common features of the figures
-      lines           = {'k-'};%{'k-','k--'};     %{'k-','k--','k-.','k:'};  {'k-'};%
-      color           = {'b'}; % {'b','r'};        %{'b','r','c','m'};        {'b-'}; % 
-      models          = {'sp'};%{'sp','sl'};      %{'sp','sl','wp','wl'};     {'sp-'};%
+      lines           = {'k-','k--'};    
+      color           = {'b','r'};       
+      models          = {'sp','sl'};     
       
       %==========================================================================
       %==========================================================================
@@ -76,7 +76,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.27 0.7]) %focus
+      ylim([0.27 0.5]) %focus
 %       ylim([0.15 0.57]) %bzero
       xlabel('\alpha')
       grid on
@@ -98,7 +98,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-%       ylim([0.015 0.315])
+      ylim([0.015 0.315])
       xlabel('\alpha')
       grid on
       
@@ -120,7 +120,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.48 0.69]) %focus
+      ylim([0.48 0.71]) %focus
 %       ylim([0.465 0.6]) %bzero
       xlabel('\alpha')
       grid on
@@ -144,7 +144,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.44 1.07]) %focus
+      ylim([0.4 1.07]) %focus
 %       ylim([0.503 1.6]) %bzero
       xlabel('\alpha')
       grid on
@@ -167,7 +167,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.315 0.52]) %focus
+      ylim([0.3 0.52]) %focus
 %       ylim([0.4 0.54]) %bzero
       xlabel('\alpha')
       grid on
@@ -188,9 +188,9 @@ for i_FC = 1:length(params.fix_cost_grid)
       %==========================================================================
       
       %Figure 2
-      % ------  V  ------  V2 ------  V3
-      % ------  E  ------  E2 ------  E3
-      figure(46+i_FC) %length(params.fix_cost_grid)
+      % ------  V  ------  V2 ------  V3 ------ (1-phi_c)V3
+      % ------  E  ------  E2 ------  E3 ------ (1-phi_c)E3 + phi_c u(b)
+      figure(length(params.fix_cost_grid)+i_FC) 
       newPosition = [1 41 1920 963]; %[1          41        1920        963];
       newUnits = 'normalized';
       set(gcf,'Position', newPosition,'Units', newUnits);
@@ -203,21 +203,22 @@ for i_FC = 1:length(params.fix_cost_grid)
       subplot(2,4,1)
       hold on
       for ii = 1:length(models)
-            %       plot(tech.alpha_vec,s.(models{ii}).V,lines{ii},'*')
-            plot(tech.alpha_vec,s.(models{ii}).obj./s.(models{ii}).q,lines{ii},...
+            plot(tech.alpha_vec,s.(models{ii}).V,lines{ii},...
                   'LineWidth', 2,'color',color{ii})
+            plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))*s.(models{ii}).V_max,...
+                  lines{ii},'LineWidth', 2,'color','k')
+            plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))*s.(models{ii}).V_min,...
+                  lines{ii},'LineWidth', 2,'color','k')
             [~,loc_prof(ii)] = max(s.(models{ii}).obj./s.(models{ii}).q);
-            plot(tech.alpha_vec(loc(ii)),s.(models{ii}).obj(loc(ii)) ...
-                  ./ s.(models{ii}).q(loc(ii)),'ks')
-            plot(tech.alpha_vec(loc_prof(ii)),...
-                  [s.(models{ii}).obj(loc_prof(ii))./s.(models{ii}).q(loc_prof(ii))],'*')
+            plot(tech.alpha_vec(loc(ii)),s.(models{ii}).V(loc(ii)),'ks')
+            plot(tech.alpha_vec(loc_prof(ii)),s.(models{ii}).V(loc_prof(ii)),'*')
       end
       title('V','FontSize', 20)
       hold off
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.052 0.182]) %focus
+      ylim([0.052 0.19]) %focus
 %       ylim([0.0201 0.356]) %bzero
       xlabel('\alpha')
       grid on
@@ -240,7 +241,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.026 0.101]) %focus
+      ylim([0.026 0.11]) %focus
 %       ylim([0.0101 0.183]) %bzero
       xlabel('\alpha')
       grid on
@@ -263,7 +264,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.026 0.101]) %focus
+      ylim([0.026 0.11]) %focus
 %       ylim([0.0101 0.183]) %bzero
       xlabel('\alpha')
       grid on
@@ -287,7 +288,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.025 0.088]) %focus
+      ylim([0.025 0.1]) %focus
 %       ylim([0.009999 0.176]) %bzero
       xlabel('\alpha')
       grid on
@@ -333,7 +334,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.225 0.32]) %focus
+      ylim([0.22 0.32]) %focus
 %       ylim([0.123 0.314]) %bzero
       xlabel('\alpha')
       grid on
@@ -356,7 +357,7 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.246 0.335]) %focus
+      ylim([0.24 0.335]) %focus
 %       ylim([0.123 0.314]) %bzero
       xlabel('\alpha')
       grid on
@@ -381,8 +382,8 @@ for i_FC = 1:length(params.fix_cost_grid)
       axis tight
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
-      ylim([0.235 0.33]) %focus
-%       ylim([0.105 0.3]) %bzero
+      ylim([0.23 0.33]) %focus
+%     ylim([0.105 0.3]) %bzero
       xlabel('\alpha')
       grid on
       
@@ -391,11 +392,11 @@ end
 
 while 1 == 1
       figure(1)
-      figure(46) %length(params.fix_cost_grid))
+      figure(length(params.fix_cost_grid))
       pause(3)
-      for i1 = 1:46 %length(params.fix_cost_grid)
+      for i1 = 1:length(params.fix_cost_grid)
             figure(i1)
-            figure(i1 + 46)% length(params.fix_cost_grid))
-            pause(1)
+            figure(i1 + length(params.fix_cost_grid))
+            pause(0.5)
       end
 end
