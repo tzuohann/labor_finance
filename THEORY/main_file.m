@@ -7,41 +7,43 @@ i_FC = 1;
 i_b = 1;
 [params,tech] = param(i_sigma,i_FC,i_b);
 
-for i_sigma = 1:length(params.ssigma_grid)
-    for i_FC = 1:length(params.fix_cost_grid)
-        for i_b = 1:length(params.b_grid)
-            
-            %Parameterization
-            [params,tech] = param(i_sigma,i_FC,i_b);
-            
-            disp(['sigma = ',num2str(i_sigma)])
-            disp(['FC = ',num2str(i_FC)])
-            disp(['b = ',num2str(i_b)])
-            
-            %Computations
-            params.whichCommitment = 'perfect';
-            model = 'sp';
-            [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
-                s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
-                s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
-                s.(model).V2,s.(model).V3,s.(model).V] = ...
-                mainDynamicLoop(params,tech);
-            params.whichCommitment = 'limited';
-            model = 'sl';
-            [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
-                s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
-                s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
-                s.(model).V2,s.(model).V3,s.(model).V] = ...
-                mainDynamicLoop(params,tech);
-            
-            BaseName = 'File';
-            FileName = [BaseName,'_sigma_',num2str(i_sigma),...
-                '_FC_',num2str(i_FC),'_b_',num2str(i_b)]
-            save(FileName)
-            
-        end
-    end
-end
+% for i_sigma = 1:length(params.ssigma_grid)
+      for i_FC = 1:length(params.fix_cost_grid)
+%             for i_b = 1:length(params.b_grid)
+                  
+                  %Parameterization
+                  [params,tech] = param(i_sigma,i_FC,i_b);
+                  
+                  disp(['sigma = ',num2str(i_sigma)])
+                  disp(['FC = ',num2str(i_FC)])
+                  disp(['b = ',num2str(i_b)])
+                  
+                  %Computations
+                  params.whichCommitment = 'perfect';
+                  model = 'sp';
+                  [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+                        s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+                        s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
+                        s.(model).V2,s.(model).V3,s.(model).V] = ...
+                        mainDynamicLoop(params,tech);
+                  params.whichCommitment = 'limited';
+                  model = 'sl';
+                  [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+                        s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+                        s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
+                        s.(model).V2,s.(model).V3,s.(model).V] = ...
+                        mainDynamicLoop(params,tech);
+                  
+                  %Saving results
+                  BaseName = 'File_b_zero_kink_focus';
+%                   FileName = [BaseName,'_sigma_',num2str(i_sigma),...
+%                         '_FC_',num2str(i_FC),'_b_',num2str(i_b)]
+                  FileName = [BaseName,'i_FC',num2str(i_FC)]
+                  save(FileName)
+                  
+            end
+%       end
+% end
 
 
 hjkl
@@ -89,6 +91,7 @@ for i_FC = 1:46
     V3_lim(i_FC)        = s.(models{2}).V2(i_alpha);
     V3_net_per(i_FC)    = s.(models{1}).V3(i_alpha);
     V3_net_lim(i_FC)    = s.(models{2}).V3(i_alpha);
+    
 end
 
 % figure(1)

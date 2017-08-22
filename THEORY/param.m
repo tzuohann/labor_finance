@@ -6,8 +6,8 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.r               = 1; %Return on capital.
   params.R               = params.r/(1-params.tau); %Gross return on capital
   params.ssigma_min      = 0;
-  params.ssigma_max      = 0.9;
-  params.length_ssigma   = 5;
+  params.ssigma_max      = 0;
+  params.length_ssigma   = 1;
   params.ssigma_grid     = [linspace(params.ssigma_min,params.ssigma_max,params.length_ssigma)]; 
   params.ssigma          = params.ssigma_grid(i_sigma); %RRA
   if params.ssigma == 0
@@ -17,8 +17,8 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.BETA            = 1; %1/(1+params.r); %Discount factor
   params.gamma_matching  = 1; %Matching elasticity parameter
   params.b_min           = 0;
-  params.b_max           = 0.25;
-  params.length_b        = 10;
+  params.b_max           = 0;
+  params.length_b        = 1;
   params.b_grid          = [linspace(params.b_min,params.b_max,params.length_b)]; 
   params.b               = params.b_grid(i_b);
   if params.b == 0
@@ -28,9 +28,9 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.Lifetime_Achievement_Award  = NaN; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
   params.whichE3         = 'endogenous'; %exogenous vs endogenous expected value in the third period
-  params.FC_min          = 0.03;
-  params.FC_max          = 0.12;
-  params.length_FC       = 10;
+  params.FC_min          = 0.01;
+  params.FC_max          = 0.01;
+  params.length_FC       = 1;
   params.fix_cost_grid   = [linspace(params.FC_min,params.FC_max,params.length_FC)]; %Fixed cost of entry. Should be equal to K (equal to 1)
   params.fix_cost        = params.fix_cost_grid(i_FC);
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
@@ -44,9 +44,12 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
   alpha_min              = 0.01;
-  alpha_max              = 0.1;
+  alpha_max              = 0.6;
+  if alpha_min > alpha_max
+        error('alpha_min cannot be greater than alpha_max')
+  end
   params.alpha_fix       = NaN;
-  lenAalpha              = 5;
+  lenAalpha              = 50;
   phi_low                = 0; %lower bound for phi
   phi_up                 = 1; %upper bound for phi
   lenPphi                = 10000;
@@ -55,7 +58,7 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   %alpha grid. Given parameters we start with lowest alpha and go almost to 1
   params.phi_vec      = linspace(phi_low,phi_up,lenPphi);
   tech.alpha_vec      = linspace(alpha_min,alpha_max,lenAalpha);
-  tech.tol            = 10^(-8); %tolerance to get convergence
+  tech.tol            = 10^(-10); %tolerance to get convergence
   
   
   %Checking if b is too high for this production function
