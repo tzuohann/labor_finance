@@ -9,7 +9,7 @@ function [U_D,EnteringW_err_D,U_err_D,Estar_err_D,Vstar_err_D,ExpPVOutput_D,...
   %%%%%%%%%%%%%%%%%%%%%%
   % Core code
   %%%%%%%%%%%%%%%%%%%%%%
-  for iD = 5%1:numel(D_grid)
+  for iD = 1:numel(D_grid)
     D = D_grid(iD);
     ke = costofentry;
     disp(' ')
@@ -79,10 +79,10 @@ function [U_D,EnteringW_err_D,U_err_D,Estar_err_D,Vstar_err_D,ExpPVOutput_D,...
         end
       end
       
-      tol_U = abs(FirmObj - ke);
+      tol_U = abs(FirmObj - ke)./ke;
       disp(sprintf('iD = %3i, iU = %3i, tol_U = %6.2d, ke = %6.2d',iD,iter_U,tol_U,ke))
-      disp(sprintf('FO = %6.2d, Ul = %6.2d, U = %6.2d, Uu = %6.2d',FirmObj,U_l,U,U_u));
-      EnteringLam_Idx
+      disp(sprintf('FO = %7.2d, Ul = %6.2d, U = %6.2d, Uu = %6.2d',FirmObj,U_l,U,U_u));
+      
       disp('')
     end
     

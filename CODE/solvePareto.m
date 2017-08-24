@@ -14,11 +14,10 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
   
   SepP = zeros(nPhi,nL);
   TP2  = zeros(nPhi,nL);
-  B2   = zeros(nPhi,nL);
-  
+    
   tol  = 1;
   Iter = 0;
-  while (tol > CV_tol && Iter < Niter )
+  while (tol > CV_tol && Iter < Niter)
     Iter = Iter +1;
     if Iter == Niter
       error('Maximum Iteration TP reached')
@@ -27,9 +26,10 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
     switch commitType
       %Perfect commitment case sped up to the MAXXXXXXX
       case{'perfect'}
-        EP       = BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),P);
-        iLp_star = repmat(reshape(1:nL,1,1,nL),nPhi,nPhi,1);
+        EP                        = BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),P);
+        iLp_star                  = repmat(reshape(1:nL,1,1,nL),nPhi,nPhi,1);
         TP(sep_pol < 1,:)         = Obj_Pre(sep_pol < 1,:) + EP(sep_pol < 1,:);
+        TP(sep_pol == 1,:)        = nan;
       case{'limited'}
         
         %Helper variables for limited commitment case
@@ -46,7 +46,6 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
         end
         
         TP2(:) = 0;
-        B2(:)  = 0;
         for iL = 1:nL
           [TP2(:,iL),B0]              = min(SepP(:,iL:nL) + UCons(:,iL:nL,iL),[],2);
           iLp_star(:,:,iL)            = repmat(B0'+iL-1,nPhi,1);
@@ -58,9 +57,10 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
           end
         end
         
-        %This is imposing that U cannot be less than E
-        TP(bsxfun(@lt,TP,Lambda_vect*U)) = 0;
-        
+        TP(sep_pol == 1,:)        = nan;
+        index                     = TP < bsxfun(@times,ones(size(TP)),Lambda_vect*U);
+        %TP is at minimum, lambda times U because E >= U in LC
+        TP(index)                 = nan;
       otherwise
         error('Commitment type not specifed correctly.')
     end

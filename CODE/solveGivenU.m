@@ -10,7 +10,7 @@ function [TP,iLp_star,w_star_v,...
     preTaxOutput);
   
   %Converting the solution from Lagrange multiplier space to promised value space
-  [E,V] = calcEV(TP,nPhi,nL,Lambda_vect,U,sep_pol,Ppsi,K,D);
+  [E,V,w_star_v] = calcEV(TP,nPhi,nL,Lambda_vect,U,sep_pol,Ppsi,K,D,commitType,w_star_v);
   
   %Solve the search problem
   [EnteringF0,EnteringW0,EnteringLam_Idx,theta_star] = ...
