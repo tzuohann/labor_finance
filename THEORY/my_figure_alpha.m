@@ -9,7 +9,7 @@ i_b = 1;
 [params,tech] = param(i_sigma,i_FC,i_b);
 
 first_FC   = 1;
-last_FC    = 10;
+last_FC    = 1;
 length_FC  = last_FC - first_FC + 1;
 
 for i_FC = first_FC:last_FC

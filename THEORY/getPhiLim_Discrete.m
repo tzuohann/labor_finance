@@ -12,7 +12,7 @@ function phi_lim = getPhiLim_Discrete(params,aalpha,phi_e,wStar,phi_db,output)
   end
   if utilFunc(minProd) + BETA*E3 >= (1+BETA)*utilFunc(b)
     phi_lim = phi_e;
-    warning('Worker will never quit in second period')
+%     warning('Worker will never quit in second period')
   else
     
     phi_lim = aalpha^(1-delta) ...

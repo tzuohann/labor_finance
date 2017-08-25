@@ -30,7 +30,8 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
             while err_alpha > tol
                   U       = (U_min + U_max)/2; %bisectional U
                   
-                  [wstar,firmVal,w_min,w_max]   = solveGivenU(U,params,aalpha,phi_e,output,phi_db);
+                  [wstar,firmVal,w_min,w_max]   = solveGivenU(U,params,aalpha,phi_e,output,...
+                        phi_db);
                   
                   if firmVal > fix_cost
                         U_min = U;
@@ -39,7 +40,7 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
                   end
                   err_alpha      = abs(firmVal - fix_cost);
                   err_U          = abs(U_max - U_min);
-                  if err_U < 1e-16
+                  if err_U < 1e-12
                         error('Some strangeness has occured in minimization over U');
                   end
             end

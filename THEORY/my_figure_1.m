@@ -17,9 +17,9 @@
       for ii = 1:length(models)
             plot(tech.alpha_vec,s.(models{ii}).U,lines{ii},'LineWidth', 2,'color',color{ii})
       end
-      plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))...
-            *params.utilFunc(params.b)*(1+params.BETA+params.BETA^2),...
-            'LineWidth',2,'color','k')
+%       plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))...
+%             *params.utilFunc(params.b)*(1+params.BETA+params.BETA^2),...
+%             'LineWidth',2,'color','k')
       for ii = 1:length(models)
             [~,loc(ii)] = max(s.(models{ii}).U);
             plot(tech.alpha_vec(loc(ii)),s.(models{ii}).U(loc(ii)),'ks')
@@ -30,7 +30,7 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.622 0.715]) %focus
-      ylim([0.09 0.32])  %bzero
+%       ylim([0.09 0.32])  %bzero
       xlabel('\alpha')
       grid on
       
@@ -42,9 +42,7 @@
       for ii = 1:length(models)
             plot(tech.alpha_vec,s.(models{ii}).wstar,lines{ii},'LineWidth', 2,...
                   'color',color{ii})
-      end
-      plot(tech.alpha_vec,s.(model).wmax,'LineWidth',2,'color','k')
-      for ii = 1:length(models)
+%             plot(tech.alpha_vec,s.(model).wmax,'LineWidth',2,'color','k')
             [~,loc_w(ii)] = max(s.(models{ii}).wstar);
             plot(tech.alpha_vec(loc(ii)),s.(models{ii}).wstar(loc(ii)),'ks')
             plot(tech.alpha_vec(loc_w(ii)),s.(models{ii}).wstar(loc_w(ii)),'*')
@@ -55,7 +53,7 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.27 0.5]) %focus
-      ylim([0.15 0.57]) %bzero
+%       ylim([0.15 0.57]) %bzero
       xlabel('\alpha')
       grid on
       
@@ -99,7 +97,7 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.48 0.71]) %focus
-      ylim([0.465 0.6]) %bzero
+%       ylim([0.465 0.6]) %bzero
       xlabel('\alpha')
       grid on
       
@@ -123,7 +121,7 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.4 1.07]) %focus
-      ylim([0.503 1.6]) %bzero
+%       ylim([0.503 1.6]) %bzero
       xlabel('\alpha')
       grid on
       
@@ -146,7 +144,7 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.3 0.52]) %focus
-      ylim([0.4 0.54]) %bzero
+%       ylim([0.4 0.54]) %bzero
       xlabel('\alpha')
       grid on
       

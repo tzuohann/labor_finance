@@ -28,8 +28,8 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.Lifetime_Achievement_Award  = NaN; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
   params.whichE3         = 'endogenous'; %exogenous vs endogenous expected value in the third period
-  params.FC_min          = 0.01;
-  params.FC_max          = 0.01;
+  params.FC_min          = 0.05;
+  params.FC_max          = 0.05;
   params.length_FC       = 1;
   params.fix_cost_grid   = [linspace(params.FC_min,params.FC_max,params.length_FC)]; %Fixed cost of entry. Should be equal to K (equal to 1)
   params.fix_cost        = params.fix_cost_grid(i_FC);
@@ -44,12 +44,12 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
   alpha_min              = 0.01;
-  alpha_max              = 0.6;
+  alpha_max              = 0.2;
   if alpha_min > alpha_max
         error('alpha_min cannot be greater than alpha_max')
   end
   params.alpha_fix       = NaN;
-  lenAalpha              = 50;
+  lenAalpha              = 5;
   phi_low                = 0; %lower bound for phi
   phi_up                 = 1; %upper bound for phi
   lenPphi                = 10000;
@@ -58,7 +58,7 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   %alpha grid. Given parameters we start with lowest alpha and go almost to 1
   params.phi_vec      = linspace(phi_low,phi_up,lenPphi);
   tech.alpha_vec      = linspace(alpha_min,alpha_max,lenAalpha);
-  tech.tol            = 10^(-10); %tolerance to get convergence
+  tech.tol            = 10^(-8); %tolerance to get convergence
   
   
   %Checking if b is too high for this production function
