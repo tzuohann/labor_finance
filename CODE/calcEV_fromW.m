@@ -7,15 +7,15 @@ function [E,V,w_star_v,iLp_star] = calcEV_fromW(CV_tol,Niter,nPhi,nL,sep_pol,del
   Ep                        = zeros(nPhi,nL);
   Vp                        = zeros(nPhi,nL);
   
-  U2                        = (max(sep_pol,delta)).*U';
+  U2                        = max(sep_pol,delta).*U';
   dividends                 = (1-tau)*(bsxfun(@minus,preTaxOutput,w_star_pre));
   
   separatedStates           = isnan(w_star_pre);
   w_star_pre_cons(isnan(w_star_pre_cons)) = 0;
   dividends(isnan(dividends))             = 0;
   
-  tol  = 1;
-  Iter = 0;
+  tol     = 1;
+  Iter    = 0;
   while (tol > CV_tol && Iter < Niter)
     Iter = Iter +1;
     if Iter == Niter
@@ -29,8 +29,11 @@ function [E,V,w_star_v,iLp_star] = calcEV_fromW(CV_tol,Niter,nPhi,nL,sep_pol,del
         %Dividends of plus continuation
         V  = dividends  + BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),Vp);
       case{'limited'}
-%         keyboard
-        
+        E  = w_star_pre_cons + BETA*pi_Phi*bsxfun(@plus,bsxfun(@times,(1-max(sep_pol,delta)),Ep),U2);
+        sepCases = E < U;
+        E(sepCases) = U;
+        V  = dividends  + BETA*pi_Phi*bsxfun(@times,(1-max(sep_pol,delta)),Vp);
+        V(sepCases) = 0;
       otherwise
         error('Commitment type not specifed correctly.')
     end
@@ -45,6 +48,9 @@ function [E,V,w_star_v,iLp_star] = calcEV_fromW(CV_tol,Niter,nPhi,nL,sep_pol,del
       for il = 1:nL
         iLp_star(:,:,il) = il;
       end
-    case{'limited'}  
+    case{'limited'}
+      sepCases = E < U;
+      E(sepCases) = nan;
+      V(sepCases) = nan;
   end
 end

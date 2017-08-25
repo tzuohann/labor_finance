@@ -51,7 +51,7 @@ init_Prod(end)      = 1;
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
 nL                  = 1000;
-Lambda_vect         = linspace(0,0.5,nL);   % Lagrange multiplier grid
+Lambda_vect         = linspace(0.5,1,nL);   % Lagrange multiplier grid
 Lambda_vect_ws0     = Lambda_util_type(rra,Lambda_vect,tau,typeu);
 
 % inner loop
