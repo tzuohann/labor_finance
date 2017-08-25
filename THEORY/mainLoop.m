@@ -1,5 +1,5 @@
 function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
-    phi_e_store,phi_lim_store,w_store_max,w_store_min,E1_store] = mainLoop(params,tech)
+    phi_e_store,phi_lim_store,w_store_max,w_store_min,E2_store] = mainLoop(params,tech)
   
   eval(reshape(structvars(params)',1,[]));
   eval(reshape(structvars(tech)',1,[]));
@@ -67,6 +67,6 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
     p_theta(ialpha)                       = 1;
     q_theta(ialpha)                       = nan;
     obj_store(ialpha)                     = nan;
-    E1_store(ialpha)                      = E2;
+    E2_store(ialpha)                      = E2;
   end
 end
