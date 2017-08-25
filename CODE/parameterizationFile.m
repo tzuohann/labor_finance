@@ -17,7 +17,7 @@ b                   = 0.01;            %Value of home production
 Ppsi                = 0;            %fraction of recovered firm value if failed search
 commitType          = 'perfect';    %Limited or perfect;
 typeu               = 1;            %Utility type
-costofentry         = 0.2;     %Cost of entry
+costofentry         = 0.05;     %Cost of entry
 prodcurve           = 0.25;          %Curvature on production function
 
 %Aggregate productivity shock -- muted for now
@@ -50,8 +50,8 @@ init_Prod(end)      = 1;
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nL                  = 500;
-Lambda_vect         = linspace(0.36,0.37,nL);   % Lagrange multiplier grid
+nL                  = 1000;
+Lambda_vect         = linspace(0,0.5,nL);   % Lagrange multiplier grid
 Lambda_vect_ws0     = Lambda_util_type(rra,Lambda_vect,tau,typeu);
 
 % inner loop

@@ -20,7 +20,9 @@ function master()
     maxIter_U,uSqueezeFactor);
   
   dm.p.EnteringLam
-  
+  dm.p.U_D
+  2.256547970320218
+  asd
   commitType = 'limited';
     [dm.l.U_D,dm.l.EnteringW_err_D,dm.l.U_err_D,dm.l.Estar_err_D,...
       dm.l.Vstar_err_D,dm.l.ExpPVOutput_D,dm.l.EnteringF_D,dm.l.Q_D,...
