@@ -1,7 +1,7 @@
 function wMin    = getWMin(params,Utarget,aalpha,phi_e,output,phi_db)
 
 eval(reshape(structvars(params)',1,[]));
-wMin = b + 0.001;
+wMin = b;
 %   wstarmax       = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
 %   wstarmin       = b;
 %   options        = optimoptions('fmincon','Display','None');

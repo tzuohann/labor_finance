@@ -14,15 +14,23 @@ function [wstar,firmVal,w_min,w_max] = solveGivenU(U,params,aalpha,phi_e,output,
     firmVal = -666;
     wstar   = NaN;
   else
+    gridW = linspace(w_min,w_max,1000);
     obj = @(w) getObjFunc(w,params,aalpha,phi_e,output,U,phi_db); %We max this guy!
+    curBest = obj(gridW(end));
+    for iw = 999:-1:1
+      curCand = obj(gridW(iw));
+      if curCand < curBest
+        curBest = curCand;
+      else
+        break
+      end
+    end
     
     options = optimoptions('fmincon','Display','None','TolX',1e-8,'TolFun',1e-8);
-    wstarint = fmincon(obj,w_min,[],[],[],[],w_min,w_max,[],options);
+    wstarint = fmincon(obj,gridW(iw),[],[],[],[],w_min,w_max,[],options);
     
     %Consider the interiors as well
-    wstarvec    = [w_min,wstarint,w_max];
-    [~,wstar]   = min([obj(w_min),obj(wstarint),obj(w_max)]);
-    wstar       = wstarvec(wstar);
+    wstar       = wstarint;
     firmVal     = -obj(wstar);
   end
 end

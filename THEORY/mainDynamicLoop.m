@@ -23,8 +23,15 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
       [U_max,E2_up,E3_up]       = getUMax(params,aalpha,phi_e,output,U_min,phi_db);
       checkFeasibility(params,aalpha,phi_e,E2_up,E3_up,output,phi_db)
       [~,firmValUMin,~,~] = solveGivenU(U_min,params,aalpha,phi_e,output,phi_db);
-      V_max_store(ia)     = firmValUMin;
+      V_max_store = nan(size(alpha_vec));
       [~,firmValUMax,~,~] = solveGivenU(U_max,params,aalpha,phi_e,output,phi_db);
+      while firmValUMax < 0
+        U_max = U_max*0.99;
+        [~,firmValUMax,~,~] = solveGivenU(U_max,params,aalpha,phi_e,output,phi_db);
+        if U_max < U_min
+          error('Commit exactly this code and pull req Tzuo')
+        end
+      end
       if firmValUMin > fix_cost && firmValUMax < fix_cost
             
             while err_alpha > tol

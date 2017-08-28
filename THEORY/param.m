@@ -16,8 +16,8 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   assert(params.ssigma  >= 0 || params.ssigma < 1,'ssigma must be [0,1)')
   params.BETA            = 1; %1/(1+params.r); %Discount factor
   params.gamma_matching  = 1; %Matching elasticity parameter
-  params.b_min           = 0;
-  params.b_max           = 0;
+  params.b_min           = 0.2;
+  params.b_max           = 0.2;
   params.length_b        = 1;
   params.b_grid          = [linspace(params.b_min,params.b_max,params.length_b)]; 
   params.b               = params.b_grid(i_b);
@@ -43,13 +43,13 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.phi_d_fun       = make_phi_d_func(params.phi_e_func,params.prod_func_type,params.R,params.r,params.delta);
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
-  alpha_min              = 0.01;
-  alpha_max              = 0.2;
+  alpha_min              = 0.1;
+  alpha_max              = 0.1;
   if alpha_min > alpha_max
         error('alpha_min cannot be greater than alpha_max')
   end
   params.alpha_fix       = NaN;
-  lenAalpha              = 5;
+  lenAalpha              = 1;
   phi_low                = 0; %lower bound for phi
   phi_up                 = 1; %upper bound for phi
   lenPphi                = 10000;
