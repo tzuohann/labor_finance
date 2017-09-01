@@ -23,6 +23,7 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
       error('Maximum Iteration TP reached')
     end
     P = TP;
+    P(isnan(P)) = 0;
     switch commitType
       %Perfect commitment case sped up to the MAXXXXXXX
       case{'perfect'}
@@ -66,8 +67,8 @@ function [TP,iLp_star,w_star_v] = solvePareto(CV_tol,Niter,nPhi,nL,sep_pol,delta
     end
     
     tol = max(max(abs(TP - P)));
-    if any(isnan(TP(:)))
-      warning('Nans in TP')
-    end
+%     if any(isnan(TP(:)))
+%       warning('Nans in TP')
+%     end
   end
 end

@@ -13,11 +13,11 @@ assert(rra > 0,'Risk Neutrality is not supported.')
 BETA                = 0.75;      %Discount factor
 delta               = 0.01;         %Exogenous separation probability.
 gamma_matching      = 1;            %Matching elasticity parameter
-b                   = 0.01;            %Value of home production
+b                   = 0.005;            %Value of home production
 Ppsi                = 0;            %fraction of recovered firm value if failed search
 commitType          = 'perfect';    %Limited or perfect;
 typeu               = 1;            %Utility type
-costofentry         = 0.05;     %Cost of entry
+costofentry         = 0.08;     %Cost of entry
 prodcurve           = 0.25;          %Curvature on production function
 
 %Aggregate productivity shock -- muted for now
@@ -27,7 +27,7 @@ pi_z                = 1;
 iz                  = 1;
 
 %Worker productivity shock
-nPhi                = 200;
+nPhi                = 50;
 rho_Phi             = 0.9;
 mean_Phi            = 0.2;
 sigma_Phi           = 0.15;
@@ -50,23 +50,23 @@ init_Prod(end)      = 1;
 %%%%%%%%%%%%%%%%%%%%%%
 % Technical parameters
 %%%%%%%%%%%%%%%%%%%%%%
-nL                  = 1000;
-Lambda_vect         = linspace(0.5,1,nL);   % Lagrange multiplier grid
+nL                  = 500;
+Lambda_vect         = linspace(0.4,0.5,nL);   % Lagrange multiplier grid
 Lambda_vect_ws0     = Lambda_util_type(rra,Lambda_vect,tau,typeu);
 
 % inner loop
 Niter               = 500;
-CV_tol              = 1e-9;
+CV_tol              = 1e-6;
 
 % outer loop
 maxIter_U           = 1000;
-CV_tol_U            = 1e-8;
+CV_tol_U            = 1e-3;
 
 %%% Optimizing grid over Debt D
 %Choose debt so that it is both inbetween 0 and 1 and increases
 %separations as a function of D
 nD                  = 1;
-D_grid              = linspace(0.25,0.25,nD);
+D_grid              = linspace(0.4,0.4,nD);
 
 %%% Bringing the unemployment value limits in the outer loop closer
 uSqueezeFactor      = 4;
