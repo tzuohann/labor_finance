@@ -4,3 +4,10 @@ CODE/matlab.mat
 *.fig
 *.mat
 scratch.m
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
