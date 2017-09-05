@@ -20,7 +20,7 @@
 }
 \institute{UNC, BC, BC}
 
-\date{November 21, 2016}
+\date{\today}
 
 \begin{document}
 \frame{\titlepage \begin{center} Midwest Macro, Pittsburgh, 2017 \end{center} }
@@ -76,8 +76,7 @@
 \frame{\frametitle{Empirical observations}
 	\begin{figure}
 		\centering
-		\begin{itemize}
-			\item 
+		\begin{itemize} 
 			\item
 			\item
 			\item
@@ -86,35 +85,113 @@
 }
 
 \frame{\frametitle{Model without Labor Market Frictions}
-	In this simple setup, there are no search frictions and the firm owner simply considers a debt choice . The firm would be identical to a risk neutral worker.
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item 
-			\item
-			\item
-			\item
-			\item
+			\item Debt is riskless. Borrows pay interest rate $ r $ and return all borrowed capital.
+			\item A single agent with initial wealth chooses debt to maximize payoffs in two periods. The output in the first period must be weakly positive.
+			\item[] \[\max_{D} \mathbb{E}u(c_1) + \beta \mathbb{E}u(c_2)\]
+			\item where \[c_t(\phi_t) = \phi_t(W + D)^\gamma - rD\] is some decreasing returns production function with period productivity realization $ \phi \in U[0,1]$ and $ c_2  = 0 $ if $ c_1 < 0 $.
 		\end{itemize}
 	\end{figure}
 }
 
-\frame{\frametitle{Simple Model with Labor Market Frictions}
-	The worker owns the entire production unit. The firm would be identical to a risk neutral worker.
+\frame{\frametitle{Model without Labor Market Frictions: Solution}
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item 
-			\item
-			\item
-			\item
-			\item
+			\item In this setup the optimal choice for debt $ D $ is
+			\[ads\] 
+			where we how the incompleteness of markets drives a wedge in the typical solution for equation the expected return of capital to the interest rate $ r $.
+			\item Finally, note here that the owner of the firm can be the worker or the firm in a setting with both agents. 
 		\end{itemize}
 	\end{figure}
+}
+
+\frame{\frametitle{Labor Market Frictions with Capital Structure}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item Mortensen and Pissarides style search frictions.  
+			\item Entrepreneurs own initial wealth $ W $ and borrow at rate $ r $. Debt is riskless.
+			\item Debt choice is made before entry. No new debt or equity.
+			\item Wage contracts are specified by \textit{unconstrained wages}, $ \tilde{w} $.
+			\item $ \tilde{w} $ is restricted to be identical in both periods.
+			\item Perfect commitment assumed. 
+			\item No storage technology. 
+		\end{itemize}
+	\end{figure}
+}
+
+\frame{\frametitle{Timing}
+	\begin{figure}
+		\centering
+		\begin{enumerate}
+			\item \textbf{Period 0.} Firms with wealth, $ W $ choose debt $ D $ and enter.
+			\begin{itemize}
+				\item All workers are unemployed.
+				\item Firm's post wage contracts, matching occurs.
+				\item Unmatched firms exit immediately.
+			\end{itemize}
+			\item \textbf{Period 1.} Draw roductivity $ \phi $.
+			\begin{itemize}
+				\item If output is weakly negative, match is broken. Firm exits.
+				\item Production + consumption occurs.
+				\item Unmatched workers consume $ b $.
+			\end{itemize}
+			\item \textbf{Period 2.} Draw roductivity $ \phi $.
+			\begin{itemize}
+				\item Separation if output is below $ b $. 
+				\item Production + consumption occurs. 
+				\item Unmatched workers consume $ b $.
+			\end{itemize}
+		\end{enumerate}
+	\end{figure}
+}
+
+\frame{\frametitle{Period production}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item Period output is given by
+			\item[] \[\phi_t (W - COE - D)^\gamma - Dr\]
+			\item If period output is negative, exit occurs.
+			\item If output exceeds $ \tilde{w} $, workers are paid $ \tilde{w} $. 
+			\item Dividends are positive iff $ (W - COE - D)^\gamma - Dr \ge w^* $
+			\item Don't worry, we have pictures.
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Period 1 Wages}
+\begin{figure}
+	\includegraphics[scale=0.3]{figures/WagePeriod1}
+	\label{fig:wageperiod1}
+\end{figure}
+}
+
+\frame{\frametitle{Period 2 Wages}
+	\begin{figure}
+		\includegraphics[scale=0.3]{figures/WagePeriod2}
+		\label{fig:wageperiod1}
+	\end{figure}
+}
+
+
+
+
+\frame{\frametitle{Worker's Problem}
+	\begin{figure}
+	\centering
+	\begin{itemize}
+		\item Firm's post \textit{unconstrained wage} contracts, $ \tilde{w} $
+		\item \[U = \max_{\tilde{w}} p(\theta(\tilde{w})) \mathbb{E}\left(u_1(\tilde{w}) + \beta  u_2(\tilde{w})\right) \]
+		\item 
+	\end{itemize}
+\end{figure}	
 }
 
 \frame{\frametitle{Dynamic Model with Labor Market Frictions}
-	The worker owns the entire production unit. The firm would be identical to a risk neutral worker.
 	\begin{figure}
 		\centering
 		\begin{itemize}
