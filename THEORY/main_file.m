@@ -1,187 +1,246 @@
-%3-Period Model. The production function is (1-t)((1+alpha)R - alpha r + (1+alpha)phi - w)
-
 %Clearing and closing
-clear
+clear all
 close all
 
-%Parameterization
-param
+i_sigma = 1;
+i_FC = 1;
+i_b = 1;
+[params,tech] = param(i_sigma,i_FC,i_b);
 
-%Select functions for phi_e and phi_d depending on model type.
-phi_e_func  = make_phi_e_func();
-phi_d_fun   = make_phi_d_func(phi_e_func);
-
-%Make this a function of different parameter values
-for is = 1:length(sigma_vec)  %Loop for the sigma varying
-    disp(num2str(is))
-    
-    %Evaluate optimal w, U, vacancies given alpha
-    for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
-        disp(num2str(ia))
-        %Technical parameters
-        err_both          = 1; %initial value for err_U
-        k                 = 0; %initial value for counting the iterations of the loops
-        aalpha            = alpha_vec(ia);
-        ssigma            = sigma_vec(is); %sigma varying
-        
-        phi_e     = phi_e_func(aalpha);
-        phi_db    = phi_d_fun(b,aalpha);
-        if phi_e >= phi_db
-            error('phi_e cannot be greater than phi_db.')
-        end
-        
-        %Boundaries of U
-        U_min     = (1+BETA+BETA^2)*utilFunc(b,ssigma,1);
-        U_max     = getUMax(aalpha,phi_e,phi_db,phi_d_fun);
-        if U_min >= U_max
-            error('U_min cannot be greater than U_max. The problem may be the parameterization.')
-        end
-        
-        while err_both > tol && k < max_iter
-            k       = k + 1; %Iteration
-            U       = (U_min + U_max)/2; %bisectional U
-            
-            %Checking the feasibility of the problem
-            wStar_up       = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
-            phi_lim        = getPhiLim_Discrete(phi_d_fun,phi_db,wStar_up,phi_e,aalpha);
-            period         = 2;
-            E2_up          = calcExpectedUtil(period,wStar_up,phi_db,phi_e,phi_d_fun,aalpha,phi_lim);
-            period         = 3;
-            E3_up          = calcExpectedUtil(period,wStar_up,phi_db,phi_e,phi_d_fun,aalpha,[]);
-            
-            if phi_lim < phi_e
-                error('phi_lim cannot be smaller than phi_e.')
+for i_sigma = 1:length(params.ssigma_grid)
+      for i_FC = 1:length(params.fix_cost_grid)
+            for i_b = 1:length(params.b_grid)
+                  
+                  %Parameterization
+                  [params,tech] = param(i_sigma,i_FC,i_b);
+                  
+                  disp(['sigma = ',num2str(i_sigma)])
+                  disp(['FC = ',num2str(i_FC)])
+                  disp(['b = ',num2str(i_b)])
+                  
+                  %Computations
+                  params.whichCommitment = 'perfect';
+                  model = 'sp';
+                  [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+                        s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+                        s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
+                        s.(model).V2,s.(model).V3,s.(model).V] = ...
+                        mainDynamicLoop(params,tech);
+                  
+                  params.whichCommitment = 'limited';
+                  model = 'sl';
+                  [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+                        s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+                        s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
+                        s.(model).V2,s.(model).V3,s.(model).V] = ...
+                        mainDynamicLoop(params,tech);
+                  
+                  %Saving results
+                  BaseName = 'Ciccio';
+                  FileName = [BaseName,'_sigma_',num2str(i_sigma),...
+                        '_FC_',num2str(i_FC),'_b_',num2str(i_b)]
+                  save(FileName)
             end
-            switch whichCommitment
-                case {'perfect'}
-                    limitIntegral = sum(phi_vec < phi_e)./numel(phi_vec);
-                case{'limited'}
-                    limitIntegral = sum(phi_vec < phi_lim)./numel(phi_vec);
-                otherwise
-                    error('Perfect or Limited for now')
-            end
-            if E2_up + BETA*(1-limitIntegral)*E3_up ...
-                    + BETA*limitIntegral*utilFunc(b,ssigma,1) <= (1+BETA)*utilFunc(b,ssigma,1)
-                error('Worker does not accept the job, the expected utility of being employed is smaller thant the expected utility of being unemployed even if the firm gives everything to the worker. To fix the problem you may either decrease b, increase the mean value of phi, or change the boundary of alpha')
-            end
-            
-            %wmin has to be a function of U while w_max doesn't change
-            w_min   = getWMin(U,phi_d_fun,phi_db,phi_e,aalpha);
-            if w_min <= 0
-                error('w_min cannot be lower than zero.')
-            end
-            w_max    = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
-            if w_max <= w_min
-                error('w_max cannot be smaller than w_min. The problem may be the parameterization.')
-            end
-            gridW   = linspace(w_min,w_max,100);
-            phi_lim = getPhiLim_Discrete(phi_d_fun,phi_db,gridW(end),phi_e,aalpha);
-            
-            %First ensure that for U, there is a solution to the problem
-            if getf(gridW(end),phi_db,phi_e,phi_d_fun,aalpha,U) > 1
-                disp('U is too large, lower U')
-                U_max = U; %Bisection U, we decrease it
-                err_U = abs(U_max - U_min);
-            else
-                
-                f = @(w) getf(w,phi_db,phi_e,phi_d_fun,aalpha,U);
-                f_max  =  f(w_max);
-                f_min  =  f(w_min);
-                
-                g = @(w) getg(w,aalpha,phi_d_fun,phi_lim,phi_e);
-                
-                obj = @(w) -((1 - f(w).^gamma).^(1/gamma).*g(w)); %We max this guy!
-                options = optimoptions('fmincon','Display','None');
-                wstar = fmincon(obj,(w_min + w_max)/2,[],[],[],[],w_min,w_max,[],options);
-                
-                if -obj(wstar) > fix_cost;
-                    U_min = U;
-                else
-                    U_max = U;
-                end
-                err_alpha = abs(fix_cost + obj(wstar));
-                err_U = abs(U_max - U_min);
-                if err_U < 10^(-14)
-                    error('Fix cost is too high to find a solution. If fix cost is already very close to zero then either b is too high, or phi_vec is too low.')
-                end
-                err_both = err_U + err_alpha;
-            end
-            
-            if k == max_iter
-                error('No Feasible Solution')
-            end
-        end
-        
-        U_store(ia) = U;
-        w_store(ia) = wstar;
-        vacancies(ia) = (f(wstar)^(-gamma) - 1)^(-1/gamma);
-        p_theta(ia) = f(wstar);
-        q_theta(ia) = p_theta(ia)/vacancies(ia);
-        obj_store(ia) = -obj(wstar);
-    end
-    
-    
-    %Storing the optimal U and alpha for sigma varying
-    [U_maximized location] = max(U_store);
-    if location == length(alpha_vec)
-        error('Corner solution. Most likely alpha_max is too small. The maximization problem is constrained by alpha_max.')
-    elseif location == 1
-        error('Corner solution. Most likely alpha_min is too large. The maximization problem is constrained by alpha_min.')
-    end
-    location
-%     alpha_maximand = alpha_vec(location);
-%     w_star_maximand = w_store(location);
-%     vacancies_maximand = vacancies(location);
-%     p_theta_maximand = p_theta(location);
-%     q_theta_maximand = q_theta(location);
-%     U_maximized_store(is) = U_maximized;
-%     alpha_maximand_store(is) = alpha_maximand;
-%     w_maximand_store(is) = w_star_maximand;
-%     vacancies_maximand_store(is) = vacancies_maximand;
-%     p_maximand_store(is) = p_theta_maximand;
-%     q_maximand_store(is) = q_theta_maximand;
+      end
 end
 
-%Figure
-% plot(alpha,vacancies,'LineWidth',2)
-% hold on
-figure(1)
-plot(alpha_vec,U_store,'LineWidth',2)
-% hold on
-% plot(alpha_vec,w_store,'LineWidth',2)
-% hold on
-% plot(alpha_vec,p_theta,'LineWidth',2)
-% hold on
-% plot(alpha_vec,q_theta,'LineWidth',2)
-% legend('U','w','p(\theta)','q(\theta)','location','northwest') %'Vacancies',
-% grid on
-% xlabel('\alpha') % x-axis label
 
+hjkl
+
+%%
+i_FC = 1;
+[params,tech] = param(i_FC);
+
+for i_FC = 1:46
+    
+    BaseName            = 'File_focus';
+    FileName            = [BaseName, '_i_FC',num2str(i_FC)];
+    load(FileName)
+    
+    models              = {'sp','sl'};
+    
+    i_alpha = 18;
+    
+    p_theta_per(i_FC)   = s.(models{1}).p(i_alpha);
+    p_theta_lim(i_FC)   = s.(models{2}).p(i_alpha);
+    q_theta_per(i_FC)   = s.(models{1}).q(i_alpha);
+    q_theta_lim(i_FC)   = s.(models{2}).q(i_alpha);
+    V_per(i_FC)         = s.(models{1}).obj(i_alpha)./s.(models{1}).q(i_alpha);
+    V_lim(i_FC)         = s.(models{2}).obj(i_alpha)./s.(models{2}).q(i_alpha);
+    E_per(i_FC)         = s.(models{1}).E(i_alpha);
+    E_lim(i_FC)         = s.(models{2}).E(i_alpha);
+    E2_per(i_FC)        = s.(models{1}).E2(i_alpha);
+    E2_lim(i_FC)        = s.(models{2}).E2(i_alpha);
+    E3_per(i_FC)        = s.(models{1}).E3(i_alpha);
+    E3_lim(i_FC)        = s.(models{2}).E3(i_alpha);
+    U_per(i_FC)         = s.(models{1}).U(i_alpha);
+    U_lim(i_FC)         = s.(models{2}).U(i_alpha);
+    w_per(i_FC)         = s.(models{1}).wstar(i_alpha);
+    w_lim(i_FC)         = s.(models{2}).wstar(i_alpha);
+    w_max(i_FC)         = s.(models{1}).wmax(i_alpha);
+    phi_e(i_FC)         = s.(models{1}).phie(i_alpha);
+    phi_lim(i_FC)       = s.(models{2}).philim(i_alpha);
+    E3_net_per(i_FC)    = (1-phi_e(i_FC))*E3_per(i_FC) + ...
+          phi_e(i_FC)*params.utilFunc(params.b);
+    E3_net_lim(i_FC)    = (1-phi_lim(i_FC))*E3_lim(i_FC) + ...
+          phi_lim(i_FC)*params.utilFunc(params.b);
+    V2_per(i_FC)        = s.(models{1}).V2(i_alpha);
+    V2_lim(i_FC)        = s.(models{2}).V2(i_alpha);
+    V3_per(i_FC)        = s.(models{1}).V2(i_alpha);
+    V3_lim(i_FC)        = s.(models{2}).V2(i_alpha);
+    V3_net_per(i_FC)    = s.(models{1}).V3(i_alpha);
+    V3_net_lim(i_FC)    = s.(models{2}).V3(i_alpha);
+    
+end
+
+% figure(1)
+% subplot(2,2,1)
+% plot(params.fix_cost_grid,ratio_p_theta,'LineWidth', 2)
+% grid on
+% title('p(\theta^P)/p(\theta^L)')
+% subplot(2,2,2)
+% plot(params.fix_cost_grid,ratio_q_theta,'LineWidth', 2)
+% grid on
+% title('q(\theta^P)/q(\theta^L)')
+% subplot(2,2,3)
+% plot(params.fix_cost_grid,ratio_V,'LineWidth', 2)
+% grid on
+% title('V^L/V^P')
+% subplot(2,2,4)
+% plot(params.fix_cost_grid,ratio_E,'LineWidth', 2)
+% grid on
+% title('E^L/E^P')
 
 % figure(2)
-% plot(alpha_vec, phi_lim_fun(w_store),'LineWidth',2)
-% hold on
-% plot(alpha_vec, obj_store,'LineWidth',2)
-% legend('\phi_l','Objective')
+% subplot(4,2,1)
+% plot(params.fix_cost_grid,[p_theta_per; p_theta_lim],'LineWidth', 2)
 % grid on
-% xlabel('\alpha') % x-axis label
-%
+% title('p(\theta^P) and p(\theta^L)')
+% legend('p(\theta^P)','p(\theta^L)')
+% subplot(4,2,2)
+% plot(params.fix_cost_grid,[q_theta_per; q_theta_lim],'LineWidth', 2)
+% grid on
+% title('q(\theta^P) and q(\theta^L)')
+% legend('q(\theta^P)','q(\theta^L)')
+% subplot(4,2,3)
+% plot(params.fix_cost_grid,[V_per; V_lim],'LineWidth', 2)
+% grid on
+% title('V^P and V^L')
+% legend('V^P','V^L')
+% subplot(4,2,4)
+% plot(params.fix_cost_grid,[E_per; E_lim],'LineWidth', 2)
+% grid on
+% title('E^P and E^L')
+% legend('E^P','E^L')
+% subplot(4,2,5)
+% plot(params.fix_cost_grid,...
+%     [U_per; U_lim],'LineWidth', 2)
+% grid on
+% title('U^P and U^L')
+% legend('U^P','U^L')
+% subplot(4,2,6)
+% plot(params.fix_cost_grid,...
+%     [w_per; w_lim; ones(1,params.length_FC)*params.b; w_max],'LineWidth', 2)
+% grid on
+% title('w^P and w^L')
+% legend('w^P','w^L','min(w)','max(w)')
+% subplot(4,2,7)
+% plot(params.fix_cost_grid,...
+%     [phi_e; phi_lim],'LineWidth', 2)
+% grid on
+% title('\phi_e and \phi_l')
+% legend('\phi_e','phi_l')
+% subplot(4,2,8)
+% plot(params.fix_cost_grid,...
+%     [phi_e; phi_lim],'LineWidth', 2)
+% grid on
+% title('E3_p and E3_l')
+% legend('E3_p','E3_l')
+% 
 % figure(3)
-% plot(sigma_vec,alpha_maximand_store,'LineWidth',2)
+% loc_zero = find((U_per - U_lim) > 0, 1);
+% subplot(4,2,1)
 % hold on
-% plot(sigma_vec,U_maximized_store,'LineWidth',2)
-% hold on
-% plot(sigma_vec,w_maximand_store,'LineWidth',2)
-% hold on
-% plot(sigma_vec,vacancies_maximand_store,'LineWidth',2)
-% hold on
-% plot(sigma_vec,p_maximand_store,'LineWidth',2)
-% hold on
-% plot(sigma_vec,q_maximand_store,'LineWidth',2)
-% legend('Optimal \alpha','Optimal U','Optimal w','Optimal vacancies',...
-%   'Optimal p(\theta)','Optimal q(\theta)','location','northwest') %'Vacancies',
+% plot(params.fix_cost_grid,[p_theta_per - p_theta_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[p_theta_per(loc_zero) - p_theta_lim(loc_zero)],'*')
 % grid on
-% xlabel('\sigma') % x-axis label
-% title('Perfect Commitment, \phi = 0.5, fix cost = 0.01, b = 0.1')
-%
-% save('limited_b01_phi05_f001')
+% title('p(\theta^P) - p(\theta^L)')
+% hold off
+% subplot(4,2,2)
+% hold on
+% plot(params.fix_cost_grid,[q_theta_per - q_theta_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[q_theta_per(loc_zero) - q_theta_lim(loc_zero)],'*')
+% grid on
+% title('q(\theta^P) and q(\theta^L)')
+% hold off
+% subplot(4,2,3)
+% hold on
+% plot(params.fix_cost_grid,[V_per - V_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[V_per(loc_zero) - V_lim(loc_zero)],'*')
+% grid on
+% title('V^P - V^L')
+% hold off
+% subplot(4,2,4)
+% hold on
+% plot(params.fix_cost_grid,[E_per - E_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[E_per(loc_zero) - E_lim(loc_zero)],'*')
+% grid on
+% title('E^P - E^L')
+% hold off
+% subplot(4,2,5)
+% hold on
+% plot(params.fix_cost_grid,[U_per - U_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[U_per(loc_zero) - U_lim(loc_zero)],'*')
+% grid on
+% title('U^P - U^L')
+% hold off
+% subplot(4,2,6)
+% hold on
+% plot(params.fix_cost_grid,[w_per - w_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[w_per(loc_zero) - w_lim(loc_zero)],'*')
+% grid on
+% title('w^P - w^L')
+% subplot(4,2,7)
+% hold on
+% plot(params.fix_cost_grid,[phi_e - phi_lim],'LineWidth', 2)
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% plot(params.fix_cost_grid(loc_zero),[phi_e(loc_zero) - phi_lim(loc_zero)],'*')
+% grid on
+% title('\phi_e - \phi_l')
+% hold off
+% 
+% 
+% figure(4)
+% subplot(2,1,1)
+% hold on
+% plot(params.fix_cost_grid,...
+%     [U_per - U_lim],'LineWidth', 2)
+% [Umax_diff, loc_diff] = max(U_per - U_lim);
+% loc_zero = find((U_per - U_lim) > 0, 1);
+% plot(params.fix_cost_grid(loc_zero),zeros(1,1),'*')
+% plot(params.fix_cost_grid(loc_diff),U_per(loc_diff) - U_lim(loc_diff),'*')
+% plot(params.fix_cost_grid,zeros(1,length(params.fix_cost_grid)))
+% grid on
+% title('U_p - U_l')
+% hold off
+% subplot(2,1,2)
+% hold on
+% plot(params.fix_cost_grid,...
+%     [U_per./U_lim],'LineWidth', 2)
+% [Umax_ratio, loc_ratio] = max(U_per./U_lim);
+% loc_one = find((U_per./U_lim) > 1, 1);
+% plot(params.fix_cost_grid(loc_one),ones(1,1),'*')
+% plot(params.fix_cost_grid(loc_ratio),U_per(loc_ratio)/U_lim(loc_ratio),'*')
+% plot(params.fix_cost_grid,ones(1,length(params.fix_cost_grid)))
+% grid on
+% title('U_p/U_l')
+% hold off
+
+
+

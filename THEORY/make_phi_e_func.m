@@ -1,5 +1,5 @@
-function phi_e_func = make_phi_e_func()
-    globalDeclaration
+function phi_e_func = make_phi_e_func(prod_func_type,r,R,delta)
+
     if prod_func_type == 1
         phi_e_func    = @(Aalpha) r*Aalpha - R;
     elseif prod_func_type == 2
