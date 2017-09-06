@@ -91,7 +91,7 @@
 			\item Debt is riskless. Borrows pay interest rate $ r $ and return all borrowed capital.
 			\item A single agent with initial wealth chooses debt to maximize payoffs in two periods. The output in the first period must be weakly positive.
 			\item[] \[\max_{D} \mathbb{E}u(c_1) + \beta \mathbb{E}u(c_2)\]
-			\item where \[c_t(\phi_t) = \phi_t(W + D)^\gamma - rD\] is some decreasing returns production function with period productivity realization $ \phi \in U[0,1]$ and $ c_2  = 0 $ if $ c_1 < 0 $.
+			\item where \[c_t(\phi_t) = \phi_t(W + D)^\gamma - rD\] is some decreasing returns production function. Productivity shock $ \phi_t \in U[0,1]$ and $ c_2  = b $ for sure if $ c_1 < 0 $.
 		\end{itemize}
 	\end{figure}
 }
@@ -100,7 +100,18 @@
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item In this setup the optimal choice for debt $ D $ is
+			\item In this setup the optimal choice for debt $ D $ is defined by
+			\[ads\] 
+			where the trade-off is between producing a positive quantity in the second period in order to obtain a chance at producing in the last period where the minimum level of production is $ b $.
+		\end{itemize}
+	\end{figure}
+}
+
+\frame{\frametitle{Model without Labor Market Frictions: Solution}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item The first order condition from earlier yields
 			\[ads\] 
 			where we how the incompleteness of markets drives a wedge in the typical solution for equation the expected return of capital to the interest rate $ r $.
 			\item Finally, note here that the owner of the firm can be the worker or the firm in a setting with both agents. 
@@ -108,12 +119,14 @@
 	\end{figure}
 }
 
+
 \frame{\frametitle{Labor Market Frictions with Capital Structure}
+	Next, we consider how labor market frictions affects debt choice.
 	\begin{figure}
 		\centering
 		\begin{itemize}
 			\item Mortensen and Pissarides style search frictions.  
-			\item Entrepreneurs own initial wealth $ W $ and borrow at rate $ r $. Debt is riskless.
+			\item Entrepreneurs/firms own wealth $ W $ and borrow at rate $ r $. Debt is riskless.
 			\item Debt choice is made before entry. No new debt or equity.
 			\item Wage contracts are specified by \textit{unconstrained wages}, $ \tilde{w} $.
 			\item $ \tilde{w} $ is restricted to be identical in both periods.
@@ -133,13 +146,13 @@
 				\item Firm's post wage contracts, matching occurs.
 				\item Unmatched firms exit immediately.
 			\end{itemize}
-			\item \textbf{Period 1.} Draw roductivity $ \phi $.
+			\item \textbf{Period 1.} Draw productivity $ \phi_1 $.
 			\begin{itemize}
 				\item If output is weakly negative, match is broken. Firm exits.
 				\item Production + consumption occurs.
 				\item Unmatched workers consume $ b $.
 			\end{itemize}
-			\item \textbf{Period 2.} Draw roductivity $ \phi $.
+			\item \textbf{Period 2.} Draw roductivity $ \phi_2 $.
 			\begin{itemize}
 				\item Separation if output is below $ b $. 
 				\item Production + consumption occurs. 
@@ -154,10 +167,10 @@
 		\centering
 		\begin{itemize}
 			\item Period output is given by
-			\item[] \[\phi_t (W - COE - D)^\gamma - Dr\]
+			\item[] \[\phi_t (W + D)^\gamma - Dr\]
 			\item If period output is negative, exit occurs.
 			\item If output exceeds $ \tilde{w} $, workers are paid $ \tilde{w} $. 
-			\item Dividends are positive iff $ (W - COE - D)^\gamma - Dr \ge w^* $
+			\item Dividends are positive iff $ (W + D)^\gamma - Dr \ge \tilde{w} $
 			\item Don't worry, we have pictures.
 		\end{itemize}
 	\end{figure}	
@@ -180,15 +193,93 @@
 
 
 
-\frame{\frametitle{Worker's Problem}
+\frame{\frametitle{Promised Value of a Contract}
 	\begin{figure}
 	\centering
 	\begin{itemize}
-		\item Firm's post \textit{unconstrained wage} contracts, $ \tilde{w} $
-		\item \[U = \max_{\tilde{w}} p(\theta(\tilde{w})) \mathbb{E}\left(u_1(\tilde{w}) + \beta  u_2(\tilde{w})\right) \]
-		\item 
+		\item $ E(\tilde{w}) $ is the promised value of contract $ \tilde{w} $.
+\begin{eqnarray*}
+		E(\tilde{w}) &=& \underbrace{\phi_e (1+\beta) u(b)}_\text{$ f(\phi_1) < 0 $, exit} \\
+					 &+& \underbrace{\int_{\phi_e}^{\phi_{dw}} f(\phi_t) d\phi}_\text{wage = output, zero div.} + \underbrace{\int_{\phi_{dw}}^1\tilde{w}d\phi}_\text{wage = $ \tilde{w} $, positive div.} \\
+					 &+& (1-\phi_e)\underbrace{\left( \phi_b u(b) + \int_{\phi_b}^{\phi_{dw}} f(\phi_t) d\phi + \int_{\phi_{dw}}^1\tilde{w}d\phi\right)}_\text{final period wages} 
+		\end{eqnarray*}
+		\item[] where $ \phi_e $, $ \phi_b $ and $ \phi_dw $ are the cutoffs seen earlier.
 	\end{itemize}
 \end{figure}	
+}
+
+\frame{\frametitle{Worker's Problem}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+		\item $ \theta(\tilde{w}) $ is market tightness for a given contract
+		\item $ p(\theta(\tilde{w})) = m(\theta(\tilde{w}))/s $ is job finding probability
+		\item \[U = \max_{\tilde{w}} \underbrace{p(\theta(\tilde{w})) E(\tilde{w})}_\text{indifference condition} \]
+	\end{itemize}
+\end{figure}	
+}
+
+\frame{\frametitle{Expected Profits of a Contract}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item $ V(\tilde{w}) $ is the value of contract $ \tilde{w} $ taking debt as given
+			\begin{eqnarray*}
+				V(\tilde{w}) &=& \underbrace{\phi_e (1+\beta) \cdot 0}_\text{$ f(\phi_1) < 0 $, exit} \\
+				&+& \underbrace{\int_{\phi_e}^{\phi_{dw}} 0 \hspace{1mm} d\phi}_\text{wage = output, zero div.} + \underbrace{\int_{\phi_{dw}}^1f(\phi_1)-\tilde{w} \hspace{1mm}d\phi}_\text{wage = $ \tilde{w} $, positive div.} \\
+				&+& (1-\phi_e)\underbrace{\left( \phi_b \cdot 0 + \int_{\phi_b}^{\phi_{dw}} 0 \hspace{1mm} d\phi + \int_{\phi_{dw}}^1f(\phi_2)-\tilde{w} \hspace{1mm}d\phi\right)}_\text{final period wages} 
+			\end{eqnarray*}
+			\item[] where $ \phi_e $, $ \phi_b $ and $ \phi_dw $ are the cutoffs seen earlier.
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Firms's Problem}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item $ q(\theta(\tilde{w})) = m(\theta(\tilde{w}))/v $ is vacancy filling probability
+			\item[] \[W = \max_{\tilde{w};D} \underbrace{q(\theta(\tilde{w})) V(\tilde{w};D)}_\text{indifference condition} \]
+			\item Optimal debt choice will involve firms choosing debt and posting the corresponding profit maximizing contract $ \tilde{w} $ which maximizes ex-ante value, $ U $ for workers. 
+		\end{itemize}
+	\end{figure}	
+}
+
+
+\frame{\frametitle{Results: Wages}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Results: Entry}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Results: Ex-ante Value of Unemployment}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Results: Profits condition on Matching}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item
+		\end{itemize}
+	\end{figure}	
 }
 
 \frame{\frametitle{Dynamic Model with Labor Market Frictions}
