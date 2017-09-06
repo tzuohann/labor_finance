@@ -1,13 +1,10 @@
-function UMax = getUMax(aalpha,phi_e,phi_db,phi_d_fun)
-  globalDeclaration
-  wStarMax  = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
-  period    = 2;
-  phi_lim   = getPhiLim_Discrete(phi_d_fun,phi_db,wStarMax,phi_e,aalpha);
-  E2Max     = calcExpectedUtil(period,wStarMax,phi_db,phi_e,phi_d_fun,...
-    aalpha,phi_lim);
-  period    = 3;
-  E3Max     = calcExpectedUtil(period,wStarMax,phi_db,phi_e,phi_d_fun,...
-              aalpha,phi_lim);
-  
-  UMax = utilFunc(b,ssigma,1) + BETA*E2Max + BETA^2*E3Max;
+function [UMax,E2Max,E3Max] = getUMax(params,aalpha,phi_e,output,U_min,phi_db)
+  wStarMax    = output(end);
+  E3Max       = getE3(params,wStarMax,output,aalpha,phi_db);
+  phi_cutoff  = getPhiCutoff(params,aalpha,phi_e,wStarMax,output,phi_db);
+  E2Max       = calcExpectedUtil(params,output,phi_cutoff,wStarMax);
+  UMax        = params.utilFunc(params.b) + params.BETA*E2Max + params.BETA^2*E3Max;
+  if U_min >= UMax
+    error('U_min cannot be greater than U_max. The problem may be the parameterization.')
+  end
 end

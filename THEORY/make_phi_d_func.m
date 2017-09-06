@@ -1,5 +1,4 @@
-function phi_d_fun = make_phi_d_func(phi_e_func)
-    globalDeclaration
+function phi_d_fun = make_phi_d_func(phi_e_func,prod_func_type,R,r,delta)
     if prod_func_type == 1
         phi_d_fun     = @(w,Aalpha) phi_e_func(Aalpha) + w ;
     elseif prod_func_type == 2
