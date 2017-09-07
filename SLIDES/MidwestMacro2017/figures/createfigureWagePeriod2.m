@@ -14,7 +14,7 @@ function createfigureWagePeriod2(X1, YMatrix1)
   hold(axes1,'on');
   
   % Create multiple lines using matrix input to plot
-  plot1 = plot(X1,YMatrix1,'LineWidth',2,'Parent',axes1);
+  plot1 = plot(X1,YMatrix1,'LineWidth',4,'Parent',axes1);
   set(plot1(1),'DisplayName','Wages','Color',[1 0 0]);
   set(plot1(2),'DisplayName','Output','LineStyle','--','Color',[0 0 1]);
   set(plot1(3),'DisplayName','Dividends','Color',[0 1 0]);
@@ -23,7 +23,7 @@ function createfigureWagePeriod2(X1, YMatrix1)
   xlabel('Productivity');
   
   % Set the remaining axes properties
-  set(axes1,'FontSize',15);
+  set(axes1,'FontSize',20);
   % Create legend
   legend1 = legend(axes1,'show');
   set(legend1,...
@@ -31,36 +31,34 @@ function createfigureWagePeriod2(X1, YMatrix1)
   
   % Create textbox
   annotation(figure1,'textbox',...
-    [0.461 0.225 0.27411961722488 0.0433333333333333],...
+    [0.35 0.23 0.27411961722488 0.0433333333333333],...
     'String',{'Zero Dividends, Constrained Wages'},...
-    'FitBoxToText','on');
+    'FitBoxToText','on','FontSize',20,'LineStyle','none');
+    % Create doublearrow
+  annotation(figure1,'doublearrow',[0.29 0.67],...
+    [0.27 0.27],'LineWidth',2);
   
+    % Create textbox
+  annotation(figure1,'textbox',...
+    [0.242 0.4 0.0456507177033493 0.0433333333333338],...
+    'String',{'Exit'},...
+    'FitBoxToText','on','FontSize',20,'LineStyle','none');
   % Create doublearrow
-%   annotation(figure1,'doublearrow',[0.295454545454545 0.374401913875598],...
-%     [0.379 0.379]);
+  annotation(figure1,'doublearrow',[0.138 0.38],...
+    [0.4 0.4],'LineWidth',2);  
   
-  % Create doublearrow
-  annotation(figure1,'doublearrow',[0.13755980861244 0.38],...
-    [0.4 0.4]);
-  
-  % Create doublearrow
-  annotation(figure1,'doublearrow',[0.39066985645933 0.66866028708134],...
-    [0.274 0.274]);
 
   % Create textbox
   annotation(figure1,'textbox',...
-    [0.245 0.39 0.0456507177033493 0.0433333333333338],...
-    'String',{'Exit'},...
-    'FitBoxToText','on');
-  
-  % Create textbox
-  annotation(figure1,'textbox',...
-    [0.711722488038277 0.515000000000001 0.177033492822966 0.0716666666666667],...
+    [0.711722488038277 0.525 0.177033492822966 0.0716666666666667],...
     'String',{'Positive Dividends','Unconstrainted Wages'},...
     'HorizontalAlignment','center',...
-    'FitBoxToText','on');
-  
+    'FitBoxToText','on','FontSize',20,'LineStyle','none');
   % Create doublearrow
   annotation(figure1,'doublearrow',[0.684210526315789 0.900717703349281],...
-    [0.535000000000001 0.535000000000001]);
+    [0.52 0.52],'LineWidth',2);
+  
+  annotation('textarrow',[0.38 0.38],[0.55 0.4],'String','\phi_b','LineWidth',2,'FontSize',20)
+  annotation('textarrow',[0.677 0.677],[0.17 0.28],'String','\phi_{dw}','LineWidth',2,'FontSize',20)
+  
   

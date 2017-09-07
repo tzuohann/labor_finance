@@ -16,6 +16,7 @@ YMatrix1 = [wages;output;dividends];
 
 createfigureWagePeriod1(X1, YMatrix1)
 export_fig(['WagePeriod1.pdf'])
+
 wages(wages < B) = B;
 YMatrix1 = [wages;output;dividends];
 createfigureWagePeriod2(X1, YMatrix1)
