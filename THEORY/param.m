@@ -16,9 +16,9 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   assert(params.ssigma  >= 0 || params.ssigma < 1,'ssigma must be [0,1)')
   params.BETA            = 1; %1/(1+params.r); %Discount factor
   params.gamma_matching  = 1; %Matching elasticity parameter
-  params.b_min           = 0.2;
-  params.b_max           = 0.2;
-  params.length_b        = 1;
+  params.b_min           = 0.001;
+  params.b_max           = 0.1;
+  params.length_b        = 10;
   params.b_grid          = [linspace(params.b_min,params.b_max,params.length_b)]; 
   params.b               = params.b_grid(i_b);
   if params.b == 0
@@ -28,8 +28,8 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.Lifetime_Achievement_Award  = NaN; %Exogenous expected profit in period 3 if match is not broken
   params.whichCommitment = 'limited'; %perfect vs limited commitment
   params.whichE3         = 'endogenous'; %exogenous vs endogenous expected value in the third period
-  params.FC_min          = 0.05;
-  params.FC_max          = 0.05;
+  params.FC_min          = 0.005;
+  params.FC_max          = 0.005;
   params.length_FC       = 1;
   params.fix_cost_grid   = [linspace(params.FC_min,params.FC_max,params.length_FC)]; %Fixed cost of entry. Should be equal to K (equal to 1)
   params.fix_cost        = params.fix_cost_grid(i_FC);
@@ -43,13 +43,13 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   params.phi_d_fun       = make_phi_d_func(params.phi_e_func,params.prod_func_type,params.R,params.r,params.delta);
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
-  alpha_min              = 0.1;
+  alpha_min              = 0.01;
   alpha_max              = 0.1;
   if alpha_min > alpha_max
         error('alpha_min cannot be greater than alpha_max')
   end
   params.alpha_fix       = NaN;
-  lenAalpha              = 1;
+  lenAalpha              = 5;
   phi_low                = 0; %lower bound for phi
   phi_up                 = 1; %upper bound for phi
   lenPphi                = 10000;
@@ -62,7 +62,7 @@ function [params,tech] = param(i_sigma,i_FC,i_b)
   
   
   %Checking if b is too high for this production function
-  prodFn_max          = prodFn(params.R,max(params.phi_vec),tech.alpha_vec,params.r,params.prod_func_type,params.delta);
+  prodFn_max          = prodFn(params.R,max(params.phi_vec),tech.alpha_vec,params.r,params.prod_func_type,params.delta,params.fix_cost);
   if prodFn_max < params.b
     error('Expected valued of production is always smaller than the reservation value.')
   end

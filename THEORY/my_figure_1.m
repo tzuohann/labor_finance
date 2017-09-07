@@ -31,6 +31,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.622 0.715]) %focus
 %       ylim([0.09 0.32])  %bzero
+%       ylim([0.610 0.858])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -54,6 +55,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.27 0.5]) %focus
 %       ylim([0.15 0.57]) %bzero
+%       ylim([0.249 0.585])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -75,6 +77,7 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.015 0.315])
+      ylim([0.02 0.33])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -97,7 +100,8 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.48 0.71]) %focus
-%       ylim([0.465 0.6]) %bzero
+% %       ylim([0.465 0.6]) %bzero
+%       ylim([0.058 0.8])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -122,6 +126,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.4 1.07]) %focus
 %       ylim([0.503 1.6]) %bzero
+%       ylim([0.255 16])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -145,6 +150,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.3 0.52]) %focus
 %       ylim([0.4 0.54]) %bzero
+%       ylim([0.2 0.9415])  %bdot2
       xlabel('\alpha')
       grid on
       

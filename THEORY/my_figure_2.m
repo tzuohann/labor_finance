@@ -29,6 +29,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.052 0.19]) %focus
 %       ylim([0.0201 0.356]) %bzero
+%       ylim([0.0157 0.208])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -52,6 +53,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.026 0.11]) %focus
 %       ylim([0.0101 0.183]) %bzero
+%       ylim([0.0079 0.118])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -75,6 +77,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %        ylim([0.026 0.11]) %focus
 %       ylim([0.0101 0.183]) %bzero
+%       ylim([0.0079 0.118])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -91,7 +94,6 @@
                   (1-s.(models{ii}).philim(loc(ii))).*s.(models{ii}).V3(loc(ii)),'ks')
             plot(tech.alpha_vec(loc_V3(ii)),...
                   [(1-s.(models{ii}).philim(loc_V3(ii))).*s.(models{ii}).V3(loc_V3(ii))],'*')
-            plot(tech.alpha_vec,ones(1,length(tech.alpha_vec))*params.fix_cost_grid(i_FC))
       end
       title('(1-\phi_c)V3','FontSize', 20)
       hold off
@@ -99,7 +101,8 @@
       V = axis;
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.025 0.1]) %focus
-%       ylim([0.009999 0.176]) %bzero
+% %       ylim([0.009999 0.176]) %bzero
+%       ylim([0.00725 0.11])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -123,6 +126,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.48 0.635]) %focus
 %       ylim([0.23 0.62]) %bzero
+%       ylim([0.45 0.675])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -146,6 +150,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.22 0.32]) %focus
 %       ylim([0.123 0.314]) %bzero
+%       ylim([0.21 0.34])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -169,6 +174,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.24 0.335]) %focus
 %       ylim([0.123 0.314]) %bzero
+%       ylim([0.230 0.36])  %bdot2
       xlabel('\alpha')
       grid on
       
@@ -194,6 +200,7 @@
       axis([min(tech.alpha_vec),max(tech.alpha_vec),V(3),V(4)])
 %       ylim([0.23 0.33]) %focus
 %     ylim([0.105 0.3]) %bzero
+%       ylim([0.222 0.345])  %bdot2
       xlabel('\alpha')
       grid on
       

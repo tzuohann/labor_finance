@@ -1,4 +1,4 @@
-function preTaxoutput = prodFn(R,phi,alpha,r,prod_func_type,delta)
+function preTaxoutput = prodFn(R,phi,alpha,r,prod_func_type,delta,COE)
 
     %Calculate pretax output assuming K = 1
     %Right now we have two types of production function. The original one
@@ -24,7 +24,7 @@ function preTaxoutput = prodFn(R,phi,alpha,r,prod_func_type,delta)
     elseif prod_func_type == 7
         preTaxoutput = (1+alpha*phi)*R - alpha*r;
     elseif prod_func_type == 8
-        preTaxoutput = phi*R*(alpha).^delta - r*alpha;
+        preTaxoutput = phi*R*(COE + alpha).^delta - r*alpha;
     end
 end
 
