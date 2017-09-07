@@ -16,7 +16,7 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
       %These quantities depend only on alpha and not on U
       phi_e     = phi_e_func(aalpha);
       phi_db    = phi_d_fun(params.b,aalpha);
-      output    = prodFn(R,phi_vec,aalpha,r,prod_func_type,delta); %this is a vector over phi
+      output    = prodFn(R,phi_vec,aalpha,r,prod_func_type,delta,params.fix_cost); %this is a vector over phi
       
       %Boundaries of U
       U_min                     = (1+BETA+BETA^2)*utilFunc(b);
@@ -26,11 +26,11 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
       V_max_store = nan(size(alpha_vec));
       [~,firmValUMax,~,~] = solveGivenU(U_max,params,aalpha,phi_e,output,phi_db);
       while firmValUMax < 0
-        U_max = U_max*0.99;
-        [~,firmValUMax,~,~] = solveGivenU(U_max,params,aalpha,phi_e,output,phi_db);
-        if U_max < U_min
-          error('Commit exactly this code and pull req Tzuo')
-        end
+            U_max = U_max*0.99;
+            [~,firmValUMax,~,~] = solveGivenU(U_max,params,aalpha,phi_e,output,phi_db);
+            if U_max < U_min
+                  error('Commit exactly this code and pull req Tzuo')
+            end
       end
       if firmValUMin > fix_cost && firmValUMax < fix_cost
             
@@ -47,8 +47,29 @@ for ia = 1:length(alpha_vec) %loop over alpha, we do for all the possible alphas
                   end
                   err_alpha      = abs(firmVal - fix_cost);
                   err_U          = abs(U_max - U_min);
-                  if err_U < 1e-12
-                        error('Some strangeness has occured in minimization over U');
+                  if err_U < 1e-11
+                        display('Some strangeness has occured in minimization over U');
+                        
+                        U_store(ia)           = NaN;
+                        vacancies(ia)         = NaN;
+                        p_theta(ia)           = NaN;
+                        q_theta(ia)           = NaN;
+                        obj_store(ia)         = NaN;
+                        phi_e_store(ia)       = NaN;
+                        phi_lim_store(ia)     = NaN;
+                        w_store(ia)           = NaN;
+                        w_store_max(ia)       = NaN;
+                        w_store_min(ia)       = NaN;
+                        phi_dw_store(ia)      = NaN;
+                        phi_db_store(ia)      = NaN;
+                        E2_store(ia)          = NaN;
+                        E3_store(ia)          = NaN;
+                        E_store(ia)           = NaN;
+                        V2_store(ia)          = NaN;
+                        V3_store(ia)          = NaN;
+                        V_store(ia)           = NaN;
+                        
+                        err_alpha = eps;
                   end
             end
             
