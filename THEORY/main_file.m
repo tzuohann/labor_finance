@@ -5,14 +5,15 @@ close all
 i_sigma = 1;
 i_FC = 1;
 i_b = 1;
-[params,tech] = param(i_sigma,i_FC,i_b);
+[params,tech] = param(i_sigma,i_FC,i_b,0);
 
 for i_sigma = 1:length(params.ssigma_grid)
       for i_FC = 1:length(params.fix_cost_grid)
             for i_b = 1:length(params.b_grid)
                   
                   %Parameterization
-                  [params,tech] = param(i_sigma,i_FC,i_b);
+                  WS = NaN;
+                  [params,tech] = param(i_sigma,i_FC,i_b,WS);
                   
                   disp(['sigma = ',num2str(i_sigma)])
                   disp(['FC = ',num2str(i_FC)])
@@ -21,11 +22,24 @@ for i_sigma = 1:length(params.ssigma_grid)
                   %Computations
                   params.whichCommitment = 'perfect';
                   model = 'sp';
+                  WS = 0;
+                  [params,tech] = param(i_sigma,i_FC,i_b,WS);
                   [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
                         s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
                         s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
                         s.(model).V2,s.(model).V3,s.(model).V] = ...
                         mainDynamicLoop(params,tech);
+                  
+                  %Worker Solution
+                  params.whichCommitment = 'perfect';
+                  model = 'ws'
+                  WS = 1;
+                  [params,tech] = param(i_sigma,i_FC,i_b,WS);
+                  [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q, ...
+                        s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,...
+                        s.(model).wmin,s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
+                        s.(model).V2,s.(model).V3,s.(model).V] = ...
+                        mainLoop(params,tech);
                   
 %                   params.whichCommitment = 'limited';
 %                   model = 'sl';

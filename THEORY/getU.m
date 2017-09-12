@@ -1,7 +1,7 @@
 function U = getU(params,output,phi_cutoff,wageStar,ptheta,aalpha,phi_db)
   
   E2_discrete   = calcExpectedUtil(params,output,phi_cutoff,wageStar);
-  E3_discrete   = getE3(params,aalpha,wageStar,aalpha,phi_db);
+  E3_discrete   = getE3(params,wageStar,output,aalpha,phi_db);
   limitIntegral = getContinuationProb(phi_cutoff,params.phi_vec);
 
   U             = params.utilFunc(params.b) ...

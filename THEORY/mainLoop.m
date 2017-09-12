@@ -1,16 +1,18 @@
 function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
-    phi_e_store,phi_lim_store,w_store_max,w_store_min,E2_store] = mainLoop(params,tech)
+    phi_e_store,phi_lim_store,w_store_max,w_store_min,E2_store,E3_store,E_store, ...
+    V_max_store,firmValUMax,...
+      V2_store,V3_store,V_store] = mainLoop(params,tech)
   
   eval(reshape(structvars(params)',1,[]));
   eval(reshape(structvars(tech)',1,[]));
   
-  phi_e_func      = make_phi_e_func(prod_func_type,r,R,delta);
-  phi_d_fun       = make_phi_d_func(phi_e_func,prod_func_type,R,r,delta);
+  phi_e_func      = make_phi_e_func(prod_func_type,r,R,delta,fix_cost);
+  phi_d_fun       = make_phi_d_func(phi_e_func,prod_func_type,R,r,delta,fix_cost);
   ptheta          = 1;
   for ialpha = 1:numel(alpha_vec)
     aalpha          = alpha_vec(ialpha);
     % Check the boundary of the production function
-    prodFn_max      = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
+    prodFn_max      = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta,fix_cost);
     if prodFn_max < b
       error('Expected valued of production is always smaller than the reservation value.')
     end
@@ -33,13 +35,13 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
     
     %wStar is the maximum level of the production, firm gives everything to
     %the worker always
-    wStar           = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta);
-    output          = prodFn(R,phi_vec,aalpha,r,prod_func_type,delta);
+    wStar           = prodFn(R,max(phi_vec),aalpha,r,prod_func_type,delta,fix_cost);
+    output          = prodFn(R,phi_vec,aalpha,r,prod_func_type,delta,fix_cost);
     
     %Checking the feasibility of the problem
     phi_cutoff      = getPhiCutoff(params,aalpha,phi_e,wStar);
     E2              = calcExpectedUtil(params,output,phi_cutoff,wStar);
-    E3              = getE3(params,wStar,output);
+    E3              = getE3(params,wStar,output,aalpha,phi_db);
     
     switch whichCommitment
       case{'perfect'}
@@ -55,7 +57,8 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
     end
     
     %Evaluating the remaing variable
-    U_store(ialpha)                       = getU(params,output,phi_cutoff,wStar,ptheta,aalpha);
+    p_theta(ialpha)                       = 1;
+    U_store(ialpha)                       = getU(params,output,phi_cutoff,wStar,ptheta,aalpha,phi_db);
     phi_e_store(ialpha)                   = phi_e;
     phi_dw_store(ialpha)                  = phi_d_fun(wStar,aalpha);
     phi_db_store(ialpha)                  = phi_d_fun(b,aalpha);
@@ -64,9 +67,15 @@ function [U_store,w_store,vacancies,p_theta,q_theta,obj_store,...
     w_store_max(ialpha)                   = wStar;
     w_store_min(ialpha)                   = wStar;
     vacancies(ialpha)                     = nan;
-    p_theta(ialpha)                       = 1;
     q_theta(ialpha)                       = nan;
     obj_store(ialpha)                     = nan;
     E2_store(ialpha)                      = E2;
+    E3_store(ialpha)                      = E3;
+    E_store(ialpha)                       = NaN;
+    V2_store(ialpha)                      = NaN;
+    V3_store(ialpha)                      = NaN;
+    V_store(ialpha)                       = NaN;
+    V_max_store(ialpha)                   = NaN;
+    firmValUMax(ialpha)                   = NaN;
   end
 end

@@ -1,4 +1,4 @@
-function phi_e_func = make_phi_e_func(prod_func_type,r,R,delta)
+function phi_e_func = make_phi_e_func(prod_func_type,r,R,delta,COE)
 
     if prod_func_type == 1
         phi_e_func    = @(Aalpha) r*Aalpha - R;
@@ -15,7 +15,7 @@ function phi_e_func = make_phi_e_func(prod_func_type,r,R,delta)
     elseif prod_func_type == 7
         phi_e_func      = @(Aalpha) (Aalpha*r/R - 1)/Aalpha;
     elseif prod_func_type == 8
-        phi_e_func      = @(Aalpha) r/R*Aalpha^(1-delta);
+        phi_e_func      = @(Aalpha) r*Aalpha/(R*(COE + Aalpha)^(delta));
     else
         error('ProdFunc Error')
     end
