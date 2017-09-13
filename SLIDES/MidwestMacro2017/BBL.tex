@@ -90,19 +90,10 @@
 		\begin{itemize}
 			\item Debt is riskless. Borrows pay interest rate $ r $ and return all borrowed capital.
 			\item A single agent with initial wealth chooses debt to maximize payoffs in two periods. The output in the first period must be weakly positive.
-			\item[] \[\max_{D} \mathbb{E}u(c_1) + \beta \mathbb{E}u(c_2)\]
-			\item where \[c_t(\phi_t) = \phi_t(W + D)^\gamma - rD\] is some decreasing returns production function. Productivity shock $ \phi_t \in U[0,1]$ and $ c_2  = b $ for sure if $ c_1 < 0 $.
-		\end{itemize}
-	\end{figure}
-}
-
-\frame{\frametitle{Model without Labor Market Frictions: Solution}
-	\begin{figure}
-		\centering
-		\begin{itemize}
-			\item In this setup the optimal choice for debt $ D $ is defined by
-			\[ads\] 
-			where the trade-off is between producing a positive quantity in the second period in order to obtain a chance at producing in the last period where the minimum level of production is $ b $.
+			\item[] \[\max_D E_2(D) + \phi_e(D)u(b) + (1-\phi_e(D))E_3(D) \] 
+			\item where \[E_2(D) = \int_0^1 max(0,\phi(W + D)^\gamma - rD) \hspace{1mm} d\phi\] 
+			\[E_3(D) = \int_0^1 max(b,\phi(W + D)^\gamma - rD) \hspace{1mm} d\phi\] 
+			\[ \phi_t \in U[0,1] \quad , \quad \phi_e(W + D)^\gamma - rD) = 0 \]
 		\end{itemize}
 	\end{figure}
 }
@@ -112,13 +103,37 @@
 		\centering
 		\begin{itemize}
 			\item The first order condition from earlier yields
-			\[ads\] 
-			where we how the incompleteness of markets drives a wedge in the typical solution for equation the expected return of capital to the interest rate $ r $.
-			\item Finally, note here that the owner of the firm can be the worker or the firm in a setting with both agents. 
+			\[\underbrace{\phi_e'}_\text{(+)} \underbrace{(E_3 - u(b))}_\text{(+) , Existence} = E_2' + (1-\phi_e)E_3'\] 
+			which shows that the probability of losing the final period output is equated with the marginal gain of more debt.
+			\item Financial frictions in the second period reduce the use of debt.
+			\item Note here that the owner of the firm can be the worker or the firm in a setting with both agents. 
 		\end{itemize}
 	\end{figure}
 }
 
+\frame{\frametitle{Model without Labor Market Frictions: Solution}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item \[E_2' + (1-\phi_e)E_3'\] can further be written as
+			\[(2-\phi_e)E_2' + (1-\phi_e)p'(D)\]
+			where 
+			\[ p'(D) = 2u(b)\frac{d}{dD}\left(\frac{b}{(W+D)^\alpha}\right) + \left[u(b)-u(0)\right]\phi_e' + someshit\] is the marginal effect of debt on the gains from exercising the outside option of home-production in the final period which can be positive or negative.
+			\item \[\phi_e' (E_3 - u(b)) -  (1-\phi_e)p'(D) = E_2' + (2-\phi_e)E_2'\] shows us that we get the net effect of financial frictions and technology to use this shit in the 3rd period to balance stuff out.
+		\end{itemize}
+	\end{figure}
+}
+
+\frame{\frametitle{Model without Labor Market Frictions: Comments}
+	With limited-liability and a liquidity constraint, a 2 period optimal production problem yields:
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item Reduced capital utilization relative to the case without liquidity constraint in the second period.
+			\item A social safety net (social benebits, $ b $) pushes debt use up because it reduces the cost of bankruptcy in the final period.
+		\end{itemize}
+	\end{figure}
+}
 
 \frame{\frametitle{Labor Market Frictions with Capital Structure}
 	Next, we consider how labor market frictions affects debt choice.
