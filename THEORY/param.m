@@ -1,15 +1,15 @@
-function [params,tech] = param(i_sigma,i_FC,i_b,WS)
+function [params,tech] = param(i_1,i_2,i_3,WS)
   %Global variables consume the most running time.
   
   %Economic Parameters
   params.tau             = 0; %Taxes
   params.r               = 1; %Return on capital.
   params.R               = params.r/(1-params.tau); %Gross return on capital
-  params.ssigma_min      = 0.5;
-  params.ssigma_max      = 0.5;
+  params.ssigma_min      = 0;
+  params.ssigma_max      = 0;
   params.length_ssigma   = 1;
   params.ssigma_grid     = [linspace(params.ssigma_min,params.ssigma_max,params.length_ssigma)]; 
-  params.ssigma          = params.ssigma_grid(i_sigma); %RRA
+  params.ssigma          = params.ssigma_grid(i_1); %RRA
   if WS == 1
         params.ssigma    = 0; %Risk neutrality of the worker solution
   end
@@ -18,12 +18,16 @@ function [params,tech] = param(i_sigma,i_FC,i_b,WS)
   end
   assert(params.ssigma  >= 0 || params.ssigma < 1,'ssigma must be [0,1)')
   params.BETA            = 1; %1/(1+params.r); %Discount factor
-  params.gamma_matching  = 1.6; %Matching elasticity parameter
-  params.b_min           = 0.1;
-  params.b_max           = 0.1;
-  params.length_b        = 1;
+  params.gamma_min       = 1;
+  params.gamma_max       = 1.6;
+  params.length_gamma    = 3;
+  params.gamma_grid      = [linspace(params.gamma_min,params.gamma_max,params.length_gamma)];
+  params.gamma_matching  = params.gamma_grid(i_2); %Matching elasticity parameter
+  params.b_min           = 0;
+  params.b_max           = 0.2;
+  params.length_b        = 3;
   params.b_grid          = [linspace(params.b_min,params.b_max,params.length_b)]; 
-  params.b               = params.b_grid(i_b);
+  params.b               = params.b_grid(i_3);
   if params.b == 0
       warning('b is equal to zero: wp should be equal to wl and sp should be equal to sl.')
   end
@@ -35,7 +39,7 @@ function [params,tech] = param(i_sigma,i_FC,i_b,WS)
   params.FC_max          = 0.005;
   params.length_FC       = 1;
   params.fix_cost_grid   = [linspace(params.FC_min,params.FC_max,params.length_FC)]; %Fixed cost of entry. Should be equal to K (equal to 1)
-  params.fix_cost        = params.fix_cost_grid(i_FC);
+  params.fix_cost        = params.fix_cost_grid(i_2);
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
   params.prod_func_type  = 8; %We use different production function to get the hump-shaped U
   params.delta           = 0.1; %decreasing return to scale active if production number 8
@@ -46,8 +50,8 @@ function [params,tech] = param(i_sigma,i_FC,i_b,WS)
   params.phi_d_fun       = make_phi_d_func(params.phi_e_func,params.prod_func_type,params.R,params.r,params.delta,params.fix_cost);
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
-  alpha_min              = 0.02;
-  alpha_max              = 0.03;
+  alpha_min              = 0.01;
+  alpha_max              = 0.1;
   if alpha_min > alpha_max
         error('alpha_min cannot be greater than alpha_max')
   end

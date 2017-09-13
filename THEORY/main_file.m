@@ -7,17 +7,17 @@ i_FC = 1;
 i_b = 1;
 [params,tech] = param(i_sigma,i_FC,i_b,0);
 
-for i_sigma = 1:length(params.ssigma_grid)
-      for i_FC = 1:length(params.fix_cost_grid)
-            for i_b = 1:length(params.b_grid)
+for i_1 = 1:length(params.ssigma_grid)
+      for i_2 = 1:length(params.gamma_grid)
+            for i_3 = 1:length(params.b_grid)
                   
                   %Parameterization
                   WS = NaN;
                   [params,tech] = param(i_sigma,i_FC,i_b,WS);
                   
-                  disp(['sigma = ',num2str(i_sigma)])
-                  disp(['FC = ',num2str(i_FC)])
-                  disp(['b = ',num2str(i_b)])
+                  disp(['sigma = ',num2str(i_1)])
+                  disp(['gamma = ',num2str(i_2)])
+                  disp(['b = ',num2str(i_3)])
                   
                   %Computations
                   params.whichCommitment = 'perfect';
@@ -41,19 +41,19 @@ for i_sigma = 1:length(params.ssigma_grid)
                         s.(model).V2,s.(model).V3,s.(model).V] = ...
                         mainLoop(params,tech);
                   
-%                   params.whichCommitment = 'limited';
-%                   model = 'sl';
-%                   [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
-%                         s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
-%                         s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
-%                         s.(model).V2,s.(model).V3,s.(model).V] = ...
-%                         mainDynamicLoop(params,tech);
+                  %params.whichCommitment = 'limited';
+                  %model = 'sl';
+                  %[s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
+                  %s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
+                  %s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
+                  %s.(model).V2,s.(model).V3,s.(model).V] = ...
+                  %mainDynamicLoop(params,tech);
                   
                   %Saving results
                   BaseName = 'File_riskneutral';
-%                   FileName = [BaseName,'_FC_',num2str(i_FC)]
-                FileName = [BaseName,'_sigma',num2str(i_sigma),...
-                '_FC',num2str(i_FC),'_b',num2str(i_b)]
+                  %FileName = [BaseName,'_FC_',num2str(i_FC)]
+                  FileName = [BaseName,'_sigma',num2str(i_1),...
+                        '_gamma',num2str(i_2),'_b',num2str(i_3)]
                   save(FileName)
             end
       end

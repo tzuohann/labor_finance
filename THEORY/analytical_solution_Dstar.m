@@ -1,32 +1,37 @@
-% clear all
-% close all
+clear all
+close all
 
-delt           = 0.1;
-b              = 0.1;
-r              = 1;
-COE            = 0.005;
-alp_min        = 0.02;
-alp_max        = 0.05;
-alp            = linspace(alp_min,alp_max,5);
-phie           = r*alp.*(COE + alp).^(-delt);
-A              = (1/2*(1+phie).*(COE + alp).^delt - r*alp);
-B              = b*(phie + (((1 - phie).*b.*(COE + alp).^(-delt))/2) - 2);
-Exp_output     = (1/2*(1-phie.^2).*(COE + alp).^delt - r*alp.*(1-phie));
+%Parameterization
+delt           = 0.1; %parameter of the decreasing return to scale
+b              = 0.15; %worker outside option
+r              = 1; %interest rate to owe to the bank
+COE            = 0.005; %initial endowment (initial equity)
+alp_min        = 0.001; %minimum level of debt
+alp_max        = 0.2; %maximum level of debt
+alp            = linspace(alp_min,alp_max,10000); %Grid over debt choice
+
+%Endogenous functions
+phie           = r*alp.*(COE + alp).^(-delt); %probability of default
+A              = (1/2*(1+phie).*(COE + alp).^delt - r*alp); %Technical object
+B              = b*(phie + (((1 - phie).*b.*(COE + alp).^(-delt))/2) - 2); %Technical object
+Exp_output     = (1/2*(1-phie.^2).*(COE + alp).^delt - r*alp.*(1-phie)); 
 Max_output     = (COE + alp).^delt - r*alp;
-C              = (COE.*((2-phie).*Exp_output + B + (2-phie).*phie*b)).^(1/2)./(2-phie);
-w              = Max_output - (COE + alp).^(delt/2)*2^(0.5).*C.^(0.5);
-phi_dw         = phie + w.*(COE + alp).^(-delt);
+C              = (COE.*((2-phie).*Exp_output + B + (2-phie).*phie*b)).^(1/2)./(2-phie); %Technical object
+w              = Max_output - (COE + alp).^(delt/2)*2^(0.5).*C.^(0.5); %wage
+phi_dw         = phie + w.*(COE + alp).^(-delt); %probability of having zero profits
 V2             = (1-phie).*A - ...
-      (1/2*(1-phie) + A.*(COE + alp).^(-delt)).*w + 1/2*(COE + alp).^(-delt).*w.^2;
-V              = (2-phie).*V2;
+      (1/2*(1-phie) + A.*(COE + alp).^(-delt)).*w + 1/2*(COE + alp).^(-delt).*w.^2; 
+V              = (2-phie).*V2; %firm's value for a given match
 E2             = phie*b + (1 - phie).*w - 1/2*((COE + alp).^(-delt)).*w.^2;
 E3             = E2 + 1/2*((COE + alp).^(-delt))*b^2;
-E_net          = (2-phie).*E2 + B;
+E_net          = (2-phie).*E2 + B; %employment's value for a given match
 E_net_check    = E2 + phie*b + (1 - phie).*E3 - 2*b;
-ptheta         = E_net./(E_net + V);
-qtheta         = V./(E_net + V);
-U              = b + ptheta.*(E2 + phie*b + (1 - phie).*E3) + (1 - ptheta)*2*b;
+ptheta         = E_net./(E_net + V); %worker's prob of matching
+qtheta         = V./(E_net + V); %firm's prob of matching
+U              = b + ptheta.*(E2 + phie*b + (1 - phie).*E3) + (1 - ptheta)*2*b; %Value of unemployment
 U_check        = E_net.^2./(E_net + V) + 3*b;
+
+%Worker solution - Set w equal to Max_output
 E2_worker      = phie*b + (1 - phie).*Max_output - 1/2*((COE + alp).^(-delt)).*Max_output.^2;
 E3_worker      = E2_worker + 1/2*((COE + alp).^(-delt))*b^2;
 U_worker       = b + E2_worker + phie*b + (1 - phie).*E3_worker;
@@ -55,6 +60,10 @@ end
 [max_V               loc_D_V]                = max(V);
 [max_V2              loc_D_V2]               = max(V2);
 [max_Ey              loc_D_Ey]               = max((2-phie).*(Exp_output + phie*b) + B);
+
+if loc_D_U - loc_D_U_worker > 0
+      display('Worker Solution and Search Solution are different')
+end
 
 %Plots
 figure(1)
