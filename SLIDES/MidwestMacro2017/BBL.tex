@@ -16,9 +16,9 @@
 
 \title[Capital Structure]{How labor market frictions affect capital structure\\ } 
 \author[\insertframenumber/\inserttotalframenumber \hskip 1in 
-]{Yasser Boualam, Marco Brianti, Tzuo Hann Law
+]{
 }
-\institute{UNC, BC, BC}
+\institute{}
 
 \date{\today}
 
@@ -45,7 +45,6 @@
 		\begin{itemize}
 			\item Highlight empirical findings in the literature that call for the models we present.
 			\item Present a simple three period model to highlight the channels.
-			\item Present a fully dynamic model and do something...
 		\end{itemize}
 	\end{figure}
 }
@@ -55,43 +54,42 @@
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item Absent any search frictions, owners of production utilize optimal quantities of debt.
+			\item Absent any search frictions, owners of production utilize optimal quantities of debt (given interest rates and DRS production).
 			\item With labor market frictions, the firm partners with a risk averse worker who potentially has the option to quit the partnership.
 			\item While this quitting in a partial equilibrium setting benefits workers ex-post, it leads to less entry, less-than-optimal debt use, lower equilibrium wages and ex-ante lower value to workers.
+			\item Our work is to understand how varying benefits, risk aversion and the matching function affects equilibrium quantities.
 		\end{itemize}
 	\end{figure}
 }
 
-\frame{\frametitle{Literature}
-	\begin{figure}
-		\centering
-		\begin{itemize}
-			\item 
-			\item
-			\item
-		\end{itemize}
-	\end{figure}
-}
 
-\frame{\frametitle{Empirical observations}
-	\begin{figure}
-		\centering
-		\begin{itemize} 
-			\item
-			\item
-			\item
-		\end{itemize}
-	\end{figure}
-}
+%\frame{\frametitle{Literature}
+%	\begin{figure}
+%		\centering
+%		\begin{itemize}
+%			\item 
+%		\end{itemize}
+%	\end{figure}
+%}
+
+%\frame{\frametitle{Empirical observations}
+%	\begin{figure}
+%		\centering
+%		\begin{itemize} 
+%			\item 
+%		\end{itemize}
+%	\end{figure}
+%}
+
 
 \frame{\frametitle{Model without Labor Market Frictions}
 	\begin{figure}
 		\centering
 		\begin{itemize}
 			\item Debt is riskless. Borrows pay interest rate $ r $ and return all borrowed capital.
-			\item A single agent with initial wealth chooses debt to maximize payoffs in two periods. The output in the first period must be weakly positive.
-			\item[] \[\max_D E_2(D) + \phi_e(D)u(b) + (1-\phi_e(D))E_3(D) \] 
-			\item where \[E_2(D) = \int_0^1 max(0,\phi(W + D)^\gamma - rD) \hspace{1mm} d\phi\] 
+			\item A risk neutral agent with initial wealth chooses debt to maximize payoffs in two periods. The output in the first period must be weakly positive.
+			\item[] \[\max_D E_2(D) + \phi_e(D)b + (1-\phi_e(D))E_3(D) \] 
+			\item where \[E_2(D) = \phi_e(D)b + \int_{\phi_e}^1 max(0,\phi(W + D)^\gamma - rD) \hspace{1mm} d\phi\] 
 			\[E_3(D) = \int_0^1 max(b,\phi(W + D)^\gamma - rD) \hspace{1mm} d\phi\] 
 			\[ \phi_t \in U[0,1] \quad , \quad \phi_e(W + D)^\gamma - rD) = 0 \]
 		\end{itemize}
@@ -106,20 +104,7 @@
 			\[\underbrace{\phi_e'}_\text{(+)} \underbrace{(E_3 - u(b))}_\text{(+) , Existence} = E_2' + (1-\phi_e)E_3'\] 
 			which shows that the probability of losing the final period output is equated with the marginal gain of more debt.
 			\item Financial frictions in the second period reduce the use of debt.
-			\item Note here that the owner of the firm can be the worker or the firm in a setting with both agents. 
-		\end{itemize}
-	\end{figure}
-}
-
-\frame{\frametitle{Model without Labor Market Frictions: Solution}
-	\begin{figure}
-		\centering
-		\begin{itemize}
-			\item \[E_2' + (1-\phi_e)E_3'\] can further be written as
-			\[(2-\phi_e)E_2' + (1-\phi_e)p'(D)\]
-			where 
-			\[ p'(D) = 2u(b)\frac{d}{dD}\left(\frac{b}{(W+D)^\alpha}\right) + \left[u(b)-u(0)\right]\phi_e' + someshit\] is the marginal effect of debt on the gains from exercising the outside option of home-production in the final period which can be positive or negative.
-			\item \[\phi_e' (E_3 - u(b)) -  (1-\phi_e)p'(D) = E_2' + (2-\phi_e)E_2'\] shows us that we get the net effect of financial frictions and technology to use this shit in the 3rd period to balance stuff out.
+			\item Note here that the owner of the firm is a worker endowed with initial wealth W.
 		\end{itemize}
 	\end{figure}
 }
@@ -131,6 +116,7 @@
 		\begin{itemize}
 			\item Reduced capital utilization relative to the case without liquidity constraint in the second period.
 			\item A social safety net (social benebits, $ b $) pushes debt use up because it reduces the cost of bankruptcy in the final period.
+			\item This debt use is our benchmark level. We now try to explore how adding labor market frictions affects debt use.
 		\end{itemize}
 	\end{figure}
 }
@@ -158,7 +144,7 @@
 			\item \textbf{Period 0.} Firms with wealth, $ W $ choose debt $ D $ and enter.
 			\begin{itemize}
 				\item All workers are unemployed.
-				\item Firm's post wage contracts, matching occurs.
+				\item Firm's post wage contracts, matching occurs. 
 				\item Unmatched firms exit immediately.
 			\end{itemize}
 			\item \textbf{Period 1.} Draw productivity $ \phi_1 $.
@@ -186,7 +172,6 @@
 			\item If period output is negative, exit occurs.
 			\item If output exceeds $ \tilde{w} $, workers are paid $ \tilde{w} $. 
 			\item Dividends are positive iff $ (W + D)^\gamma - Dr \ge \tilde{w} $
-			\item Don't worry, we have pictures.
 		\end{itemize}
 	\end{figure}	
 }
@@ -214,9 +199,9 @@
 	\begin{itemize}
 		\item $ E(\tilde{w}) $ is the promised value of contract $ \tilde{w} $.
 \begin{eqnarray*}
-		E(\tilde{w}) &=& \underbrace{\phi_e (1+\beta) u(b)}_\text{$ f(\phi_1) < 0 $, exit} \\
-					 &+& \underbrace{\int_{\phi_e}^{\phi_{dw}} f(\phi_t) d\phi}_\text{wage = output, zero div.} + \underbrace{\int_{\phi_{dw}}^1\tilde{w}d\phi}_\text{wage = $ \tilde{w} $, positive div.} \\
-					 &+& (1-\phi_e)\underbrace{\left( \phi_b u(b) + \int_{\phi_b}^{\phi_{dw}} f(\phi_t) d\phi + \int_{\phi_{dw}}^1\tilde{w}d\phi\right)}_\text{final period wages} 
+		E(\tilde{w}) &=& \underbrace{2\phi_e u(b)}_\text{$ f(\phi_1) < 0 $, exit} \\
+					 &+& \underbrace{\int_{\phi_e}^{\phi_{dw}} u(f(\phi_t)) d\phi}_\text{wage = output, zero div.} + \underbrace{\int_{\phi_{dw}}^1u(\tilde{w})d\phi}_\text{wage = $ \tilde{w} $, positive div.} \\
+					 &+& (1-\phi_e)\underbrace{\left( \phi_b u(b) + \int_{\phi_b}^{\phi_{dw}} u(f(\phi_t)) d\phi + \int_{\phi_{dw}}^1u(\tilde{w})d\phi\right)}_\text{final period wages} 
 		\end{eqnarray*}
 		\item[] where $ \phi_e $, $ \phi_b $ and $ \phi_dw $ are the cutoffs seen earlier.
 	\end{itemize}
@@ -229,7 +214,7 @@
 		\begin{itemize}
 		\item $ \theta(\tilde{w}) $ is market tightness for a given contract
 		\item $ p(\theta(\tilde{w})) = m(\theta(\tilde{w}))/s $ is job finding probability
-		\item \[U = \max_{\tilde{w}} \underbrace{p(\theta(\tilde{w})) E(\tilde{w})}_\text{indifference condition} \]
+		\item \[U = u(b) + \max_{\tilde{w}} \underbrace{p(\theta(\tilde{w})) E(\tilde{w}) + (1-p(\theta(\tilde{w})))2u(b)}_\text{indifference condition} \]
 	\end{itemize}
 \end{figure}	
 }
@@ -240,7 +225,7 @@
 		\begin{itemize}
 			\item $ V(\tilde{w}) $ is the value of contract $ \tilde{w} $ taking debt as given
 			\begin{eqnarray*}
-				V(\tilde{w}) &=& \underbrace{\phi_e (1+\beta) \cdot 0}_\text{$ f(\phi_1) < 0 $, exit} \\
+				V(\tilde{w}) &=& \underbrace{2 \phi_e \cdot 0}_\text{$ f(\phi_1) < 0 $, exit} \\
 				&+& \underbrace{\int_{\phi_e}^{\phi_{dw}} 0 \hspace{1mm} d\phi}_\text{wage = output, zero div.} + \underbrace{\int_{\phi_{dw}}^1f(\phi_1)-\tilde{w} \hspace{1mm}d\phi}_\text{wage = $ \tilde{w} $, positive div.} \\
 				&+& (1-\phi_e)\underbrace{\left( \phi_b \cdot 0 + \int_{\phi_b}^{\phi_{dw}} 0 \hspace{1mm} d\phi + \int_{\phi_{dw}}^1f(\phi_2)-\tilde{w} \hspace{1mm}d\phi\right)}_\text{final period wages} 
 			\end{eqnarray*}
@@ -254,73 +239,98 @@
 		\centering
 		\begin{itemize}
 			\item $ q(\theta(\tilde{w})) = m(\theta(\tilde{w}))/v $ is vacancy filling probability
-			\item[] \[W = \max_{\tilde{w};D} \underbrace{q(\theta(\tilde{w})) V(\tilde{w};D)}_\text{indifference condition} \]
+			\item[] \[W = \max_{\tilde{w}} \underbrace{q(\theta(\tilde{w})) V(\tilde{w};D)}_\text{indifference condition} \]
 			\item Optimal debt choice will involve firms choosing debt and posting the corresponding profit maximizing contract $ \tilde{w} $ which maximizes ex-ante value, $ U $ for workers. 
 		\end{itemize}
 	\end{figure}	
 }
 
-
-\frame{\frametitle{Results: Wages}
+\frame{\frametitle{Solution}
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item
+			\item From the worker's indifference condition, we obtain
+			\begin{equation*}
+			p(\theta) = \frac{U - 3u(b)}{E_2(w) + \phi_e u(b) + (1-\phi_e)E_3(w) - 2u(b)} = \frac{U - 3 u(b)}{E}
+			\end{equation*}
+			\item From $q(\theta) = (1-p(\theta)^\gamma)^{\frac{1}{\gamma}}$ we can then solve the firm's problem taking debt level, D as given, which gives
+			\begin{equation*}
+				p(\theta) = \bigg( \frac{E}{E + u'(\tilde{w}^*)V}   \bigg)^{\frac{1}{\gamma}}
+			\end{equation*}
+	which by construction implies
+\begin{equation*}
+q(\theta) = \bigg( \frac{u'(\tilde{w}^*)V}{E + u'(\tilde{w}^*)V}   \bigg)^{\frac{1}{\gamma}}
+\end{equation*}
 		\end{itemize}
 	\end{figure}	
 }
 
-\frame{\frametitle{Results: Entry}
+\frame{\frametitle{Solution}
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item
+			\item Now we have wages for every given D and the final stage of maximization would be firms choosing D and hence capital structure to maximize value to workers while meeting return on equity.
+			\item In other words, firms maximize worker's value of unemployment.
+			\item This gives the solution to the capital-structure/search problem 
+			\begin{equation}
+			\frac{\frac{dE}{dD}}{\frac{d (E + u'(\tilde{w}^*)V)}{dD}} = p(\theta)^{\gamma}\frac{1}{1+\gamma}
+			\end{equation}
 		\end{itemize}
 	\end{figure}	
 }
 
-\frame{\frametitle{Results: Ex-ante Value of Unemployment}
+\frame{\frametitle{Discussion}
+	We now try to see what this solution tells us as far as matching empirical results is concerned. 
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item
-		\end{itemize}
-	\end{figure}	
-}
-
-\frame{\frametitle{Results: Profits condition on Matching}
-	\begin{figure}
-		\centering
-		\begin{itemize}
-			\item
-		\end{itemize}
-	\end{figure}	
-}
-
-\frame{\frametitle{Dynamic Model with Labor Market Frictions}
-	\begin{figure}
-		\centering
-		\begin{itemize}
-			\item 
-			\item
-			\item
-			\item
-			\item
+			\item Higher leverage yields higher wages
+			\item Higher leverage when benefits are higher.
 		\end{itemize}
 	\end{figure}
 }
 
-\frame{\frametitle{Conclusion}
+\frame{\frametitle{Results: Risk Neutral Workers}
 	\begin{figure}
 		\centering
 		\begin{itemize}
-			\item 
-			\item
-			\item
-			\item
-			\item
+			\item The debt use in the model with search frictions is identical to the benchmark model.
+			\item Wages, benefits and leverage move in same direction. 
+			\item $ \gamma $ does not matter. The matching function only impacts how the surplus is split between risk neutral agents. Since surplus is fully transferable, capital structure that maximizes surplus solves the search model. 
 		\end{itemize}
-	\end{figure}
+	\end{figure}	
+}
+
+\frame{\frametitle{Results: Solution to search model}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item \[\frac{dE}{dD} (1+\gamma) = p^\gamma\left(\frac{dE}{dD} + \frac{dV}{dD}\right)\]
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Results: Some propositions}
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item \[sign(\frac{dE}{dD}) = sign(\frac{dV}{dD})\]
+			\item Search solution for debt must equal solution of model with labor market frictions.
+			\item The matching function ($\gamma$) plays no role in determining D but affects surplus splitting.
+		\end{itemize}
+	\end{figure}	
+}
+
+\frame{\frametitle{Results: Risk aversion}
+	Only quantitative results for now:
+	\begin{figure}
+		\centering
+		\begin{itemize}
+			\item Higher b gives higher debt use because of insurance.
+			\item Higher b also gives higher wages. Closed from solution for wages.
+			\item This yields higher leverage is correlated with higher wages. 
+		\end{itemize}
+	\end{figure}	
 }
 
 \end{document}
