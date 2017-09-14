@@ -8,12 +8,12 @@ i_b = 1;
 [params,tech] = param(i_sigma,i_FC,i_b,0);
 
 for i_1 = 1:length(params.ssigma_grid)
-      for i_2 = 1:length(params.gamma_grid)
+      for i_2 = 2:length(params.gamma_grid)
             for i_3 = 1:length(params.b_grid)
                   
                   %Parameterization
                   WS = NaN;
-                  [params,tech] = param(i_sigma,i_FC,i_b,WS);
+                  [params,tech] = param(i_1,i_2,i_3,WS);
                   
                   disp(['sigma = ',num2str(i_1)])
                   disp(['gamma = ',num2str(i_2)])
@@ -23,7 +23,7 @@ for i_1 = 1:length(params.ssigma_grid)
                   params.whichCommitment = 'perfect';
                   model = 'sp';
                   WS = 0;
-                  [params,tech] = param(i_sigma,i_FC,i_b,WS);
+                  [params,tech] = param(i_1,i_2,i_3,WS);
                   [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q,...
                         s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,s.(model).wmin,...
                         s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
@@ -34,7 +34,7 @@ for i_1 = 1:length(params.ssigma_grid)
                   params.whichCommitment = 'perfect';
                   model = 'ws'
                   WS = 1;
-                  [params,tech] = param(i_sigma,i_FC,i_b,WS);
+                  [params,tech] = param(i_1,i_2,i_3,WS);
                   [s.(model).U,s.(model).wstar,s.(model).theta,s.(model).p,s.(model).q, ...
                         s.(model).obj,s.(model).phie,s.(model).philim,s.(model).wmax,...
                         s.(model).wmin,s.(model).E2,s.(model).E3,s.(model).E,s.(model).V_max,s.(model).V_min,...
@@ -51,7 +51,6 @@ for i_1 = 1:length(params.ssigma_grid)
                   
                   %Saving results
                   BaseName = 'File_riskneutral';
-                  %FileName = [BaseName,'_FC_',num2str(i_FC)]
                   FileName = [BaseName,'_sigma',num2str(i_1),...
                         '_gamma',num2str(i_2),'_b',num2str(i_3)]
                   save(FileName)

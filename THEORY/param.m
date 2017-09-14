@@ -22,7 +22,7 @@ function [params,tech] = param(i_1,i_2,i_3,WS)
   params.gamma_max       = 1.6;
   params.length_gamma    = 3;
   params.gamma_grid      = [linspace(params.gamma_min,params.gamma_max,params.length_gamma)];
-  params.gamma_matching  = params.gamma_grid(i_2); %Matching elasticity parameter
+  params.gamma_matching  = params.gamma_grid(i_1); %Matching elasticity parameter
   params.b_min           = 0;
   params.b_max           = 0.2;
   params.length_b        = 3;
@@ -39,7 +39,7 @@ function [params,tech] = param(i_1,i_2,i_3,WS)
   params.FC_max          = 0.005;
   params.length_FC       = 1;
   params.fix_cost_grid   = [linspace(params.FC_min,params.FC_max,params.length_FC)]; %Fixed cost of entry. Should be equal to K (equal to 1)
-  params.fix_cost        = params.fix_cost_grid(i_2);
+  params.fix_cost        = params.fix_cost_grid(i_1);
   assert(params.fix_cost > 0,'The firm is fully owned by the worker. Use file: workerSolution.m')
   params.prod_func_type  = 8; %We use different production function to get the hump-shaped U
   params.delta           = 0.1; %decreasing return to scale active if production number 8
