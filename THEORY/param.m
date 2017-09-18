@@ -5,8 +5,8 @@ function [params,tech] = param(i_1,i_2,i_3,WS)
   params.tau             = 0; %Taxes
   params.r               = 1; %Return on capital.
   params.R               = params.r/(1-params.tau); %Gross return on capital
-  params.ssigma_min      = 0;
-  params.ssigma_max      = 0;
+  params.ssigma_min      = 0.5;
+  params.ssigma_max      = 0.5;
   params.length_ssigma   = 1;
   params.ssigma_grid     = [linspace(params.ssigma_min,params.ssigma_max,params.length_ssigma)]; 
   params.ssigma          = params.ssigma_grid(i_1); %RRA
@@ -22,7 +22,7 @@ function [params,tech] = param(i_1,i_2,i_3,WS)
   params.gamma_max       = 1.6;
   params.length_gamma    = 3;
   params.gamma_grid      = [linspace(params.gamma_min,params.gamma_max,params.length_gamma)];
-  params.gamma_matching  = params.gamma_grid(i_1); %Matching elasticity parameter
+  params.gamma_matching  = params.gamma_grid(i_2); %Matching elasticity parameter
   params.b_min           = 0;
   params.b_max           = 0.2;
   params.length_b        = 3;
@@ -50,13 +50,13 @@ function [params,tech] = param(i_1,i_2,i_3,WS)
   params.phi_d_fun       = make_phi_d_func(params.phi_e_func,params.prod_func_type,params.R,params.r,params.delta,params.fix_cost);
   params.utilFunc        = makeUtilFunc(params.ssigma,typeu);
   %Technical Parameters
-  alpha_min              = 0.01;
-  alpha_max              = 0.1;
+  alpha_min              = 0.012;
+  alpha_max              = 0.04;
   if alpha_min > alpha_max
         error('alpha_min cannot be greater than alpha_max')
   end
   params.alpha_fix       = NaN;
-  lenAalpha              = 20;
+  lenAalpha              = 80;
   phi_low                = 0; %lower bound for phi
   phi_up                 = 1; %upper bound for phi
   lenPphi                = 10000;

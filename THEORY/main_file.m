@@ -8,8 +8,8 @@ i_b = 1;
 [params,tech] = param(i_sigma,i_FC,i_b,0);
 
 for i_1 = 1:length(params.ssigma_grid)
-      for i_2 = 2:length(params.gamma_grid)
-            for i_3 = 1:length(params.b_grid)
+      for i_2 = 1:2
+            for i_3 = 2:2
                   
                   %Parameterization
                   WS = NaN;
@@ -50,7 +50,7 @@ for i_1 = 1:length(params.ssigma_grid)
                   %mainDynamicLoop(params,tech);
                   
                   %Saving results
-                  BaseName = 'File_riskneutral';
+                  BaseName = 'File_riskaversion_all';
                   FileName = [BaseName,'_sigma',num2str(i_1),...
                         '_gamma',num2str(i_2),'_b',num2str(i_3)]
                   save(FileName)
