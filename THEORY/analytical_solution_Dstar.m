@@ -3,11 +3,11 @@ close all
 
 %Parameterization
 delt           = 0.1; %parameter of the decreasing return to scale
-b              = 0.15; %worker outside option
+b              = 0.2; %worker outside option
 r              = 1; %interest rate to owe to the bank
 COE            = 0.005; %initial endowment (initial equity)
 alp_min        = 0.001; %minimum level of debt
-alp_max        = 0.2; %maximum level of debt
+alp_max        = 0.3; %maximum level of debt
 alp            = linspace(alp_min,alp_max,10000); %Grid over debt choice
 
 %Endogenous functions
@@ -35,6 +35,7 @@ U_check        = E_net.^2./(E_net + V) + 3*b;
 E2_worker      = phie*b + (1 - phie).*Max_output - 1/2*((COE + alp).^(-delt)).*Max_output.^2;
 E3_worker      = E2_worker + 1/2*((COE + alp).^(-delt))*b^2;
 U_worker       = b + E2_worker + phie*b + (1 - phie).*E3_worker;
+E_worker_fake  = b + E2_worker + E3_worker;
 
 %Some checks
 if sum(abs(E_net - E_net_check)) > 10^(-8)
@@ -113,6 +114,25 @@ xlabel('Grid over D') % x-axis label
 % ylabel('Value of Unemployment') % y-axis label
 legend('V','V2')
 title('Firm Values')
+hold off
+
+figure(2)
+hold on
+plot(alp,E_worker_fake,'LineWidth',2,'Color','b')
+plot(alp,U_worker,'LineWidth',2,'Color','r')
+plot(alp,E2_worker,':','LineWidth',1,'Color','r')
+plot(alp,E3_worker,'--','LineWidth',1,'Color','r')
+plot(alp(loc_D_U_worker),U_worker(loc_D_U_worker),'*')
+[ciccio loc_D_E_worker_fake] = max(E_worker_fake);
+plot(alp(loc_D_E_worker_fake),E_worker_fake(loc_D_E_worker_fake),'*')
+[ciccio loc_D_E2_worker] = max(E2_worker);
+[ciccio loc_D_E3_worker] = max(E3_worker);
+plot(alp(loc_D_E2_worker),E2_worker(loc_D_E2_worker),'*')
+plot(alp(loc_D_E3_worker),E3_worker(loc_D_E3_worker),'*')
+grid on
+xlabel('Grid over D') % x-axis label
+legend('E worker fake','U','E2','E3')
+title('First Proposition')
 hold off
 
 
