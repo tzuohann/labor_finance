@@ -47,13 +47,11 @@ set_loc_int    = find(CE_int - COE < 0,1,'first');
 
 %Analytical wage
 w_check_int    = Max_output - (COE + alp)^(delt/2)*2^(0.5)*(COE/(2-phie)*Exp_output)^(0.25);
-w_check_b      = Max_output - (COE + alp)^(delt/2)*2^(0.5)*C^(0.5)
+w_check_b      = Max_output - (COE + alp)^(delt/2)*2^(0.5)*C^(0.5);
 if abs(w(set_loc_int) - w_check_int) > 10^(-5)
       warning('Analytical interior solution for wstar is wrong.')
 end
 
-asdf
-  
 %Checks
 
 %P of theta
@@ -61,6 +59,7 @@ p_int          = U_int(set_loc_int)/((2-phie)*Et(set_loc_int));
 if p_int > 1 || p_int < 0
       display('p(theta) is greater than 1.')
 end
+
 %q of theta
 q_int          = 1 - p_int;
 if q_int > 1 || p_int < 0
@@ -69,7 +68,7 @@ end
 
 %wstar
 w_int          = w(set_loc_int);
-if w_int - Exp_output > 0
+if w_int - Max_output > 0
       display('wstar is greater than expected output.')
 end
 
@@ -85,8 +84,6 @@ if abs(U_int_check - U_int(set_loc_int)) > 10^(-5)
       display('U is not consistent with the equilibrium wage.')
 end
 
-asd
-
 %Plots
 figure(1)
 newPosition = [1 41 1920 963];
@@ -98,10 +95,8 @@ hL.FontSize = 16;
 subplot(2,3,1)
 hold on
 plot(w,CE_int,'LineWidth',2,'Color','b')
-plot(w,CE_con,'LineWidth',2,'Color','r')
-line([w(set_loc) w(set_loc)],[0 .7])
+line([w(set_loc_int) w(set_loc_int)],[0 .7])
 plot(w,ones(1,length(w))*COE)
-legend('Interior Solution','Constrained Solution')
 grid on
 xlabel('Grid over w') % x-axis label
 ylabel('Cost of Entry') % y-axis label
@@ -112,11 +107,8 @@ hold off
 subplot(2,3,2)
 hold on
 plot(w,U_int,'LineWidth',2,'Color','b')
-plot(w,U_con,'LineWidth',2,'Color','r')
-line([w(set_loc) w(set_loc)],[0 .7])
+line([w(set_loc_int) w(set_loc_int)],[0 .7])
 plot(w(set_loc_int),U_int(set_loc_int),'*')
-plot(w(set_loc_con),U_con(set_loc_con),'*')
-legend('Interior Solution','Constrained Solution')
 grid on
 xlabel('Grid over w') % x-axis label
 ylabel('Value of Unemployment') % y-axis label
@@ -128,9 +120,8 @@ subplot(2,3,3)
 hold on
 plot(w,Et,'LineWidth',2,'Color','b')
 plot(w,Vt,'LineWidth',2,'Color','r')
-line([w(set_loc) w(set_loc)],[0 .7])
+line([w(set_loc_int) w(set_loc_int)],[0 .7])
 plot(w(set_loc_int),Et(set_loc_int),'*')
-plot(w(set_loc_con),Vt(set_loc_con),'*')
 legend('E_t','V_t')
 grid on
 xlabel('Grid over w') % x-axis label
@@ -143,9 +134,8 @@ subplot(2,3,4)
 hold on
 plot(w,(1-phie)*Et,'LineWidth',2,'Color','b')
 plot(w,(1-phie)*Vt,'LineWidth',2,'Color','r')
-line([w(set_loc) w(set_loc)],[0 .7])
+line([w(set_loc_int) w(set_loc_int)],[0 .7])
 plot(w(set_loc_int),(1-phie)*Et(set_loc_int),'*')
-plot(w(set_loc_con),(1-phie)*Vt(set_loc_con),'*')
 legend('(1-\phi_e)E_t','(1-\phi_e)V_t')
 grid on
 xlabel('Grid over w') % x-axis label
@@ -158,9 +148,8 @@ subplot(2,3,5)
 hold on
 plot(w,(2-phie)*Et,'LineWidth',2,'Color','b')
 plot(w,(2-phie)*Vt,'LineWidth',2,'Color','r')
-line([w(set_loc) w(set_loc)],[0 .7])
+line([w(set_loc_int) w(set_loc_int)],[0 .7])
 plot(w(set_loc_int),(2-phie)*Et(set_loc_int),'*')
-plot(w(set_loc_con),(2-phie)*Vt(set_loc_con),'*')
 legend('(2-\phi_e)E_t','(2-\phi_e)V_t')
 grid on
 xlabel('Grid over w') % x-axis label

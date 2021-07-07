@@ -9,7 +9,7 @@ i_b = 1;
 [params,tech] = param(i_sigma,i_FC,i_b);
 
 first_FC   = 1;
-last_FC    = 20;
+last_FC    = 1;
 length_FC  = last_FC - first_FC + 1;
 
 for i_FC = first_FC:last_FC
@@ -23,7 +23,7 @@ for i_FC = first_FC:last_FC
       
       lines           = {'k-','k--'};    
       color           = {'b','r'};       
-      models          = {'sp'};%{'sp','sl'};     
+      models          = {'sp','ws'};     
 
       figure(i_FC)
       my_figure_1
